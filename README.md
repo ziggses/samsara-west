@@ -11,15 +11,21 @@
 ## 快速开始
 
 ```powershell
-# 1. 接入外部素材（每台机器、每次新克隆做一次）
-powershell -NoProfile -ExecutionPolicy Bypass -File E:\tx2\samsara-west\Tools\setup-external-assets.ps1
+# 1. 挂载外部素材 + 初始化工程（新机器、新克隆跑一次；幂等，可反复执行）
+powershell -NoProfile -ExecutionPolicy Bypass -File E:\tx2\samsara-west\Tools\setup-project.ps1
 
 # 2. 跑全套测试（当前基线：EditMode 269 + PlayMode 10）
 powershell -NoProfile -ExecutionPolicy Bypass -File E:\tx2\samsara-west\Tools\run-tests.ps1 -Platform All
 ```
 
-用 Unity 打开 `E:\tx2\samsara-west`。若数据资产或引导场景缺失，先执行菜单 `SamsaraWest/工程/一键初始化骨架`
-（无头等价：`-executeMethod SamsaraWest.Editor.ProjectSetup.RunAll`）。
+`setup-project.ps1` 做三件事：先调 `setup-external-assets.ps1` 把素材挂进来（`-SkipExternalAssets` 可跳过，
+`-ArtFolder` 可换素材位置），再以 `-executeMethod SamsaraWest.Editor.ProjectSetup.RunAll` 跑一次菜单
+`SamsaraWest/工程/一键初始化骨架`，最后核验四个产物确实落地（`DefinitionCatalog`、`BattleConfig_Default`、
+`LocalizationTable_zh-Hans`、`Bootstrap.unity`）——批处理编辑器早退时也会返回干净退出码，所以只认磁盘上的产物。
+退出码：`0` 初始化完成；`2` 挂载失败或数据/本地化校验有错（按提示修表后重跑）；`1` 编译错误、崩溃或超时。
+冷 `Library` 首次导入要几分钟，期间脚本按日志体量报告进度，`-TimeoutSeconds` 默认 900。
+
+只缺素材、不想动工程时单独跑 `Tools\setup-external-assets.ps1`（见下节）。
 
 ## 目录结构
 
@@ -142,6 +148,10 @@ Unity.exe -batchmode -quit -projectPath E:\tx2\samsara-west ^
 3. 带中文的 `.ps1` **必须存成 UTF-8 with BOM**，否则 PowerShell 5.1 按 GBK 解码会乱码；
    `Tools/setup-external-assets.ps1` 的默认中文路径用 char code 拼出，不依赖文件编码。
 4. 素材源目录不可写会导致导入失败（Unity 要写 `.meta`）。
+5. `SamsaraWest/工程/一键初始化骨架`（含 `setup-project.ps1`）每次都会重建引导场景并重新分配其中的 `fileID`：
+   实测连续两次运行产出的 blob 互不相同，因此跑完 `git status` 里 `Bootstrap.unity` 必然是脏的。
+   确认三个资产引用 guid 未变后 `git checkout --` 回退即可；若想彻底消除，需让 `CreateBootstrapScene`
+   在场景已存在时提前返回（`CreateBattleConfigAsset` 已是这个写法）。
 
 ## 设计文档
 
