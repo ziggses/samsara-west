@@ -154,6 +154,8 @@ namespace SamsaraWest.Tests.EditMode
             var service = new PoolService();
             var pool = service.GetOrCreate(() => new Payload(), prewarm: 2);
 
+            Assert.AreEqual(2, pool.CountInactive);
+
             service.ClearAll();
 
             Assert.AreEqual(0, pool.CountInactive);

@@ -110,7 +110,7 @@ namespace SamsaraWest.Core
 
             if (_inactive.Count >= _maxSize)
             {
-                _onDestroy?.Invoke(item);
+                DestroyItem(item);
                 return;
             }
 
@@ -131,10 +131,26 @@ namespace SamsaraWest.Core
         {
             while (_inactive.Count > 0)
             {
-                _onDestroy?.Invoke(_inactive.Pop());
+                DestroyItem(_inactive.Pop());
             }
 
             _active = 0;
+        }
+
+        /// <summary>
+        /// 统一走这里销毁实例。写成「局部变量 + 显式判空」而不是 <c>_onDestroy?.Invoke(item)</c>：
+        /// 在 Unity 编辑器（Mono）下，空条件调用叠加泛型集合取值的写法
+        /// （如 <c>_onDestroy?.Invoke(_inactive.Pop())</c>）会把编辑器主线程挂死——
+        /// 表现是 EditMode 测试永久等待、结果文件永不生成，且日志停在进入 Clear 那一刻。
+        /// 拆开写则完全正常，故此处刻意保留啰嗦写法。
+        /// </summary>
+        private void DestroyItem(T item)
+        {
+            var onDestroy = _onDestroy;
+            if (onDestroy != null)
+            {
+                onDestroy(item);
+            }
         }
     }
 
