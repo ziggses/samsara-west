@@ -1,0 +1,35 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8fb6372df6a38ea41ba6ca003b18b400, type: 3}
+  m_Name: LUT_ENM_BANDIT_LEADER
+  m_EditorClassIdentifier: 
+  _id: LUT_ENM_BANDIT_LEADER
+  _displayNameKey: loot.enm.bandit_leader.name
+  _descriptionKey: loot.enm.bandit_leader.desc
+  _tags:
+  - ch01
+  - loot
+  - boss
+  _version: 1
+  _icon: {fileID: 0}
+  _itemIds:
+  - ITM_WOLF_PELT
+  - ITM_IRON_SHARD
+  _weights: 3c00000028000000
+  _minCounts: 0100000001000000
+  _maxCounts: 0200000002000000
+  _guaranteedItemIds:
+  - ITM_BANDIT_TOKEN
+  _guaranteedItemCounts: 01000000
+  _dropRolls: 2
+  _goldMin: 40
+  _goldMax: 60

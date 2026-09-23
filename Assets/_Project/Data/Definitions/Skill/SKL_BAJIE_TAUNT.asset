@@ -1,0 +1,36 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: eeb0fd57a4cc996408aa9fc4e8aff3dd, type: 3}
+  m_Name: SKL_BAJIE_TAUNT
+  m_EditorClassIdentifier: 
+  _id: SKL_BAJIE_TAUNT
+  _displayNameKey: skill.bajie.taunt.name
+  _descriptionKey: skill.bajie.taunt.desc
+  _tags:
+  - ch01
+  - control
+  _version: 1
+  _icon: {fileID: 0}
+  _power: 10
+  _element: 5
+  _nature: 0
+  _target: 1
+  _spiritCost: 6
+  _cooldownTurns: 2
+  _hitCount: 1
+  _breakDamage: 12
+  _appliedStatusId: STS_STUN
+  _statusChance: 0.35
+  _healPower: 0
+  _vfxKey: vfx.bajie.taunt
+  _animationKey: anim.bajie.taunt
+  _sfxKey: sfx.bajie.taunt

@@ -1,0 +1,17 @@
+{
+    "name": "SamsaraWest.Narrative",
+    "rootNamespace": "SamsaraWest.Narrative",
+    "references": [
+        "SamsaraWest.Core",
+        "SamsaraWest.Data"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

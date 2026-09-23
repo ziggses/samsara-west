@@ -1,0 +1,37 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: eeb0fd57a4cc996408aa9fc4e8aff3dd, type: 3}
+  m_Name: SKL_BANDIT_LEADER_CLEAVE
+  m_EditorClassIdentifier: 
+  _id: SKL_BANDIT_LEADER_CLEAVE
+  _displayNameKey: skill.bandit.leader_cleave.name
+  _descriptionKey: skill.bandit.leader_cleave.desc
+  _tags:
+  - enemy
+  - ch01
+  - boss
+  _version: 1
+  _icon: {fileID: 0}
+  _power: 14
+  _element: 2
+  _nature: 0
+  _target: 5
+  _spiritCost: 8
+  _cooldownTurns: 2
+  _hitCount: 1
+  _breakDamage: 16
+  _appliedStatusId: STS_WEAKEN
+  _statusChance: 0.5
+  _healPower: 0
+  _vfxKey: vfx.bandit.cleave
+  _animationKey: anim.bandit.cleave
+  _sfxKey: sfx.bandit.cleave

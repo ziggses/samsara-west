@@ -1,0 +1,17 @@
+# 硬编码中文扫描允许清单（FND-07 的兜底网）
+#
+# 格式：一行一条，支持两种写法
+#   相对路径                  → 忽略整个文件
+#   相对路径:关键词           → 只忽略该文件里这一条字面量
+#   以 * 结尾的相对路径前缀    → 忽略该目录下所有文件
+#
+# 登记原则：只允许「开发者可见、玩家不可见」的文案。
+# 一切玩家可见文案必须走文本键（LocalizationKeys），禁止登记到这里。
+
+# 开发期异常面板：仅在 Editor 与 Development Build 生效，发布版自动降级为文件日志。
+Assets/_Project/UI/Runtime/ErrorOverlay.cs:运行期异常（最近 {_records.Count} 条）
+Assets/_Project/UI/Runtime/ErrorOverlay.cs:复制
+Assets/_Project/UI/Runtime/ErrorOverlay.cs:清空
+
+# Inspector 字段提示：Tooltip 是编辑器元数据，玩家永远看不到。
+Assets/_Project/UI/Runtime/LocalizedLabel.cs:文本键，例如 ui.battle.command.attack。不是中文原文。

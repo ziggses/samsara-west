@@ -1,0 +1,32 @@
+{
+    "name": "SamsaraWest.Tests.PlayMode",
+    "rootNamespace": "SamsaraWest.Tests.PlayMode",
+    "references": [
+        "UnityEngine.TestRunner",
+        "SamsaraWest.Core",
+        "SamsaraWest.Data",
+        "SamsaraWest.Save",
+        "SamsaraWest.Localization",
+        "SamsaraWest.Flow",
+        "SamsaraWest.Battle",
+        "SamsaraWest.Exploration",
+        "SamsaraWest.Narrative",
+        "SamsaraWest.Progression",
+        "SamsaraWest.Economy",
+        "SamsaraWest.Audio",
+        "SamsaraWest.UI"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": true,
+    "precompiledReferences": [
+        "nunit.framework.dll"
+    ],
+    "autoReferenced": false,
+    "defineConstraints": [
+        "UNITY_INCLUDE_TESTS"
+    ],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

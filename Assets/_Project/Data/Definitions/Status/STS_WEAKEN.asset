@@ -1,0 +1,33 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: afa080f24149f5647bfa27ca26e0ef09, type: 3}
+  m_Name: STS_WEAKEN
+  m_EditorClassIdentifier: 
+  _id: STS_WEAKEN
+  _displayNameKey: status.weaken.name
+  _descriptionKey: status.weaken.desc
+  _tags:
+  - debuff
+  _version: 1
+  _icon: {fileID: 0}
+  _durationTurns: 2
+  _maxStacks: 1
+  _stackRule: 0
+  _healthDeltaPerTurn: 0
+  _attackModifier: -0.2
+  _defenseModifier: 0
+  _speedModifier: 0
+  _incomingDamageModifier: 1
+  _breakDamageModifier: 1
+  _preventsAction: 0
+  _isDebuff: 1
+  _vfxKey: vfx.status.weaken

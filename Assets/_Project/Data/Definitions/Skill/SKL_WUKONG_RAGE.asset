@@ -1,0 +1,36 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: eeb0fd57a4cc996408aa9fc4e8aff3dd, type: 3}
+  m_Name: SKL_WUKONG_RAGE
+  m_EditorClassIdentifier: 
+  _id: SKL_WUKONG_RAGE
+  _displayNameKey: skill.wukong.rage.name
+  _descriptionKey: skill.wukong.rage.desc
+  _tags:
+  - ch01
+  - signature
+  _version: 1
+  _icon: {fileID: 0}
+  _power: 22
+  _element: 4
+  _nature: 0
+  _target: 1
+  _spiritCost: 12
+  _cooldownTurns: 3
+  _hitCount: 1
+  _breakDamage: 22
+  _appliedStatusId: 
+  _statusChance: 0
+  _healPower: 0
+  _vfxKey: vfx.wukong.rage
+  _animationKey: anim.wukong.rage
+  _sfxKey: sfx.wukong.rage

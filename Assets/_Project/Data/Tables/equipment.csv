@@ -1,0 +1,7 @@
+# 《西游：第八十二难》装备定义表 v1
+# slot：Weapon/Armor/Talisman/Sutra；allowedCharacterIds 留空表示全队可装备。
+id,displayNameKey,descriptionKey,tags,version,slot,tier,attackBonus,defenseBonus,speedBonus,healthBonus,spiritBonus,element,resistElement,breakDamageBonus,passiveSkillId,requiredLevel,price,forgeRecipeId,spriteKey,allowedCharacterIds
+EQP_STAFF_IRON,eqp.staff.iron.name,eqp.staff.iron.desc,ch01;weapon,1,Weapon,Common,5,0,0,0,0,None,None,2,,1,60,,sprite.eqp.staff.iron,
+EQP_ARMOR_LEATHER,eqp.armor.leather.name,eqp.armor.leather.desc,ch01;armor,1,Armor,Common,0,4,0,10,0,None,None,0,,1,80,,sprite.eqp.armor.leather,
+EQP_TALISMAN_JADE,eqp.talisman.jade.name,eqp.talisman.jade.desc,ch01;talisman,1,Talisman,Refined,0,0,0,0,10,None,Water,0,,2,150,,sprite.eqp.talisman.jade,
+EQP_STAFF_RUYI,eqp.staff.ruyi.name,eqp.staff.ruyi.desc,ch03;weapon;signature,1,Weapon,Legendary,14,0,0,0,0,Fire,None,8,,5,1200,RCP_STAFF_RUYI,sprite.eqp.staff.ruyi,CHR_WUKONG

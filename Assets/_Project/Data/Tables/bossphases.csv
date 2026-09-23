@@ -1,0 +1,6 @@
+# 《西游：第八十二难》Boss 阶段表 v1
+# healthThreshold 为「进入本阶段的生命百分比下限」（1.0 = 开局即进入第一阶段）。
+# ID 末位 P<n> 必须与 phaseIndex 一致，便于日志与截图定位。
+id,displayNameKey,descriptionKey,tags,version,phaseIndex,encounterId,healthThreshold,skillIds,onEnterStatusIds,attackMultiplier,defenseMultiplier,speedMultiplier,tauntKey,bgmSwitchKey,cameraCueKey
+BSP_CH01_001_P1,phase.ch01.boss.p1.name,phase.ch01.boss.p1.desc,ch01;boss,1,1,BENC_CH01_001,1,SKL_BANDIT_SLASH;SKL_BANDIT_LEADER_CLEAVE,,1,1,1,phase.ch01.boss.p1.taunt,bgm.battle.boss.p1,camera.boss.enter
+BSP_CH01_001_P2,phase.ch01.boss.p2.name,phase.ch01.boss.p2.desc,ch01;boss,1,2,BENC_CH01_001,0.5,SKL_BANDIT_LEADER_CLEAVE,STS_HASTE,1.25,1,1.1,phase.ch01.boss.p2.taunt,bgm.battle.boss.p2,camera.boss.rage

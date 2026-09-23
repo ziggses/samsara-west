@@ -1,0 +1,34 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ccb1b488a09f9b749ae4291be2fa6ed3, type: 3}
+  m_Name: INT_CH01_003_CHEST
+  m_EditorClassIdentifier: 
+  _id: INT_CH01_003_CHEST
+  _displayNameKey: int.ch01.003.name
+  _descriptionKey: int.ch01.003.desc
+  _tags:
+  - ch01
+  - chest
+  _version: 1
+  _icon: {fileID: 0}
+  _mapId: CH01_MAP02
+  _gridX: 8
+  _gridY: 5
+  _interactionTypeKey: interact.chest
+  _targetId: LUT_ENM_BANDIT
+  _requiredStateKey: flag.ch01.prologue_done
+  _requiredOperator: 0
+  _requiredValue: 1
+  _oneShot: 1
+  _isHiddenUntilConditionMet: 1
+  _promptKey: ui.prompt.open
+  _interactSpriteKey: sprite.int.chest

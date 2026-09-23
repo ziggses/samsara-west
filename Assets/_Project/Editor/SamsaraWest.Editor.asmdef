@@ -1,0 +1,29 @@
+{
+    "name": "SamsaraWest.Editor",
+    "rootNamespace": "SamsaraWest.Editor",
+    "references": [
+        "SamsaraWest.Core",
+        "SamsaraWest.Data",
+        "SamsaraWest.Save",
+        "SamsaraWest.Localization",
+        "SamsaraWest.Flow",
+        "SamsaraWest.Battle",
+        "SamsaraWest.Exploration",
+        "SamsaraWest.Narrative",
+        "SamsaraWest.Progression",
+        "SamsaraWest.Economy",
+        "SamsaraWest.Audio",
+        "SamsaraWest.UI"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

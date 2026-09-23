@@ -1,0 +1,39 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1718f3f096b3c3d47ab53c32f9747652, type: 3}
+  m_Name: CH01_MAP01
+  m_EditorClassIdentifier: 
+  _id: CH01_MAP01
+  _displayNameKey: map.ch01.map01.name
+  _descriptionKey: map.ch01.map01.desc
+  _tags:
+  - ch01
+  - field
+  _version: 1
+  _icon: {fileID: 0}
+  _chapterIndex: 1
+  _sceneName: Map_CH01_MAP01
+  _gridWidth: 20
+  _gridHeight: 12
+  _tilePixelSize: 32
+  _originOffsetX: 0
+  _originOffsetY: 0
+  _encounterTableId: ENC_CH01_001
+  _encounterRate: 0.12
+  _isTown: 0
+  _isSafeZone: 0
+  _allowsSaving: 1
+  _bgmKey: music.ch01.field
+  _ambientKey: amb.ch01.wind
+  _backgroundSpriteKey: sprite.map.ch01.road
+  _connections:
+  - CH01_MAP02

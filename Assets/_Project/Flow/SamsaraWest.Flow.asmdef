@@ -1,0 +1,21 @@
+{
+    "name": "SamsaraWest.Flow",
+    "rootNamespace": "SamsaraWest.Flow",
+    "references": [
+        "SamsaraWest.Core",
+        "SamsaraWest.Data",
+        "SamsaraWest.Localization",
+        "SamsaraWest.Save",
+        "SamsaraWest.Battle",
+        "Unity.InputSystem"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

@@ -1,0 +1,38 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5321a105b9e915c40bf2856824b78e2d, type: 3}
+  m_Name: END_TRUE
+  m_EditorClassIdentifier: 
+  _id: END_TRUE
+  _displayNameKey: ending.true.name
+  _descriptionKey: ending.true.desc
+  _tags:
+  - ending
+  - true
+  _version: 1
+  _icon: {fileID: 0}
+  _priority: 30
+  _requiredStateKeys:
+  - flag.ch01.truth_told
+  - ending.blank_page_available
+  _requiredOperators:
+  - Equal
+  - Equal
+  _requiredValues: 0100000001000000
+  _minCompassion: 20
+  _minTruth: 20
+  _minFreedom: 20
+  _endingTitleKey: ending.true.title
+  _endingSceneName: Ending_True
+  _epilogueKey: ending.true.epilogue
+  _isTrueEnding: 1
+  _unlockedGalleryKey: gallery.ending.true

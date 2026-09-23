@@ -1,0 +1,34 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5321a105b9e915c40bf2856824b78e2d, type: 3}
+  m_Name: END_DEFAULT
+  m_EditorClassIdentifier: 
+  _id: END_DEFAULT
+  _displayNameKey: ending.default.name
+  _descriptionKey: ending.default.desc
+  _tags:
+  - ending
+  - fallback
+  _version: 1
+  _icon: {fileID: 0}
+  _priority: 0
+  _requiredStateKeys: []
+  _requiredOperators: []
+  _requiredValues: 
+  _minCompassion: 0
+  _minTruth: 0
+  _minFreedom: 0
+  _endingTitleKey: ending.default.title
+  _endingSceneName: Ending_Default
+  _epilogueKey: ending.default.epilogue
+  _isTrueEnding: 0
+  _unlockedGalleryKey: 

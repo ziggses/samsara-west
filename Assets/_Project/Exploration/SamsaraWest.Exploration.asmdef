@@ -1,0 +1,17 @@
+{
+    "name": "SamsaraWest.Exploration",
+    "rootNamespace": "SamsaraWest.Exploration",
+    "references": [
+        "SamsaraWest.Core",
+        "SamsaraWest.Data"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

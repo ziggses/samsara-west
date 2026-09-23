@@ -1,0 +1,8 @@
+# 《西游：第八十二难》任务定义表 v1
+# objectiveOperators：Equal/NotEqual/Greater/GreaterOrEqual/Less/LessOrEqual
+# karmaChannel 必须以 karma. 开头；karmaDelta 为 0 时频道留空。
+# 三个数组（objectiveStateKeys/objectiveOperators/objectiveValues）必须等长。
+id,displayNameKey,descriptionKey,tags,version,chapterIndex,questTypeKey,isMainQuest,prerequisiteQuestIds,objectiveStateKeys,objectiveOperators,objectiveValues,rewardItemIds,rewardItemCounts,rewardGold,karmaChannel,karmaDelta,giverCharacterId,isOptional,autoComplete
+QST_CH01_MAIN01,quest.ch01.main01.name,quest.ch01.main01.desc,ch01;main,1,1,quest.type.main,true,,flag.ch01.met_woodcutter,Equal,1,ITM_POTION_SMALL,2,50,karma.compassion,2,CHR_TANGSENG,false,true
+QST_CH01_MAIN02,quest.ch01.main02.name,quest.ch01.main02.desc,ch01;main,1,1,quest.type.main,true,QST_CH01_MAIN01,flag.ch01.bandit_leader_defeated,Equal,1,ITM_POTION_SPIRIT,1,120,karma.truth,3,CHR_WUKONG,false,true
+QST_CH01_SIDE01,quest.ch01.side01.name,quest.ch01.side01.desc,ch01;side,1,1,quest.type.side,false,QST_CH01_MAIN01,flag.ch01.wolves_cleared,GreaterOrEqual,3,ITM_WOLF_PELT,3,30,karma.compassion,1,CHR_BAJIE,true,false

@@ -1,0 +1,9 @@
+# 《西游：第八十二难》对话（剧情节点）定义表 v1
+# inkKnotName 是给 Ink 脚本用的剧本节点名，骨架期不接 Ink，仅做登记与校验。
+# nextNodeIds 必须是 CH01_Nxx_XXXX 形式的剧本节点名（与 inkKnotName 同一命名空间），不是 DLG_ 资产 ID。
+# requiredStateKey / setsStateKeys 必须带 flag. / relation. / karma. / ending. 前缀；karmaChannel 必须以 karma. 开头。
+id,displayNameKey,descriptionKey,tags,version,chapterIndex,inkKnotName,speakerCharacterId,lineCount,nextNodeIds,requiredStateKey,requiredOperator,requiredValue,setsStateKeys,karmaChannel,karmaDelta,bgmKey,portraitKey
+DLG_CH01_001,dlg.ch01.001.name,dlg.ch01.001.desc,ch01;dialogue,1,1,CH01_N01_WOODCUTTER_ENTRY,CHR_TANGSENG,6,CH01_N02_TRUTH_CHOICE,,Equal,0,flag.ch01.met_woodcutter,,0,music.ch01.field,portrait.chr.tangseng
+DLG_CH01_002,dlg.ch01.002.name,dlg.ch01.002.desc,ch01;dialogue;branch,1,1,CH01_N02_TRUTH_CHOICE,CHR_WUKONG,8,CH01_N03_FAREWELL,flag.ch01.met_woodcutter,Equal,1,flag.ch01.truth_told,karma.truth,1,music.ch01.field,portrait.chr.wukong
+DLG_CH01_003,dlg.ch01.003.name,dlg.ch01.003.desc,ch01;dialogue,1,1,CH01_N03_FAREWELL,CHR_TANGSENG,4,CH01_N04_EXIT,,Equal,0,,,0,music.ch01.field,portrait.chr.tangseng
+DLG_CH01_004,dlg.ch01.004.name,dlg.ch01.004.desc,ch01;dialogue;exit,1,1,CH01_N04_EXIT,CHR_WUKONG,0,,,Equal,0,flag.ch01.prologue_done,,0,music.ch01.field,portrait.chr.wukong

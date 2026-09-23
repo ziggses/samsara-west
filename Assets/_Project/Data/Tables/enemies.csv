@@ -1,0 +1,7 @@
+# 《西游：第八十二难》敌人定义表 v1
+# weakToElement 用于「火眼金睛」等探查技能与图鉴提示；留空表示无弱点。
+id,displayNameKey,descriptionKey,tags,version,maxHealth,attack,defense,speed,element,breakThreshold,weakToElement,skillIds,aiProfileKey,lootTableId,goldReward,experienceReward,isBoss
+ENM_BANDIT,enemy.bandit.name,enemy.bandit.desc,ch01;human,1,60,14,6,11,Wood,20,Metal,SKL_BANDIT_SLASH,ai.basic.bandit,LUT_ENM_BANDIT,8,12,false
+ENM_BANDIT_ARCHER,enemy.bandit_archer.name,enemy.bandit_archer.desc,ch01;human;ranged,1,50,15,4,13,Metal,16,Fire,SKL_BANDIT_SHOT,ai.ranged.bandit,LUT_ENM_BANDIT_ARCHER,9,14,false
+ENM_WOLF,enemy.wolf.name,enemy.wolf.desc,ch01;beast,1,70,16,5,15,Fire,18,Water,SKL_WOLF_BITE,ai.aggressive.beast,LUT_ENM_WOLF,6,16,false
+ENM_BANDIT_LEADER,enemy.bandit_leader.name,enemy.bandit_leader.desc,ch01;human;boss,1,160,20,10,12,Wood,40,Metal,SKL_BANDIT_SLASH;SKL_BANDIT_LEADER_CLEAVE,ai.boss.bandit_leader,LUT_ENM_BANDIT_LEADER,60,80,true

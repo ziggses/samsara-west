@@ -1,0 +1,32 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f12f024eda5f1b946bf8e484bad5195b, type: 3}
+  m_Name: RCP_STAFF_RUYI
+  m_EditorClassIdentifier: 
+  _id: RCP_STAFF_RUYI
+  _displayNameKey: recipe.staff.ruyi.name
+  _descriptionKey: recipe.staff.ruyi.desc
+  _tags:
+  - ch03
+  - forge
+  _version: 1
+  _icon: {fileID: 0}
+  _resultItemId: EQP_STAFF_RUYI
+  _resultCount: 1
+  _materialIds:
+  - ITM_IRON_SHARD
+  _materialCounts: 05000000
+  _goldCost: 800
+  _requiredLevel: 5
+  _discoveredByDefault: 0
+  _categoryKey: recipe.category.forge
+  _unlockedByStateKey: flag.ch03.ruyi_forge

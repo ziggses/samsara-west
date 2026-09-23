@@ -1,0 +1,6 @@
+# 《西游：第八十二难》配方定义表 v1
+# materialIds 与 materialCounts 必须等长；配方产物不能同时是自己的材料。
+id,displayNameKey,descriptionKey,tags,version,resultItemId,resultCount,materialIds,materialCounts,goldCost,requiredLevel,discoveredByDefault,categoryKey,unlockedByStateKey
+RCP_POTION_SMALL,recipe.potion.small.name,recipe.potion.small.desc,ch01;alchemy,1,ITM_POTION_SMALL,1,ITM_HERB,2,5,1,true,recipe.category.alchemy,
+RCP_POTION_SPIRIT,recipe.potion.spirit.name,recipe.potion.spirit.desc,ch01;alchemy,1,ITM_POTION_SPIRIT,1,ITM_HERB;ITM_IRON_SHARD,2;1,8,2,false,recipe.category.alchemy,flag.ch01.recipe_spirit
+RCP_STAFF_RUYI,recipe.staff.ruyi.name,recipe.staff.ruyi.desc,ch03;forge,1,EQP_STAFF_RUYI,1,ITM_IRON_SHARD,5,800,5,false,recipe.category.forge,flag.ch03.ruyi_forge

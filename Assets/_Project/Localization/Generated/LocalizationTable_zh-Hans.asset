@@ -1,0 +1,384 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7ddbf301441a7bd44889035e6a28c130, type: 3}
+  m_Name: LocalizationTable_zh-Hans
+  m_EditorClassIdentifier: 
+  _language: zh-Hans
+  _entries:
+  - _key: chr.bajie.desc
+    _text: "\u62A4\u4F53\u6700\u539A\uFF0C\u9489\u8019\u6A2A\u626B\u4E00\u5217\uFF0C\u662F\u961F\u4F0D\u7684\u524D\u6392\u3002"
+  - _key: chr.bajie.name
+    _text: "\u516B\u6212"
+  - _key: chr.shawujing.desc
+    _text: "\u6C34\u6027\u6C89\u7A33\uFF0C\u6D41\u6C99\u5377\u53EF\u524A\u5F31\u5168\u4F53\u654C\u4EBA\u3002"
+  - _key: chr.shawujing.name
+    _text: "\u6C99\u50E7"
+  - _key: chr.tangseng.desc
+    _text: "\u8F93\u51FA\u6700\u4F4E\uFF0C\u4F46\u51C0\u5FC3\u5492\u4E0E\u91D1\u521A\u62A4\u4F53\u662F\u961F\u4F0D\u7684\u547D\u8109\u3002"
+  - _key: chr.tangseng.name
+    _text: "\u5510\u50E7"
+  - _key: chr.wukong.desc
+    _text: "\u5FC3\u6BD4\u5929\u9AD8\uFF0C\u706B\u6027\u672A\u6D88\u3002\u7834\u9632\u540E\u4F24\u5BB3\u6781\u9AD8\uFF0C\u6015\u88AB\u96C6\u706B\u3002"
+  - _key: chr.wukong.name
+    _text: "\u609F\u7A7A"
+  - _key: dlg.ch01.001.desc
+    _text: "\u5C71\u9053\u4E0A\u7684\u521D\u9047\u3002"
+  - _key: dlg.ch01.001.name
+    _text: "\u6A35\u592B\u6307\u8DEF"
+  - _key: dlg.ch01.002.desc
+    _text: "\u609F\u7A7A\u95EE\u51FA\u4E86\u4E0E\u5510\u50E7\u8BF4\u6CD5\u4E0D\u540C\u7684\u5185\u60C5\u3002"
+  - _key: dlg.ch01.002.name
+    _text: "\u771F\u8BDD\u4E0E\u8C0E\u8BDD"
+  - _key: dlg.ch01.003.desc
+    _text: "\u4E0A\u8DEF\u524D\u7684\u77ED\u8C08\u3002"
+  - _key: dlg.ch01.003.name
+    _text: "\u4E34\u522B\u53EE\u5631"
+  - _key: dlg.ch01.004.desc
+    _text: "\u7B2C\u4E00\u7AE0\u7684\u6536\u675F\u8282\u70B9\u3002"
+  - _key: dlg.ch01.004.name
+    _text: "\u7AE0\u8282\u51FA\u53E3"
+  - _key: enc.ch01.001.desc
+    _text: "\u4E24\u540D\u5C71\u8D3C\u62E6\u8DEF\u3002"
+  - _key: enc.ch01.001.name
+    _text: "\u5C71\u9053\u906D\u9047"
+  - _key: enc.ch01.002.desc
+    _text: "\u5C71\u8D3C\u4E0E\u72FC\u5996\u540C\u65F6\u6251\u4E0A\u3002"
+  - _key: enc.ch01.002.name
+    _text: "\u72FC\u8D3C\u5408\u56F4"
+  - _key: enc.ch01.003.desc
+    _text: "\u5F13\u624B\u62BC\u9635\u7684\u4E09\u4EBA\u5C0F\u961F\u3002"
+  - _key: enc.ch01.003.name
+    _text: "\u7CBE\u82F1\u56F4\u527F"
+  - _key: enc.ch01.boss.desc
+    _text: "\u4E0D\u53EF\u9003\u8DD1\u7684\u4E00\u6218\u3002"
+  - _key: enc.ch01.boss.name
+    _text: "\u5BE8\u4E3B\u4E4B\u96BE"
+  - _key: ending.default.desc
+    _text: "\u4EC0\u4E48\u4E5F\u6CA1\u6539\u53D8\uFF0C\u8DEF\u8FD8\u957F\u7740\u3002"
+  - _key: ending.default.epilogue
+    _text: "\u5E08\u5F92\u56DB\u4EBA\u7EE7\u7EED\u5411\u897F\uFF0C\u9ED1\u98CE\u5CAD\u7684\u4E8B\u65E0\u4EBA\u518D\u63D0\u3002"
+  - _key: ending.default.name
+    _text: "\u7ED3\u5C40\xB7\u672A\u7ADF"
+  - _key: ending.default.title
+    _text: "\u672A\u7ADF\u4E4B\u8DEF"
+  - _key: ending.mercy.desc
+    _text: "\u4F60\u653E\u8FC7\u4E86\u592A\u591A\u4EBA\u3002"
+  - _key: ending.mercy.epilogue
+    _text: "\u5BE8\u4E2D\u8001\u5C0F\u66FF\u4F60\u7ACB\u4E86\u957F\u751F\u724C\u4F4D\u3002"
+  - _key: ending.mercy.name
+    _text: "\u7ED3\u5C40\xB7\u6148\u60B2"
+  - _key: ending.mercy.title
+    _text: "\u6148\u822A\u666E\u5EA6"
+  - _key: ending.true.desc
+    _text: "\u4E09\u5FF5\u4FF1\u5168\uFF0C\u65B9\u89C1\u771F\u7AE0\u3002"
+  - _key: ending.true.epilogue
+    _text: "\u539F\u6765\u96BE\u7684\u4E0D\u662F\u5C71\uFF0C\u662F\u4EBA\u5FC3\u3002"
+  - _key: ending.true.name
+    _text: "\u7ED3\u5C40\xB7\u7B2C\u516B\u5341\u4E8C\u96BE"
+  - _key: ending.true.title
+    _text: "\u7B2C\u516B\u5341\u4E8C\u96BE"
+  - _key: ending.truth.desc
+    _text: "\u4F60\u542C\u89C1\u4E86\u4E0D\u8BE5\u542C\u89C1\u7684\u8BDD\u3002"
+  - _key: ending.truth.epilogue
+    _text: "\u53D6\u56DE\u7684\u771F\u7ECF\u5C11\u4E86\u4E00\u9875\uFF0C\u800C\u90A3\u4E00\u9875\u5728\u4F60\u624B\u91CC\u3002"
+  - _key: ending.truth.name
+    _text: "\u7ED3\u5C40\xB7\u771F\u76F8"
+  - _key: ending.truth.title
+    _text: "\u7ECF\u91CC\u6709\u8C0E"
+  - _key: enemy.bandit.desc
+    _text: "\u62E6\u8DEF\u8BA8\u94B1\u7684\u5C0F\u5352\uFF0C\u4E94\u884C\u5C5E\u6728\u3002"
+  - _key: enemy.bandit.name
+    _text: "\u5C71\u8D3C\u55BD\u5570"
+  - _key: enemy.bandit_archer.desc
+    _text: "\u8EB2\u5728\u540E\u9762\u7684\u51B7\u7BAD\u624B\uFF0C\u4E94\u884C\u5C5E\u91D1\u3002"
+  - _key: enemy.bandit_archer.name
+    _text: "\u5C71\u8D3C\u5F13\u624B"
+  - _key: enemy.bandit_leader.desc
+    _text: "\u7B2C\u4E5D\u7AE0\u4E4B\u5916\u7684\u7B2C\u516B\u5341\u4E8C\u96BE\uFF0C\u7531\u6B64\u4EBA\u8D77\u3002"
+  - _key: enemy.bandit_leader.name
+    _text: "\u9ED1\u98CE\u5BE8\u4E3B"
+  - _key: enemy.wolf.desc
+    _text: "\u5C71\u4E2D\u51F6\u517D\uFF0C\u901F\u5EA6\u6781\u5FEB\uFF0C\u4E94\u884C\u5C5E\u706B\u3002"
+  - _key: enemy.wolf.name
+    _text: "\u9ED1\u98CE\u72FC\u5996"
+  - _key: eqp.armor.leather.desc
+    _text: "\u78E8\u635F\u7684\u76AE\u7532\uFF0C\u5C1A\u53EF\u6321\u5200\u3002"
+  - _key: eqp.armor.leather.name
+    _text: "\u65E7\u76AE\u7532"
+  - _key: eqp.staff.iron.desc
+    _text: "\u5BFB\u5E38\u94C1\u6756\uFF0C\u804A\u80DC\u4E8E\u65E0\u3002"
+  - _key: eqp.staff.iron.name
+    _text: "\u94C1\u7985\u6756"
+  - _key: eqp.staff.ruyi.desc
+    _text: "\u53EA\u8BA4\u4E00\u4E2A\u4E3B\u4EBA\uFF0C\u7834\u9632\u4E4B\u529B\u8FDC\u80DC\u5BFB\u5E38\u5175\u5668\u3002"
+  - _key: eqp.staff.ruyi.name
+    _text: "\u5982\u610F\u91D1\u7B8D\u68D2"
+  - _key: eqp.talisman.jade.desc
+    _text: "\u523B\u6709\u6C34\u7EB9\u7684\u7389\u7B26\uFF0C\u80FD\u6321\u6C34\u6027\u6CD5\u672F\u3002"
+  - _key: eqp.talisman.jade.name
+    _text: "\u7389\u7B26"
+  - _key: gallery.ending.mercy
+    _text: "\u5DF2\u89E3\u9501\uFF1A\u6148\u822A\u666E\u5EA6"
+  - _key: gallery.ending.true
+    _text: "\u5DF2\u89E3\u9501\uFF1A\u7B2C\u516B\u5341\u4E8C\u96BE"
+  - _key: gallery.ending.truth
+    _text: "\u5DF2\u89E3\u9501\uFF1A\u7ECF\u91CC\u6709\u8C0E"
+  - _key: int.ch01.001.desc
+    _text: "\u80CC\u67F4\u7684\u6A35\u592B\uFF0C\u77E5\u9053\u8FDB\u5C71\u7684\u8DEF\u3002"
+  - _key: int.ch01.001.name
+    _text: "\u8FC7\u8DEF\u6A35\u592B"
+  - _key: int.ch01.002.desc
+    _text: "\u5B57\u8FF9\u6A21\u7CCA\u7684\u65E7\u6728\u724C\u3002"
+  - _key: int.ch01.002.name
+    _text: "\u6307\u8DEF\u6728\u724C"
+  - _key: int.ch01.003.desc
+    _text: "\u4E0A\u4E86\u9501\u7684\u6728\u7BB1\uFF0C\u9700\u8981\u5148\u8D70\u5B8C\u524D\u9762\u7684\u8DEF\u3002"
+  - _key: int.ch01.003.name
+    _text: "\u5BE8\u4E2D\u6728\u7BB1"
+  - _key: item.antidote.desc
+    _text: "\u89E3\u9664\u4E00\u540D\u961F\u53CB\u8EAB\u4E0A\u7684\u8D1F\u9762\u72B6\u6001\u3002"
+  - _key: item.antidote.name
+    _text: "\u89E3\u6BD2\u8349"
+  - _key: item.bandit_token.desc
+    _text: "\u8BC1\u660E\u901A\u5173\u7684\u51ED\u8BC1\uFF0C\u5BE8\u4E3B\u8EAB\u4E0A\u53D6\u5F97\u3002"
+  - _key: item.bandit_token.name
+    _text: "\u5C71\u8D3C\u8170\u724C"
+  - _key: item.herb.desc
+    _text: "\u70BC\u5236\u56DE\u6C14\u6563\u7684\u57FA\u7840\u6750\u6599\u3002"
+  - _key: item.herb.name
+    _text: "\u7075\u8349"
+  - _key: item.iron_shard.desc
+    _text: "\u953B\u9020\u7528\u7684\u7CBE\u94C1\u788E\u5757\u3002"
+  - _key: item.iron_shard.name
+    _text: "\u94C1\u7CBE"
+  - _key: item.map_blackwind.desc
+    _text: "\u6807\u6CE8\u4E86\u5C71\u5BE8\u6697\u9053\u7684\u6B8B\u7834\u5730\u56FE\u3002"
+  - _key: item.map_blackwind.name
+    _text: "\u9ED1\u98CE\u5CAD\u6B8B\u56FE"
+  - _key: item.potion.small.desc
+    _text: "\u6218\u6597\u4E2D\u56DE\u590D\u5C11\u91CF\u751F\u547D\u3002"
+  - _key: item.potion.small.name
+    _text: "\u56DE\u6C14\u6563"
+  - _key: item.potion.spirit.desc
+    _text: "\u6218\u6597\u4E2D\u56DE\u590D\u5C11\u91CF\u7075\u529B\u3002"
+  - _key: item.potion.spirit.name
+    _text: "\u7075\u6DB2"
+  - _key: item.wolf_pelt.desc
+    _text: "\u53EF\u5356\u51FA\u6362\u94B1\u7684\u517D\u76AE\u3002"
+  - _key: item.wolf_pelt.name
+    _text: "\u72FC\u76AE"
+  - _key: loot.enm.bandit.desc
+    _text: "\u55BD\u5570\u8EAB\u4E0A\u7684\u6742\u7269\u3002"
+  - _key: loot.enm.bandit.name
+    _text: "\u5C71\u8D3C\u6389\u843D"
+  - _key: loot.enm.bandit_archer.desc
+    _text: "\u5F13\u624B\u7559\u4E0B\u7684\u94C1\u7CBE\u4E0E\u8349\u6599\u3002"
+  - _key: loot.enm.bandit_archer.name
+    _text: "\u5F13\u624B\u6389\u843D"
+  - _key: loot.enm.bandit_leader.desc
+    _text: "\u5FC5\u6389\u8170\u724C\uFF0C\u53E6\u6709\u4E24\u6B21\u62BD\u53D6\u3002"
+  - _key: loot.enm.bandit_leader.name
+    _text: "\u5BE8\u4E3B\u6389\u843D"
+  - _key: loot.enm.wolf.desc
+    _text: "\u4E00\u5F20\u6216\u4E24\u5F20\u72FC\u76AE\u3002"
+  - _key: loot.enm.wolf.name
+    _text: "\u72FC\u5996\u6389\u843D"
+  - _key: map.ch01.map01.desc
+    _text: "\u901A\u5F80\u5C71\u5BE8\u7684\u788E\u77F3\u8DEF\uFF0C\u5E38\u6709\u72FC\u5996\u51FA\u6CA1\u3002"
+  - _key: map.ch01.map01.name
+    _text: "\u9ED1\u98CE\u5CAD\xB7\u5C71\u9053"
+  - _key: map.ch01.map02.desc
+    _text: "\u5BE8\u95E8\u53E3\u7684\u96C6\u5E02\uFF0C\u5B89\u5168\u53EF\u5B58\u6863\u3002"
+  - _key: map.ch01.map02.name
+    _text: "\u9ED1\u98CE\u5CAD\xB7\u5C71\u5BE8"
+  - _key: phase.ch01.boss.p1.desc
+    _text: "\u5BE8\u4E3B\u5C1A\u5728\u8BD5\u63A2\u6765\u8005\u65A4\u4E24\u3002"
+  - _key: phase.ch01.boss.p1.name
+    _text: "\u7B2C\u4E00\u9636\u6BB5\xB7\u8BD5\u63A2"
+  - _key: phase.ch01.boss.p1.taunt
+    _text: "\u54EA\u6765\u7684\u548C\u5C1A\uFF0C\u4E5F\u6562\u95EF\u9ED1\u98CE\u5CAD\uFF1F"
+  - _key: phase.ch01.boss.p2.desc
+    _text: "\u5BE8\u4E3B\u534A\u6570\u6C14\u8840\u540E\u8FDB\u5165\u72C2\u6012\uFF0C\u653B\u901F\u5168\u9762\u63D0\u5347\u3002"
+  - _key: phase.ch01.boss.p2.name
+    _text: "\u7B2C\u4E8C\u9636\u6BB5\xB7\u72C2\u6012"
+  - _key: phase.ch01.boss.p2.taunt
+    _text: "\u65E2\u7136\u4E0D\u7ED9\u6D3B\u8DEF\uFF0C\u90A3\u5C31\u4E00\u8D77\u6B7B\u5728\u8FD9\u5C71\u91CC\uFF01"
+  - _key: quest.ch01.main01.desc
+    _text: "\u5411\u6A35\u592B\u6253\u542C\u9ED1\u98CE\u5CAD\u7684\u8DEF\u5F84\u3002"
+  - _key: quest.ch01.main01.name
+    _text: "\u95EE\u8DEF"
+  - _key: quest.ch01.main02.desc
+    _text: "\u627E\u5230\u5E76\u51FB\u7834\u9ED1\u98CE\u5BE8\u4E3B\u3002"
+  - _key: quest.ch01.main02.name
+    _text: "\u9ED1\u98CE\u5CAD"
+  - _key: quest.ch01.side01.desc
+    _text: "\u66FF\u5C71\u5BE8\u6E05\u6389\u4E09\u53EA\u72FC\u5996\u3002"
+  - _key: quest.ch01.side01.name
+    _text: "\u72FC\u60A3"
+  - _key: recipe.potion.small.desc
+    _text: "\u4E24\u682A\u7075\u8349\u53EF\u6210\u4E00\u5242\u3002"
+  - _key: recipe.potion.small.name
+    _text: "\u56DE\u6C14\u6563\u65B9"
+  - _key: recipe.potion.spirit.desc
+    _text: "\u7075\u8349\u52A0\u94C1\u7CBE\uFF0C\u53E6\u9700\u5F15\u7075\u4E4B\u6CD5\u3002"
+  - _key: recipe.potion.spirit.name
+    _text: "\u7075\u6DB2\u65B9"
+  - _key: recipe.staff.ruyi.desc
+    _text: "\u5927\u5723\u672C\u547D\u5175\u5668\u7684\u6B8B\u65B9\u3002"
+  - _key: recipe.staff.ruyi.name
+    _text: "\u5982\u610F\u91D1\u7B8D\u68D2\u65B9"
+  - _key: shop.ch01.001.desc
+    _text: "\u4EF7\u683C\u516C\u9053\uFF0C\u7AE5\u53DF\u65E0\u6B3A\u3002"
+  - _key: shop.ch01.001.merchant
+    _text: "\u8D27\u90CE"
+  - _key: shop.ch01.001.name
+    _text: "\u5BE8\u53E3\u6742\u8D27"
+  - _key: skill.bajie.rake.desc
+    _text: "\u4EE5\u9489\u8019\u6A2A\u626B\u4E00\u5217\u654C\u4EBA\uFF0C\u5206\u4E24\u6BB5\u7ED3\u7B97\u7834\u9632\u3002"
+  - _key: skill.bajie.rake.name
+    _text: "\u4E5D\u9F7F\u9489\u8019"
+  - _key: skill.bajie.taunt.desc
+    _text: "\u731B\u649E\u76EE\u6807\uFF0C\u6709\u673A\u7387\u4F7F\u5176\u7729\u6655\u4E00\u56DE\u5408\u3002"
+  - _key: skill.bajie.taunt.name
+    _text: "\u732A\u7A81\u731B\u8FDB"
+  - _key: skill.bandit.leader_cleave.desc
+    _text: "\u5BE8\u4E3B\u5168\u529B\u4E00\u65A9\uFF0C\u6A2A\u626B\u4E00\u5217\u5E76\u524A\u5F31\u58EB\u6C14\u3002"
+  - _key: skill.bandit.leader_cleave.name
+    _text: "\u5F00\u5C71\u65A9"
+  - _key: skill.bandit.shot.desc
+    _text: "\u5C71\u8D3C\u5F13\u624B\u80E1\u4E71\u653E\u7BAD\uFF0C\u76EE\u6807\u968F\u673A\u3002"
+  - _key: skill.bandit.shot.name
+    _text: "\u51B7\u7BAD"
+  - _key: skill.bandit.slash.desc
+    _text: "\u5C71\u8D3C\u7684\u7B28\u62D9\u5288\u780D\u3002"
+  - _key: skill.bandit.slash.name
+    _text: "\u8D3C\u5200\u5288\u780D"
+  - _key: skill.shawujing.sand.desc
+    _text: "\u6D41\u6C99\u8986\u5411\u5168\u4F53\u654C\u4EBA\uFF0C\u964D\u4F4E\u5176\u653B\u51FB\u3002"
+  - _key: skill.shawujing.sand.name
+    _text: "\u6D41\u6C99\u5377"
+  - _key: skill.tangseng.heal.desc
+    _text: "\u4E3A\u4E00\u540D\u961F\u53CB\u56DE\u590D\u751F\u547D\uFF0C\u5E76\u9644\u52A0\u51C0\u5FC3\u56DE\u8840\u3002"
+  - _key: skill.tangseng.heal.name
+    _text: "\u51C0\u5FC3\u5492"
+  - _key: skill.tangseng.shield.desc
+    _text: "\u4E3A\u4E00\u540D\u961F\u53CB\u5957\u4E0A\u62A4\u4F53\uFF0C\u964D\u4F4E\u5176\u53D7\u5230\u7684\u4F24\u5BB3\u3002"
+  - _key: skill.tangseng.shield.name
+    _text: "\u91D1\u521A\u62A4\u4F53"
+  - _key: skill.wolf.bite.desc
+    _text: "\u72FC\u5996\u8FDE\u54AC\u4E24\u6BB5\u3002"
+  - _key: skill.wolf.bite.name
+    _text: "\u6495\u54AC"
+  - _key: skill.wukong.fire_eye.desc
+    _text: "\u4EE5\u706B\u6027\u795E\u901A\u707C\u70E7\u76EE\u6807\uFF0C\u6709\u8F83\u5927\u6982\u7387\u9644\u52A0\u707C\u70E7\u3002"
+  - _key: skill.wukong.fire_eye.name
+    _text: "\u706B\u773C\u91D1\u775B"
+  - _key: skill.wukong.rage.desc
+    _text: "\u5168\u529B\u4E00\u51FB\uFF0C\u7834\u9632\u503C\u6781\u9AD8\uFF0C\u4F46\u6D88\u8017\u7075\u529B\u4E14\u6709\u51B7\u5374\u3002"
+  - _key: skill.wukong.rage.name
+    _text: "\u5927\u5723\u6012\u51FB"
+  - _key: skill.wukong.staff.desc
+    _text: "\u6325\u68D2\u6A2A\u626B\u773C\u524D\u4E4B\u654C\uFF0C\u6D88\u8017\u4E3A\u96F6\uFF0C\u7528\u4E8E\u7A33\u6B65\u79EF\u7D2F\u7834\u9632\u3002"
+  - _key: skill.wukong.staff.name
+    _text: "\u91D1\u7B8D\u68D2\xB7\u6A2A\u626B"
+  - _key: status.blessed.desc
+    _text: "\u6BCF\u56DE\u5408\u6062\u590D\u5C11\u91CF\u751F\u547D\u3002"
+  - _key: status.blessed.name
+    _text: "\u51C0\u5FC3"
+  - _key: status.break_vuln.desc
+    _text: "\u62A4\u4F53\u88AB\u51FB\u7834\u540E\u7684\u865A\u5F31\uFF1A\u53D7\u5230\u4F24\u5BB3\u589E\u52A0\u56DB\u5206\u4E4B\u4E00\u3002"
+  - _key: status.break_vuln.name
+    _text: "\u7834\u7EFD"
+  - _key: status.burn.desc
+    _text: "\u6BCF\u56DE\u5408\u635F\u5931\u751F\u547D\uFF0C\u53EF\u53E0\u52A0\u5C42\u6570\u3002"
+  - _key: status.burn.name
+    _text: "\u707C\u70E7"
+  - _key: status.haste.desc
+    _text: "\u901F\u5EA6\u63D0\u5347\u4E09\u6210\u3002"
+  - _key: status.haste.name
+    _text: "\u75BE\u884C"
+  - _key: status.shield.desc
+    _text: "\u9632\u5FA1\u63D0\u5347\uFF0C\u53D7\u5230\u7684\u4F24\u5BB3\u964D\u4F4E\u3002"
+  - _key: status.shield.name
+    _text: "\u91D1\u521A\u62A4\u4F53"
+  - _key: status.stun.desc
+    _text: "\u65E0\u6CD5\u884C\u52A8\uFF0C\u6301\u7EED\u4E00\u56DE\u5408\u3002"
+  - _key: status.stun.name
+    _text: "\u7729\u6655"
+  - _key: status.weaken.desc
+    _text: "\u653B\u51FB\u529B\u4E0B\u964D\u4E24\u6210\u3002"
+  - _key: status.weaken.name
+    _text: "\u7834\u6CD5"
+  - _key: sutra.rage.desc
+    _text: "\u4EE5\u8840\u6C14\u6362\u653B\u52BF\uFF0C\u653B\u51FB\u4E0E\u62A4\u4F53\u540C\u65F6\u63D0\u5347\u3002"
+  - _key: sutra.rage.name
+    _text: "\u6012\u76EE\u91D1\u521A"
+  - _key: sutra.stillness.desc
+    _text: "\u6BCF\u56DE\u5408\u56DE\u590D\u7075\u529B\uFF0C\u9002\u5408\u4E45\u6218\u3002"
+  - _key: sutra.stillness.name
+    _text: "\u9759\u5FC3\u7985"
+  - _key: ui.battle.command.attack
+    _text: "\u653B\u51FB"
+  - _key: ui.battle.command.defend
+    _text: "\u9632\u5FA1"
+  - _key: ui.battle.command.flee
+    _text: "\u9003\u8DD1"
+  - _key: ui.battle.command.item
+    _text: "\u9053\u5177"
+  - _key: ui.battle.command.skill
+    _text: "\u6CD5\u672F"
+  - _key: ui.battle.intent.preview
+    _text: "\u654C\u4EBA\u610F\u56FE\uFF1A{0}"
+  - _key: ui.battle.status.break
+    _text: "\u62A4\u4F53\u5DF2\u7834"
+  - _key: ui.common.cancel
+    _text: "\u53D6\u6D88"
+  - _key: ui.common.confirm
+    _text: "\u786E\u5B9A"
+  - _key: ui.dialogue.continue
+    _text: "\u7EE7\u7EED"
+  - _key: ui.equip.slot.armor
+    _text: "\u7532\u80C4"
+  - _key: ui.equip.slot.sutra
+    _text: "\u7ECF\u6587"
+  - _key: ui.equip.slot.talisman
+    _text: "\u7B26\u7B93"
+  - _key: ui.equip.slot.weapon
+    _text: "\u5175\u5668"
+  - _key: ui.error.hint
+    _text: "\u8BF7\u8FDE\u540C\u65E5\u5FD7\u6587\u4EF6\u4E00\u5E76\u53CD\u9988\u3002"
+  - _key: ui.error.title
+    _text: "\u8FD0\u884C\u671F\u5F02\u5E38"
+  - _key: ui.hud.chapter
+    _text: "\u7B2C {0} \u7AE0"
+  - _key: ui.inventory.title
+    _text: "\u884C\u56CA"
+  - _key: ui.menu.title
+    _text: "\u897F\u6E38\uFF1A\u7B2C\u516B\u5341\u4E8C\u96BE"
+  - _key: ui.prompt.examine
+    _text: "\u67E5\u770B"
+  - _key: ui.prompt.open
+    _text: "\u6253\u5F00"
+  - _key: ui.prompt.talk
+    _text: "\u4EA4\u8C08"
+  - _key: ui.quest.tracker.title
+    _text: "\u5F53\u524D\u4EFB\u52A1"
+  - _key: ui.save.slot
+    _text: "\u5B58\u6863\u4F4D {0}"
+  - _key: ui.settings.audio
+    _text: "\u97F3\u91CF"
+  - _key: ui.shop.buy
+    _text: "\u4E70\u5165"
+  - _key: ui.shop.sell
+    _text: "\u5356\u51FA"
+  - _key: ui.skeleton.greeting
+    _text: "\u9AA8\u5934\u5DF2\u5C31\u4F4D\uFF0C\u53EF\u4EE5\u5F00\u59CB\u5F80\u91CC\u586B\u8089\u4E86\u3002"

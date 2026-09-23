@@ -1,0 +1,36 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: eeb0fd57a4cc996408aa9fc4e8aff3dd, type: 3}
+  m_Name: SKL_WUKONG_STAFF
+  m_EditorClassIdentifier: 
+  _id: SKL_WUKONG_STAFF
+  _displayNameKey: skill.wukong.staff.name
+  _descriptionKey: skill.wukong.staff.desc
+  _tags:
+  - ch01
+  - basic
+  _version: 1
+  _icon: {fileID: 0}
+  _power: 8
+  _element: 4
+  _nature: 0
+  _target: 1
+  _spiritCost: 0
+  _cooldownTurns: 0
+  _hitCount: 1
+  _breakDamage: 10
+  _appliedStatusId: 
+  _statusChance: 0
+  _healPower: 0
+  _vfxKey: vfx.wukong.staff
+  _animationKey: anim.wukong.staff
+  _sfxKey: sfx.wukong.staff

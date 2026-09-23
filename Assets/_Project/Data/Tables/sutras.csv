@@ -1,0 +1,6 @@
+# 《西游：第八十二难》经文（心法）定义表 v1
+# 经文是被动加成，spriteKey 与 EquipmentSlot.Sutra 的装备位对应。
+# healthCostPerTurn > 0 表示苦修：每回合扣血换增益（SUT_COST_NO_BENEFIT 会警告无收益的苦修）。
+id,displayNameKey,descriptionKey,tags,version,tier,mantraTypeKey,attackBonus,defenseBonus,healthBonus,spiritBonus,breakThresholdBonus,spiritRegenPerTurn,element,passiveSkillId,requiredLevel,price,healthCostPerTurn,spriteKey
+SUT_STILLNESS,sutra.stillness.name,sutra.stillness.desc,ch01;sutra;mind,1,Refined,sutra.mind.stillness,0,0,0,5,0,3,None,,2,120,0,sprite.sutra.stillness
+SUT_RAGE,sutra.rage.name,sutra.rage.desc,ch01;sutra;wrath,1,Rare,sutra.mind.rage,6,0,20,0,4,0,Fire,,3,200,4,sprite.sutra.rage

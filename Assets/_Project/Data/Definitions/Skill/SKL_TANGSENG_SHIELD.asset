@@ -1,0 +1,36 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: eeb0fd57a4cc996408aa9fc4e8aff3dd, type: 3}
+  m_Name: SKL_TANGSENG_SHIELD
+  m_EditorClassIdentifier: 
+  _id: SKL_TANGSENG_SHIELD
+  _displayNameKey: skill.tangseng.shield.name
+  _descriptionKey: skill.tangseng.shield.desc
+  _tags:
+  - ch01
+  - support
+  _version: 1
+  _icon: {fileID: 0}
+  _power: 0
+  _element: 0
+  _nature: 1
+  _target: 2
+  _spiritCost: 12
+  _cooldownTurns: 2
+  _hitCount: 1
+  _breakDamage: 0
+  _appliedStatusId: STS_SHIELD
+  _statusChance: 1
+  _healPower: 15
+  _vfxKey: vfx.tangseng.shield
+  _animationKey: anim.tangseng.shield
+  _sfxKey: sfx.tangseng.shield

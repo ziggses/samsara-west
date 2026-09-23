@@ -1,0 +1,38 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 24e2318e9a165a145a8e390922e70d8a, type: 3}
+  m_Name: EQP_TALISMAN_JADE
+  m_EditorClassIdentifier: 
+  _id: EQP_TALISMAN_JADE
+  _displayNameKey: eqp.talisman.jade.name
+  _descriptionKey: eqp.talisman.jade.desc
+  _tags:
+  - ch01
+  - talisman
+  _version: 1
+  _icon: {fileID: 0}
+  _slot: 3
+  _tier: 2
+  _attackBonus: 0
+  _defenseBonus: 0
+  _speedBonus: 0
+  _healthBonus: 0
+  _spiritBonus: 10
+  _element: 0
+  _resistElement: 3
+  _breakDamageBonus: 0
+  _passiveSkillId: 
+  _requiredLevel: 2
+  _price: 150
+  _forgeRecipeId: 
+  _spriteKey: sprite.eqp.talisman.jade
+  _allowedCharacterIds: []

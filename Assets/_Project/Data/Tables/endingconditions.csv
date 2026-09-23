@@ -1,0 +1,9 @@
+# 《西游：第八十二难》结局条件表 v1
+# priority 越大越先判定。END_DEFAULT 的 priority 为 0，是全局唯一允许无条件的兜底结局：
+# 它排在最后，只有别的结局都不命中时才轮到它。除它以外的结局都必须写条件，否则会无条件抢走判定。
+# requiredStateKeys/requiredOperators/requiredValues 三个数组必须等长，用分号分隔。
+id,displayNameKey,descriptionKey,tags,version,priority,requiredStateKeys,requiredOperators,requiredValues,minCompassion,minTruth,minFreedom,endingTitleKey,endingSceneName,epilogueKey,isTrueEnding,unlockedGalleryKey
+END_DEFAULT,ending.default.name,ending.default.desc,ending;fallback,1,0,,,,0,0,0,ending.default.title,Ending_Default,ending.default.epilogue,false,
+END_MERCY,ending.mercy.name,ending.mercy.desc,ending;compassion,1,10,,,,30,0,0,ending.mercy.title,Ending_Mercy,ending.mercy.epilogue,false,gallery.ending.mercy
+END_TRUTH,ending.truth.name,ending.truth.desc,ending;truth,1,20,flag.ch01.truth_told,Equal,1,0,30,0,ending.truth.title,Ending_Truth,ending.truth.epilogue,false,gallery.ending.truth
+END_TRUE,ending.true.name,ending.true.desc,ending;true,1,30,flag.ch01.truth_told;ending.blank_page_available,Equal;Equal,1;1,20,20,20,ending.true.title,Ending_True,ending.true.epilogue,true,gallery.ending.true

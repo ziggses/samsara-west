@@ -1,0 +1,37 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 196154fc8abe6ec42bf1f7fcec0d6d97, type: 3}
+  m_Name: DLG_CH01_001
+  m_EditorClassIdentifier: 
+  _id: DLG_CH01_001
+  _displayNameKey: dlg.ch01.001.name
+  _descriptionKey: dlg.ch01.001.desc
+  _tags:
+  - ch01
+  - dialogue
+  _version: 1
+  _icon: {fileID: 0}
+  _chapterIndex: 1
+  _inkKnotName: CH01_N01_WOODCUTTER_ENTRY
+  _speakerCharacterId: CHR_TANGSENG
+  _lineCount: 6
+  _nextNodeIds:
+  - CH01_N02_TRUTH_CHOICE
+  _requiredStateKey: 
+  _requiredOperator: 0
+  _requiredValue: 0
+  _setsStateKeys:
+  - flag.ch01.met_woodcutter
+  _karmaChannel: 
+  _karmaDelta: 0
+  _bgmKey: music.ch01.field
+  _portraitKey: portrait.chr.tangseng

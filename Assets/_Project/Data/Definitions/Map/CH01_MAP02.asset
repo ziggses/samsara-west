@@ -1,0 +1,39 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1718f3f096b3c3d47ab53c32f9747652, type: 3}
+  m_Name: CH01_MAP02
+  m_EditorClassIdentifier: 
+  _id: CH01_MAP02
+  _displayNameKey: map.ch01.map02.name
+  _descriptionKey: map.ch01.map02.desc
+  _tags:
+  - ch01
+  - town
+  _version: 1
+  _icon: {fileID: 0}
+  _chapterIndex: 1
+  _sceneName: Map_CH01_MAP02
+  _gridWidth: 16
+  _gridHeight: 10
+  _tilePixelSize: 32
+  _originOffsetX: 0
+  _originOffsetY: 0
+  _encounterTableId: 
+  _encounterRate: 0
+  _isTown: 1
+  _isSafeZone: 1
+  _allowsSaving: 1
+  _bgmKey: music.ch01.town
+  _ambientKey: amb.ch01.village
+  _backgroundSpriteKey: sprite.map.ch01.village
+  _connections:
+  - CH01_MAP01

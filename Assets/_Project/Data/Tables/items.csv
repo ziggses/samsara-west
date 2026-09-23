@@ -1,0 +1,12 @@
+# 《西游：第八十二难》道具定义表 v1
+# category：None/Consumable/Material/Key/Currency/QuestItem/Recipe；tier：Common/Refined/Rare/Legendary/Mythic
+# effectKey 为效果语义键（如 item.effect.heal.health），由效果解释器消费，不是本地化键。
+id,displayNameKey,descriptionKey,tags,version,category,tier,stackLimit,price,usableInBattle,usableInField,isConsumedOnUse,effectKey,effectMagnitude,effectDurationTurns,effectSkillId,spriteKey
+ITM_POTION_SMALL,item.potion.small.name,item.potion.small.desc,ch01;consumable,1,Consumable,Common,99,20,true,true,true,item.effect.heal.health,40,0,,sprite.item.potion.small
+ITM_POTION_SPIRIT,item.potion.spirit.name,item.potion.spirit.desc,ch01;consumable,1,Consumable,Common,99,25,true,true,true,item.effect.heal.spirit,25,0,,sprite.item.potion.spirit
+ITM_ANTIDOTE,item.antidote.name,item.antidote.desc,ch01;consumable,1,Consumable,Common,99,18,true,true,true,item.effect.cure.status,1,0,,sprite.item.antidote
+ITM_HERB,item.herb.name,item.herb.desc,ch01;material,1,Material,Common,999,4,false,false,false,,0,0,,sprite.item.herb
+ITM_WOLF_PELT,item.wolf_pelt.name,item.wolf_pelt.desc,ch01;material,1,Material,Common,999,6,false,false,false,,0,0,,sprite.item.wolf_pelt
+ITM_IRON_SHARD,item.iron_shard.name,item.iron_shard.desc,ch01;material,1,Material,Refined,999,12,false,false,false,,0,0,,sprite.item.iron_shard
+ITM_BANDIT_TOKEN,item.bandit_token.name,item.bandit_token.desc,ch01;quest,1,QuestItem,Refined,1,0,false,false,false,,0,0,,sprite.item.bandit_token
+ITM_MAP_BLACKWIND,item.map_blackwind.name,item.map_blackwind.desc,ch01;quest,1,QuestItem,Rare,1,0,false,false,false,,0,0,,sprite.item.map_blackwind

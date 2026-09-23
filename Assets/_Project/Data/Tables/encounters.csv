@@ -1,0 +1,8 @@
+# 《西游：第八十二难》遭遇定义表 v1
+# enemyIds 顺序即 3×2 阵型的布阵顺序（前三个为前排，后面为后排）。
+# formation 为策划备注用的阵型标签，运行时按 enemyIds 顺序落位。
+id,displayNameKey,descriptionKey,tags,version,chapterIndex,enemyIds,formation,isElite,isBoss,bossPhaseIds,backgroundKey,bgmKey,allowFlee,defeatGameOver
+ENC_CH01_001,enc.ch01.001.name,enc.ch01.001.desc,ch01;random,1,1,ENM_BANDIT;ENM_BANDIT,2x1,false,false,,bg.ch01.road,music.battle.normal,true,false
+ENC_CH01_002,enc.ch01.002.name,enc.ch01.002.desc,ch01;random,1,1,ENM_BANDIT;ENM_WOLF,2x1,false,false,,bg.ch01.road,music.battle.normal,true,false
+EENC_CH01_001,enc.ch01.003.name,enc.ch01.003.desc,ch01;elite,1,1,ENM_BANDIT_ARCHER;ENM_BANDIT;ENM_BANDIT,3x1,true,false,,bg.ch01.road,music.battle.elite,true,false
+BENC_CH01_001,enc.ch01.boss.name,enc.ch01.boss.desc,ch01;boss,1,1,ENM_BANDIT_LEADER,1x1,false,true,BSP_CH01_001_P1;BSP_CH01_001_P2,bg.ch01.stronghold,music.battle.boss,false,true

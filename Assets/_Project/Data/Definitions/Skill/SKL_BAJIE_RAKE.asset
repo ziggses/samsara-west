@@ -1,0 +1,36 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: eeb0fd57a4cc996408aa9fc4e8aff3dd, type: 3}
+  m_Name: SKL_BAJIE_RAKE
+  m_EditorClassIdentifier: 
+  _id: SKL_BAJIE_RAKE
+  _displayNameKey: skill.bajie.rake.name
+  _descriptionKey: skill.bajie.rake.desc
+  _tags:
+  - ch01
+  - basic
+  _version: 1
+  _icon: {fileID: 0}
+  _power: 14
+  _element: 5
+  _nature: 0
+  _target: 5
+  _spiritCost: 8
+  _cooldownTurns: 0
+  _hitCount: 2
+  _breakDamage: 9
+  _appliedStatusId: 
+  _statusChance: 0
+  _healPower: 0
+  _vfxKey: vfx.bajie.rake
+  _animationKey: anim.bajie.rake
+  _sfxKey: sfx.bajie.rake

@@ -1,0 +1,4 @@
+# 《西游：第八十二难》商店定义表 v1
+# priceMultiplier 为售价倍率（1.0 = 按道具原价）；buybackMultiplier 为回收价倍率，必须落在 [0,1]。
+id,displayNameKey,descriptionKey,tags,version,chapterIndex,mapId,itemIds,recipeIds,priceMultiplier,buybackMultiplier,restocksOnChapterChange,merchantNameKey
+SHP_CH01_001,shop.ch01.001.name,shop.ch01.001.desc,ch01;shop,1,1,CH01_MAP02,ITM_POTION_SMALL;ITM_POTION_SPIRIT;ITM_ANTIDOTE;ITM_HERB,RCP_POTION_SMALL,1,0.4,true,shop.ch01.001.merchant

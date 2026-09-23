@@ -1,0 +1,36 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 098b04c4551dd1d4e8d2a798b798604f, type: 3}
+  m_Name: ENM_WOLF
+  m_EditorClassIdentifier: 
+  _id: ENM_WOLF
+  _displayNameKey: enemy.wolf.name
+  _descriptionKey: enemy.wolf.desc
+  _tags:
+  - ch01
+  - beast
+  _version: 1
+  _icon: {fileID: 0}
+  _maxHealth: 70
+  _attack: 16
+  _defense: 5
+  _speed: 15
+  _element: 4
+  _breakThreshold: 18
+  _weakToElement: 3
+  _skillIds:
+  - SKL_WOLF_BITE
+  _aiProfileKey: ai.aggressive.beast
+  _lootTableId: LUT_ENM_WOLF
+  _goldReward: 6
+  _experienceReward: 16
+  _isBoss: 0

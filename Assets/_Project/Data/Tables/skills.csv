@@ -1,0 +1,16 @@
+# 《西游：第八十二难》技能定义表 v1
+# nature：Physical/Mystic/True；target：Self/SingleEnemy/SingleAlly/AllEnemies/AllAllies/Column/Row/RandomEnemy
+# 伤害公式：floor((power + 攻击力 - 防御力*0.5) * 五行倍率 * 破防倍率)，见 Docs/战斗数值-v1.md
+id,displayNameKey,descriptionKey,tags,version,power,element,nature,target,spiritCost,cooldownTurns,hitCount,breakDamage,appliedStatusId,statusChance,healPower,vfxKey,animationKey,sfxKey
+SKL_WUKONG_STAFF,skill.wukong.staff.name,skill.wukong.staff.desc,ch01;basic,1,8,Fire,Physical,SingleEnemy,0,0,1,10,,0,0,vfx.wukong.staff,anim.wukong.staff,sfx.wukong.staff
+SKL_WUKONG_RAGE,skill.wukong.rage.name,skill.wukong.rage.desc,ch01;signature,1,22,Fire,Physical,SingleEnemy,12,3,1,22,,0,0,vfx.wukong.rage,anim.wukong.rage,sfx.wukong.rage
+SKL_WUKONG_FIRE_EYE,skill.wukong.fire_eye.name,skill.wukong.fire_eye.desc,ch01;mystic,1,16,Fire,Mystic,SingleEnemy,10,2,1,14,STS_BURN,0.6,0,vfx.wukong.fire_eye,anim.wukong.fire_eye,sfx.wukong.fire_eye
+SKL_BAJIE_RAKE,skill.bajie.rake.name,skill.bajie.rake.desc,ch01;basic,1,14,Earth,Physical,Column,8,0,2,9,,0,0,vfx.bajie.rake,anim.bajie.rake,sfx.bajie.rake
+SKL_BAJIE_TAUNT,skill.bajie.taunt.name,skill.bajie.taunt.desc,ch01;control,1,10,Earth,Physical,SingleEnemy,6,2,1,12,STS_STUN,0.35,0,vfx.bajie.taunt,anim.bajie.taunt,sfx.bajie.taunt
+SKL_SHAWUJING_SAND,skill.shawujing.sand.name,skill.shawujing.sand.desc,ch01;mystic,1,12,Water,Mystic,AllEnemies,12,2,1,8,STS_WEAKEN,0.4,0,vfx.shawujing.sand,anim.shawujing.sand,sfx.shawujing.sand
+SKL_TANGSENG_HEAL,skill.tangseng.heal.name,skill.tangseng.heal.desc,ch01;support,1,0,Wood,Mystic,SingleAlly,10,0,1,0,STS_BLESSED,1,40,vfx.tangseng.heal,anim.tangseng.heal,sfx.tangseng.heal
+SKL_TANGSENG_SHIELD,skill.tangseng.shield.name,skill.tangseng.shield.desc,ch01;support,1,0,None,Mystic,SingleAlly,12,2,1,0,STS_SHIELD,1,15,vfx.tangseng.shield,anim.tangseng.shield,sfx.tangseng.shield
+SKL_BANDIT_SLASH,skill.bandit.slash.name,skill.bandit.slash.desc,enemy;ch01,1,6,Metal,Physical,SingleEnemy,0,0,1,6,,0,0,vfx.bandit.slash,anim.bandit.slash,sfx.bandit.slash
+SKL_BANDIT_SHOT,skill.bandit.shot.name,skill.bandit.shot.desc,enemy;ch01,1,7,Metal,Physical,RandomEnemy,0,1,1,4,,0,0,vfx.bandit.shot,anim.bandit.shot,sfx.bandit.shot
+SKL_BANDIT_LEADER_CLEAVE,skill.bandit.leader_cleave.name,skill.bandit.leader_cleave.desc,enemy;ch01;boss,1,14,Wood,Physical,Column,8,2,1,16,STS_WEAKEN,0.5,0,vfx.bandit.cleave,anim.bandit.cleave,sfx.bandit.cleave
+SKL_WOLF_BITE,skill.wolf.bite.name,skill.wolf.bite.desc,enemy;ch01,1,9,Fire,Physical,SingleEnemy,0,1,2,5,,0,0,vfx.wolf.bite,anim.wolf.bite,sfx.wolf.bite

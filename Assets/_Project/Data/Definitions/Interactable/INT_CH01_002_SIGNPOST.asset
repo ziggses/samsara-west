@@ -1,0 +1,34 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ccb1b488a09f9b749ae4291be2fa6ed3, type: 3}
+  m_Name: INT_CH01_002_SIGNPOST
+  m_EditorClassIdentifier: 
+  _id: INT_CH01_002_SIGNPOST
+  _displayNameKey: int.ch01.002.name
+  _descriptionKey: int.ch01.002.desc
+  _tags:
+  - ch01
+  - prop
+  _version: 1
+  _icon: {fileID: 0}
+  _mapId: CH01_MAP01
+  _gridX: 6
+  _gridY: 4
+  _interactionTypeKey: interact.examine
+  _targetId: DLG_CH01_002
+  _requiredStateKey: 
+  _requiredOperator: 0
+  _requiredValue: 0
+  _oneShot: 0
+  _isHiddenUntilConditionMet: 0
+  _promptKey: ui.prompt.examine
+  _interactSpriteKey: sprite.int.signpost

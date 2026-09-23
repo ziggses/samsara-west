@@ -1,0 +1,7 @@
+# 《西游：第八十二难》可交互物定义表 v1
+# interactionTypeKey 必须是键名（如 interact.dialogue / interact.chest / interact.examine）。
+# targetId 指向被触发的目标（对话 ID / 掉落表 ID 等），纯装饰物留空。
+id,displayNameKey,descriptionKey,tags,version,mapId,gridX,gridY,interactionTypeKey,targetId,requiredStateKey,requiredOperator,requiredValue,oneShot,isHiddenUntilConditionMet,promptKey,interactSpriteKey
+INT_CH01_001_VILLAGER,int.ch01.001.name,int.ch01.001.desc,ch01;npc,1,CH01_MAP01,3,4,interact.dialogue,DLG_CH01_001,,Equal,0,false,false,ui.prompt.talk,sprite.int.villager
+INT_CH01_002_SIGNPOST,int.ch01.002.name,int.ch01.002.desc,ch01;prop,1,CH01_MAP01,6,4,interact.examine,DLG_CH01_002,,Equal,0,false,false,ui.prompt.examine,sprite.int.signpost
+INT_CH01_003_CHEST,int.ch01.003.name,int.ch01.003.desc,ch01;chest,1,CH01_MAP02,8,5,interact.chest,LUT_ENM_BANDIT,flag.ch01.prologue_done,Equal,1,true,true,ui.prompt.open,sprite.int.chest
