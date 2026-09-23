@@ -130,10 +130,35 @@ namespace SamsaraWest.Editor
                 asset = ScriptableObject.CreateInstance<LocalizationTable>();
                 AssetDatabase.CreateAsset(asset, SamsaraWestPaths.LocalizationTableAsset);
             }
+            else if (TableMatches(asset, entries))
+            {
+                // 文本没变就别标脏：重写同样内容只会让工作区多一个假改动。
+                return;
+            }
 
             asset.SetEntries(LanguageCode, entries);
             EditorUtility.SetDirty(asset);
             summary.Say($"本地化表资产已更新（语言 {LanguageCode}）。");
+        }
+
+        private static bool TableMatches(LocalizationTable asset, List<LocalizationTable.Entry> entries)
+        {
+            if (!string.Equals(asset.Language, LanguageCode, StringComparison.Ordinal) || asset.Count != entries.Count)
+            {
+                return false;
+            }
+
+            var current = asset.Entries;
+            for (var i = 0; i < entries.Count; i++)
+            {
+                if (!string.Equals(current[i].Key, entries[i].Key, StringComparison.Ordinal) ||
+                    !string.Equals(current[i].Text, entries[i].Text, StringComparison.Ordinal))
+                {
+                    return false;
+                }
+            }
+
+            return true;
         }
 
         /// <summary>生成 key 常量类，让代码里写 LocalizationKeys.UiBattleCommandAttack 而不是裸字符串。</summary>

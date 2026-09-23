@@ -64,7 +64,13 @@ namespace SamsaraWest.Editor
                     assetPath: $"{SamsaraWestPaths.DataTables}/{unmapped}.csv");
             }
 
-            EditorUtility.SetDirty(manifest);
+            // 一张表都没导入时不要碰清单：SetDirty 会把内容不变的资产整份重写一遍，mtime 一变，
+            // 工作区就平白多出一个「看起来改过」的生成物。（单表导入时 ImportTable 已经标脏过清单。）
+            if (summary.ImportedTables > 0)
+            {
+                EditorUtility.SetDirty(manifest);
+            }
+
             AssetDatabase.SaveAssets();
 
             RebuildCatalog(summary);
@@ -253,6 +259,10 @@ namespace SamsaraWest.Editor
 
             // 排序后写入：目录资产的序列化顺序稳定，git diff 才有意义。
             definitions.Sort(static (left, right) => string.CompareOrdinal(left.Id, right.Id));
+
+            // 每次跑初始化都会重建目录，但重建结果常常和磁盘上一模一样。内容没变就别落盘，
+            // 否则 mtime 白白变掉，工作区又多一个假改动。
+            var contentChanged = CatalogContentDiffers(catalog, definitions);
             catalog.SetDefinitions(definitions);
 
             var validation = new ValidationReport();
@@ -260,9 +270,36 @@ namespace SamsaraWest.Editor
             summary?.Report.Absorb(validation);
             summary?.Say($"目录重建：{catalog.Count} 条定义，重复 ID {catalog.Duplicates.Count} 条，校验问题 {validation.Issues.Count} 条。");
 
-            EditorUtility.SetDirty(catalog);
-            AssetDatabase.SaveAssets();
+            if (contentChanged)
+            {
+                EditorUtility.SetDirty(catalog);
+                AssetDatabase.SaveAssets();
+            }
+
             return catalog;
+        }
+
+        /// <summary>
+        /// 目录资产序列化下去的只有 _definitions 这一份列表（ID 索引与重复项都是 NonSerialized），
+        /// 所以按引用逐项比对就能确定要不要落盘——同一资产在同一次会话里只会有一个实例。
+        /// </summary>
+        private static bool CatalogContentDiffers(DefinitionCatalog catalog, List<DefinitionBase> definitions)
+        {
+            var current = catalog.Definitions;
+            if (current.Count != definitions.Count)
+            {
+                return true;
+            }
+
+            for (var i = 0; i < definitions.Count; i++)
+            {
+                if (!ReferenceEquals(current[i], definitions[i]))
+                {
+                    return true;
+                }
+            }
+
+            return false;
         }
 
         public static DataImportManifest LoadOrCreateManifest()

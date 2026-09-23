@@ -72,6 +72,40 @@ namespace SamsaraWest.Tests.EditMode
         }
 
         [Test]
+        public void GeneratedArtifacts_AreNotRewrittenWhenNothingChanged()
+        {
+            // 「跳过」如果只做到逻辑上跳过，Unity 仍会把内容相同的资产整份重写：mtime 一变，
+            // 跑完初始化工作区就多出几个假改动。所以这里不看逻辑，直接看文件写入时间。
+            CsvImporter.ImportAll(force: true);
+            LocalizationImporter.ImportAll();
+            AssetDatabase.SaveAssets();
+
+            var artifacts = new[]
+            {
+                SamsaraWestPaths.ImportManifestAsset,
+                SamsaraWestPaths.DefinitionCatalogAsset,
+                SamsaraWestPaths.LocalizationTableAsset,
+            };
+
+            var before = new System.DateTime[artifacts.Length];
+            for (var i = 0; i < artifacts.Length; i++)
+            {
+                before[i] = File.GetLastWriteTimeUtc(CsvImporter.ToAbsolutePath(artifacts[i]));
+            }
+
+            CsvImporter.ImportAll(force: false);
+            LocalizationImporter.ImportAll();
+
+            for (var i = 0; i < artifacts.Length; i++)
+            {
+                Assert.AreEqual(
+                    before[i],
+                    File.GetLastWriteTimeUtc(CsvImporter.ToAbsolutePath(artifacts[i])),
+                    $"{artifacts[i]} 内容未变却被重写，跑完初始化工作区会平白多出改动。");
+            }
+        }
+
+        [Test]
         public void ImportTable_ForcedUpdate_KeepsAssetPathAndGuid()
         {
             Assert.IsTrue(DefinitionImportMap.TryResolve(ItemsTable, out var binding));

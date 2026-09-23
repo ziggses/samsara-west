@@ -152,6 +152,10 @@ Unity.exe -batchmode -quit -projectPath E:\tx2\samsara-west ^
    所以 `SamsaraWest/工程/一键初始化骨架`（含 `setup-project.ps1`）对已存在的场景直接跳过，不再弄脏工作区；
    只有场景缺失、或它已引用不到当前数据资产（资产被删掉重建、GUID 变了）时才重建。
    要强制重建用菜单 `SamsaraWest/工程/重建引导场景`。
+6. **`SetDirty` + `SaveAssets` 会把内容没变的资产整份重写**，mtime 一变，`git status` 就会把生成物显示成已修改
+   （`git diff` 却是空的：内容逐字节相同）。所以导入管线一律「内容没变就不落盘」——清单、数据目录、
+   本地化表、本地化常量类都按这条写，新增生成物时请照办，否则每次初始化都会留下假改动。
+   注意测试套件里有强制全量导入（`ImportAll(force: true)`），跑完测试清单时间戳会变，这是预期内的。
 
 ## 设计文档
 
