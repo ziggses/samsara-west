@@ -151,6 +151,18 @@ catch {
     Write-Line "Could not read the editor exit code: $($_.Exception.Message)" 'Yellow'
 }
 
+# A compile error means RunAll never ran: whatever sits on disk is left over from an earlier run, so
+# listing those files as "OK" would be a lie. Fail before the artifact table, not after it.
+$compileErrors = @(Select-String -LiteralPath $logFile -Pattern 'error CS' -SimpleMatch -ErrorAction SilentlyContinue)
+if ($compileErrors.Count -gt 0) {
+    Write-Line "The editor did not compile, so the project was never initialised ($($compileErrors.Count) errors):" 'Red'
+    foreach ($compileError in $compileErrors | Select-Object -First 10) {
+        Write-Line "  $($compileError.Line.Trim())" 'DarkRed'
+    }
+
+    Stop-Setup "Fix the compile errors, then re-run. Log: $logFile" 1
+}
+
 # --- artifacts: the only proof that RunAll actually produced the project -------------------
 $expected = [ordered] @{
     'data catalog'        = 'Assets\_Project\Data\Generated\DefinitionCatalog.asset'
@@ -169,12 +181,6 @@ foreach ($entry in $expected.GetEnumerator()) {
         Write-Line ("MISSING {0,-19} {1}" -f $entry.Key, $entry.Value) 'Red'
         $missing += $entry.Key
     }
-}
-
-$compileErrors = @(Select-String -LiteralPath $logFile -Pattern 'error CS' -SimpleMatch -ErrorAction SilentlyContinue)
-if ($compileErrors.Count -gt 0) {
-    Write-Line "Compile errors in $logFile :" 'Red'
-    foreach ($error in $compileErrors | Select-Object -First 10) { Write-Line "  $($error.Line)" 'DarkRed' }
 }
 
 $report = @()

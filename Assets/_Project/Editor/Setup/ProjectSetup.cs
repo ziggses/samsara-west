@@ -167,8 +167,31 @@ namespace SamsaraWest.Editor
             return config;
         }
 
-        public static void CreateBootstrapScene()
+        [MenuItem("SamsaraWest/工程/重建引导场景", priority = 2)]
+        public static void RebuildBootstrapScene()
         {
+            CreateBootstrapScene(true);
+        }
+
+        /// <summary>
+        /// 建引导场景。场景已存在且三个资产引用都还在时直接跳过：重建会重新分配其中的 fileID，
+        /// 于是「每次跑初始化都把工作区弄脏」——而初始化本身是幂等操作，不该有这种副作用。
+        /// 引用失效（资产被删掉重建、GUID 变了）时才重建，否则场景里的引用会静默变成 null。
+        /// </summary>
+        public static void CreateBootstrapScene(bool force = false)
+        {
+            if (!force)
+            {
+                if (SceneIsUpToDate(out var reason))
+                {
+                    Debug.Log(
+                        $"[SamsaraWest] 引导场景已是既有状态，跳过重建：{SamsaraWestPaths.BootstrapScene}（强制重建用菜单 SamsaraWest/工程/重建引导场景）。");
+                    return;
+                }
+
+                Debug.Log($"[SamsaraWest] 重建引导场景：{reason}");
+            }
+
             var catalog = AssetDatabase.LoadAssetAtPath<DefinitionCatalog>(SamsaraWestPaths.DefinitionCatalogAsset);
             var localizationTable = AssetDatabase.LoadAssetAtPath<LocalizationTable>(SamsaraWestPaths.LocalizationTableAsset);
             var battleConfig = AssetDatabase.LoadAssetAtPath<BattleConfig>(SamsaraWestPaths.BattleConfigAsset);
@@ -219,6 +242,41 @@ namespace SamsaraWest.Editor
             }
 
             Debug.Log($"[SamsaraWest] 已生成引导场景：{SamsaraWestPaths.BootstrapScene}（相机已设 480×270 参考分辨率、32 PPU）。");
+        }
+
+        /// <summary>
+        /// 判断已有引导场景是否还引用得到当前的三个数据资产。只看「文件在不在」不够：
+        /// 资产被删掉重建后 GUID 会变，场景里的引用会静默变成 null，运行期才发现就晚了。
+        /// GetDependencies 不打开场景，因此不会打断编辑器里正在编辑的其它场景。
+        /// </summary>
+        private static bool SceneIsUpToDate(out string reason)
+        {
+            var absoluteScenePath = CsvImporter.ToAbsolutePath(SamsaraWestPaths.BootstrapScene);
+            if (!File.Exists(absoluteScenePath))
+            {
+                reason = "场景文件不存在";
+                return false;
+            }
+
+            var dependencies = AssetDatabase.GetDependencies(SamsaraWestPaths.BootstrapScene, true);
+            var required = new[]
+            {
+                SamsaraWestPaths.DefinitionCatalogAsset,
+                SamsaraWestPaths.LocalizationTableAsset,
+                SamsaraWestPaths.BattleConfigAsset,
+            };
+
+            for (var i = 0; i < required.Length; i++)
+            {
+                if (Array.IndexOf(dependencies, required[i]) < 0)
+                {
+                    reason = $"场景未引用 {required[i]}（该资产可能被删掉重建过）";
+                    return false;
+                }
+            }
+
+            reason = null;
+            return true;
         }
 
         public static void ConfigureBuildSettings()

@@ -148,10 +148,10 @@ Unity.exe -batchmode -quit -projectPath E:\tx2\samsara-west ^
 3. 带中文的 `.ps1` **必须存成 UTF-8 with BOM**，否则 PowerShell 5.1 按 GBK 解码会乱码；
    `Tools/setup-external-assets.ps1` 的默认中文路径用 char code 拼出，不依赖文件编码。
 4. 素材源目录不可写会导致导入失败（Unity 要写 `.meta`）。
-5. `SamsaraWest/工程/一键初始化骨架`（含 `setup-project.ps1`）每次都会重建引导场景并重新分配其中的 `fileID`：
-   实测连续两次运行产出的 blob 互不相同，因此跑完 `git status` 里 `Bootstrap.unity` 必然是脏的。
-   确认三个资产引用 guid 未变后 `git checkout --` 回退即可；若想彻底消除，需让 `CreateBootstrapScene`
-   在场景已存在时提前返回（`CreateBattleConfigAsset` 已是这个写法）。
+5. 引导场景只在必要时重建。重建会重新分配场景里的 `fileID`（实测连续两次运行产出的 blob 互不相同），
+   所以 `SamsaraWest/工程/一键初始化骨架`（含 `setup-project.ps1`）对已存在的场景直接跳过，不再弄脏工作区；
+   只有场景缺失、或它已引用不到当前数据资产（资产被删掉重建、GUID 变了）时才重建。
+   要强制重建用菜单 `SamsaraWest/工程/重建引导场景`。
 
 ## 设计文档
 
