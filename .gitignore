@@ -1,0 +1,75 @@
+# ===========================================================================
+#  Unity 2022.3 (LTS) —《西游：第八十二难》samsara-west
+# ===========================================================================
+
+# --- Unity 生成目录（绝不入库）-------------------------------------------
+/[Ll]ibrary/
+/[Tt]emp/
+/[Oo]bj/
+/[Bb]uild/
+/[Bb]uilds/
+/[Ll]ogs/
+/[Uu]ser[Ss]ettings/
+/[Mm]emoryCaptures/
+/[Rr]ecordings/
+/.utmp/
+/.vs/
+/.idea/
+/.vscode/
+/.gradle/
+/[Ee]xported[Oo]bj/
+
+# --- 外部素材（经目录 junction 接入，单一真源在 E:\tx2\素材）--------------
+# junction 不随仓库分发；换机器后用 Tools/setup-external-assets.ps1 重建
+/[Aa]ssets/_External/
+/[Aa]ssets/_External.meta
+
+# --- 设计文档与剧本（实体保留在仓库外的 E:\tx2\开发md文件）----------------
+# 若需随仓库分发，取消下面两行的注释并移除对应的忽略规则
+/开发md文件/
+/[Dd]ocs/[Nn]arrative/
+
+# --- 资源元数据：仅忽略与已忽略资源对应的 meta ----------------------------
+!/[Aa]ssets/**/*.meta
+
+# --- IDE / 编辑器临时文件 -------------------------------------------------
+*.csproj
+*.unityproj
+*.sln
+*.suo
+*.tmp
+*.user
+*.userprefs
+*.pidb
+*.booproj
+*.svd
+*.pdb
+*.mdb
+*.opendb
+*.VC.db
+*.VC.opendb
+*.pidb.meta
+*.pdb.meta
+*.mdb.meta
+*.DotSettings.user
+
+# --- 构建产物 -------------------------------------------------------------
+*.apk
+*.aab
+*.unitypackage
+*.app
+/[Bb]uilds/Windows/
+/[Bb]uilds/WebGL/
+/[Bb]uilds/Windows.zip
+/[Bb]uilds/WebGL.zip
+
+# --- 崩溃报告 -------------------------------------------------------------
+sysinfo.txt
+crashlytics-build.properties
+
+# --- OS / PowerShell 杂项 --------------------------------------------------
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+.DS_Store
