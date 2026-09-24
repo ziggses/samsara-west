@@ -2,7 +2,16 @@
 # itemIds/weights/minCounts/maxCounts 四个数组必须等长；guaranteedItemIds 与 guaranteedItemCounts 必须等长。
 # dropRolls 为该表的抽取次数（每次按权重抽一条）。
 id,displayNameKey,descriptionKey,tags,version,itemIds,weights,minCounts,maxCounts,guaranteedItemIds,guaranteedItemCounts,dropRolls,goldMin,goldMax
-LUT_ENM_BANDIT,loot.enm.bandit.name,loot.enm.bandit.desc,ch01;loot,1,ITM_WOLF_PELT;ITM_HERB,70;30,1;1,1;2,,0,1,4,10
-LUT_ENM_BANDIT_ARCHER,loot.enm.bandit_archer.name,loot.enm.bandit_archer.desc,ch01;loot,1,ITM_IRON_SHARD;ITM_HERB,50;50,1;1,1;1,,0,1,5,11
-LUT_ENM_WOLF,loot.enm.wolf.name,loot.enm.wolf.desc,ch01;loot,1,ITM_WOLF_PELT,100,1,2,,0,1,3,8
-LUT_ENM_BANDIT_LEADER,loot.enm.bandit_leader.name,loot.enm.bandit_leader.desc,ch01;loot;boss,1,ITM_WOLF_PELT;ITM_IRON_SHARD,60;40,1;1,2;2,ITM_BANDIT_TOKEN,1,2,40,60
+LUT_ENM_BANDIT,loot.enm.bandit.name,loot.enm.bandit.desc,legacy;loot,1,ITM_WOLF_PELT;ITM_HERB,70;30,1;1,1;2,,0,1,4,10
+LUT_ENM_BANDIT_ARCHER,loot.enm.bandit_archer.name,loot.enm.bandit_archer.desc,legacy;loot,1,ITM_IRON_SHARD;ITM_HERB,50;50,1;1,1;1,,0,1,5,11
+LUT_ENM_WOLF,loot.enm.wolf.name,loot.enm.wolf.desc,legacy;loot,1,ITM_WOLF_PELT,100,1,2,,0,1,3,8
+LUT_ENM_BANDIT_LEADER,loot.enm.bandit_leader.name,loot.enm.bandit_leader.desc,legacy;loot;boss,1,ITM_WOLF_PELT;ITM_IRON_SHARD,60;40,1;1,2;2,ITM_BANDIT_TOKEN,1,2,40,60
+LUT_ENM_CH01_DRUNK_MONKEY,loot.enm.ch01.drunk_monkey.name,loot.enm.ch01.drunk_monkey.desc,ch01;loot,1,ITM_PEACH_WINE;ITM_HERB,60;40,1;1,1;2,,0,1,6,14
+LUT_ENM_CH01_STONE_THROWER,loot.enm.ch01.stone_thrower.name,loot.enm.ch01.stone_thrower.desc,ch01;loot,1,ITM_STONE_SHARD;ITM_HERB,55;45,1;1,1;1,,0,1,5,12
+LUT_ENM_CH01_ROTTEN_PEACH,loot.enm.ch01.rotten_peach.name,loot.enm.ch01.rotten_peach.desc,ch01;loot,1,ITM_ROTTEN_PEACH_CORE,100,1,2,,0,1,7,15
+LUT_ENM_CH01_VINE_SPIRIT,loot.enm.ch01.vine_spirit.name,loot.enm.ch01.vine_spirit.desc,ch01;loot,1,ITM_VINE_FIBER;ITM_HERB,70;30,1;1,1;2,,0,1,6,13
+LUT_ENM_CH01_MOUNTAIN_APE,loot.enm.ch01.mountain_ape.name,loot.enm.ch01.mountain_ape.desc,ch01;loot,1,ITM_APE_FANG,100,1,1,,0,1,8,16
+LUT_ENM_CH01_BANQUET_MONKEY,loot.enm.ch01.banquet_monkey.name,loot.enm.ch01.banquet_monkey.desc,ch01;loot,1,ITM_BANQUET_CUP;ITM_HERB,60;40,1;1,1;1,,0,1,6,14
+LUT_ENM_CH01_MONKEY_GRUNT,loot.enm.ch01.monkey_grunt.name,loot.enm.ch01.monkey_grunt.desc,ch01;loot,1,ITM_STONE_SHARD;ITM_HERB,50;50,1;1,1;1,,0,1,5,12
+LUT_ENM_CH01_NAMELESS_BONE,loot.enm.ch01.nameless_bone.name,loot.enm.ch01.nameless_bone.desc,ch01;loot;hidden,1,ITM_BONE_ASH,100,1,1,,0,1,0,0
+LUT_ENM_CH01_MONKEY_KING,loot.enm.ch01.monkey_king.name,loot.enm.ch01.monkey_king.desc,ch01;loot;boss,1,ITM_MEMORY_SHARD;ITM_ROTTEN_PEACH_CORE,60;40,1;1,2;2,ITM_MEMORY_SHARD,1,2,180,260

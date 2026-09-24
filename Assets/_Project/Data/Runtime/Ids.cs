@@ -43,8 +43,8 @@ namespace SamsaraWest.Data
             { DefinitionKind.Status, @"^STS_[A-Z0-9_]{2,40}$" },
             { DefinitionKind.Enemy, @"^ENM_[A-Z0-9_]{2,40}$" },
 
-            // 遭遇：普通 ENC_、精英 EENC_、Boss BENC_，后接章节与三位序号。
-            { DefinitionKind.Encounter, @"^(ENC|EENC|BENC)_CH\d{2}_\d{3}$" },
+            // 遭遇：普通 ENC_、精英 EENC_、Boss BENC_、隐藏 OPT_，后接章节与三位序号。
+            { DefinitionKind.Encounter, @"^(ENC|EENC|BENC|OPT)_CH\d{2}_\d{3}$" },
             { DefinitionKind.BossPhase, @"^BSP_CH\d{2}_\d{3}_P\d$" },
 
             { DefinitionKind.Item, @"^ITM_[A-Z0-9_]{2,40}$" },

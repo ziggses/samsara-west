@@ -16,7 +16,7 @@ MonoBehaviour:
   _displayNameKey: item.map_blackwind.name
   _descriptionKey: item.map_blackwind.desc
   _tags:
-  - ch01
+  - legacy
   - quest
   _version: 1
   _icon: {fileID: 0}

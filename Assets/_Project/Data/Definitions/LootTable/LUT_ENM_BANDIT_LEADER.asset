@@ -16,7 +16,7 @@ MonoBehaviour:
   _displayNameKey: loot.enm.bandit_leader.name
   _descriptionKey: loot.enm.bandit_leader.desc
   _tags:
-  - ch01
+  - legacy
   - loot
   - boss
   _version: 1

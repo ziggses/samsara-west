@@ -17,7 +17,7 @@ MonoBehaviour:
   _descriptionKey: skill.bandit.leader_cleave.desc
   _tags:
   - enemy
-  - ch01
+  - legacy
   - boss
   _version: 1
   _icon: {fileID: 0}

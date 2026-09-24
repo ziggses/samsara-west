@@ -1,3 +1,4 @@
+using SamsaraWest.Battle;
 using SamsaraWest.Data;
 using UnityEditor;
 using UnityEngine;
@@ -12,7 +13,7 @@ namespace SamsaraWest.Editor
     ///   -executeMethod SamsaraWest.Editor.HeadlessTasks.ImportAndValidate ^
     ///   -logFile &lt;日志&gt;
     /// </code>
-    /// 退出码：0 通过，2 校验有错误，3 命中硬编码中文。
+    /// 退出码：0 通过，2 校验有错误或节奏校算不完整，3 命中硬编码中文。
     /// </summary>
     public static class HeadlessTasks
     {
@@ -56,6 +57,96 @@ namespace SamsaraWest.Editor
             var failed = summary.Report.HasErrors || localization.Report.HasErrors;
             Debug.Log($"[CI] data_errors={CountErrors(summary.Report)} loc_errors={CountErrors(localization.Report)} loc_keys={localization.KeyCount}");
             Finish(failed ? ExitValidationFailed : ExitOk);
+        }
+
+        /// <summary>
+        /// 战斗节奏校算：全量重导入后按最低配打法打印每场遭遇打几回合，
+        /// 让「常规 4–6 回合、Boss 10–15 回合」这条设计目标在不打开编辑器的前提下也能一眼核对。
+        /// 越界只报警告：判死的红线由 <c>EncounterPacingTests</c> 持有，这里不做第二套断言。
+        /// 退出码：0 校算完整，2 有遭遇算不出来（缺敌人、血量写坏导致回合数不收敛）。
+        /// </summary>
+        public static void EstimatePacing()
+        {
+            var import = CsvImporter.ImportAll(true);
+            if (import.Report.HasErrors)
+            {
+                Debug.LogWarning("[SamsaraWest] 表格有错误，节奏校算基于可能不完整的数据。");
+            }
+
+            var catalog = AssetDatabase.LoadAssetAtPath<DefinitionCatalog>(SamsaraWestPaths.DefinitionCatalogAsset);
+            if (catalog == null)
+            {
+                Debug.LogError("[SamsaraWest] 定义目录资产缺失，无法校算。");
+                Finish(ExitValidationFailed);
+                return;
+            }
+
+            catalog.Rebuild();
+            var config = BattleConfig.CreateDefault();
+            try
+            {
+                var total = 0;
+                var problems = 0;
+                for (var chapter = 1; chapter <= 8; chapter++)
+                {
+                    var report = EncounterPacingEstimator.EstimateChapter(config, catalog, chapter);
+                    if (report.Encounters.Count == 0 && report.Problems.Count == 0)
+                    {
+                        continue;
+                    }
+
+                    Debug.Log($"[SamsaraWest] 第 {chapter} 章：{report.Encounters.Count} 场遭遇");
+                    foreach (var pacing in report.Encounters)
+                    {
+                        Debug.Log($"[SamsaraWest]     {pacing}");
+                        total++;
+                        if (TryDescribeOutOfRange(pacing, out var note))
+                        {
+                            Debug.LogWarning($"[SamsaraWest]     {note}");
+                        }
+                    }
+
+                    foreach (var problem in report.Problems)
+                    {
+                        Debug.LogWarning($"[SamsaraWest]     {problem}");
+                        problems++;
+                    }
+                }
+
+                Debug.Log($"[CI] pacing_encounters={total} pacing_problems={problems}");
+                Finish(problems > 0 ? ExitValidationFailed : ExitOk);
+            }
+            finally
+            {
+                Object.DestroyImmediate(config);
+            }
+        }
+
+        /// <summary>把「超出设计目标」写成一句人话。只用于命令行提示，不参与判死。</summary>
+        private static bool TryDescribeOutOfRange(EncounterPacing pacing, out string note)
+        {
+            if (pacing.IsBoss)
+            {
+                if (pacing.Rounds < 10 || pacing.Rounds > 15)
+                {
+                    note = $"{pacing.EncounterId} 是 Boss 战，设计目标是 10–15 回合，当前 {pacing.Rounds} 回合。";
+                    return true;
+                }
+
+                if (pacing.PeakRoundHealthShare > 0.25f)
+                {
+                    note = $"{pacing.EncounterId} 单回合峰值 {pacing.PeakRoundHealthShare:P0}，超过阶段间距 25%。";
+                    return true;
+                }
+            }
+            else if (pacing.Rounds < 4 || pacing.Rounds > 6)
+            {
+                note = $"{pacing.EncounterId} 是常规遭遇，设计目标是 4–6 回合，当前 {pacing.Rounds} 回合。";
+                return true;
+            }
+
+            note = null;
+            return false;
         }
 
         /// <summary>硬编码中文扫描（FND-07 兜底网）。命中即失败，避免中文文案绕过文本键。</summary>

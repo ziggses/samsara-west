@@ -22,14 +22,15 @@ MonoBehaviour:
   _icon: {fileID: 0}
   _phaseIndex: 2
   _encounterId: BENC_CH01_001
-  _healthThreshold: 0.5
+  _healthThreshold: 0.7
   _skillIds:
-  - SKL_BANDIT_LEADER_CLEAVE
+  - SKL_KING_EARTH_FIST
+  - SKL_KING_RELEASE
   _onEnterStatusIds:
   - STS_HASTE
-  _attackMultiplier: 1.25
+  _attackMultiplier: 1.15
   _defenseMultiplier: 1
-  _speedMultiplier: 1.1
+  _speedMultiplier: 1.05
   _tauntKey: phase.ch01.boss.p2.taunt
   _bgmSwitchKey: bgm.battle.boss.p2
   _cameraCueKey: camera.boss.rage

@@ -9,3 +9,4 @@ STS_BREAK_VULN,status.break_vuln.name,status.break_vuln.desc,debuff;break,1,2,1,
 STS_SHIELD,status.shield.name,status.shield.desc,buff,1,2,1,Refresh,0,0,0.5,0,0.8,1,false,false,vfx.status.shield
 STS_BLESSED,status.blessed.name,status.blessed.desc,buff,1,3,1,Refresh,6,0,0,0,1,1,false,false,vfx.status.blessed
 STS_HASTE,status.haste.name,status.haste.desc,buff,1,2,1,Refresh,0,0,0,0.3,1,1,false,false,vfx.status.haste
+STS_SWEET_ROT,status.sweet_rot.name,status.sweet_rot.desc,debuff;ch01,1,2,1,Refresh,4,0,-0.25,0,1,1,false,true,vfx.status.sweet_rot

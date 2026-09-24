@@ -16,7 +16,7 @@ MonoBehaviour:
   _displayNameKey: item.iron_shard.name
   _descriptionKey: item.iron_shard.desc
   _tags:
-  - ch01
+  - legacy
   - material
   _version: 1
   _icon: {fileID: 0}

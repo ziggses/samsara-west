@@ -22,13 +22,15 @@ MonoBehaviour:
   _icon: {fileID: 0}
   _chapterIndex: 1
   _enemyIds:
-  - ENM_BANDIT_LEADER
+  - ENM_CH01_MONKEY_KING
   _formation: 1x1
   _isElite: 0
   _isBoss: 1
   _bossPhaseIds:
   - BSP_CH01_001_P1
   - BSP_CH01_001_P2
+  - BSP_CH01_001_P3
+  - BSP_CH01_001_P4
   _backgroundKey: bg.ch01.stronghold
   _bgmKey: music.battle.boss
   _allowFlee: 0

@@ -1,0 +1,37 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: eeb0fd57a4cc996408aa9fc4e8aff3dd, type: 3}
+  m_Name: SKL_MONKEY_GRUNT_STAB
+  m_EditorClassIdentifier: 
+  _id: SKL_MONKEY_GRUNT_STAB
+  _displayNameKey: skill.monkey_grunt_stab.name
+  _descriptionKey: skill.monkey_grunt_stab.desc
+  _tags:
+  - enemy
+  - ch01
+  - monkey
+  _version: 1
+  _icon: {fileID: 0}
+  _power: 9
+  _element: 5
+  _nature: 0
+  _target: 1
+  _spiritCost: 0
+  _cooldownTurns: 0
+  _hitCount: 1
+  _breakDamage: 6
+  _appliedStatusId: 
+  _statusChance: 0
+  _healPower: 0
+  _vfxKey: vfx.enemy.stab
+  _animationKey: anim.enemy.stab
+  _sfxKey: sfx.enemy.stab

@@ -36,7 +36,7 @@ namespace SamsaraWest.Save
     public sealed class SaveService : ISaveService
     {
         /// <summary>当前存档格式版本。破坏性改动时 +1，并在 <see cref="Migrate"/> 中补一条迁移。</summary>
-        public const int LatestVersion = 2;
+        public const int LatestVersion = 3;
 
         private readonly string _directory;
 
@@ -276,6 +276,44 @@ namespace SamsaraWest.Save
                     $"InventoryItemIds 有 {data.InventoryItemIds.Count} 项，InventoryItemCounts 有 {data.InventoryItemCounts.Count} 项，必须等长。");
             }
 
+            if (data.Equipment != null)
+            {
+                var occupiedSlots = new HashSet<string>(StringComparer.Ordinal);
+                for (var i = 0; i < data.Equipment.Count; i++)
+                {
+                    var assignment = data.Equipment[i];
+                    if (assignment == null)
+                    {
+                        problems.Add($"Equipment 第 {i + 1} 项为空。");
+                        continue;
+                    }
+
+                    if (string.IsNullOrWhiteSpace(assignment.CharacterId))
+                    {
+                        problems.Add($"Equipment 第 {i + 1} 项缺少成员 ID。");
+                        continue;
+                    }
+
+                    if (string.IsNullOrWhiteSpace(assignment.SlotId))
+                    {
+                        problems.Add($"Equipment 第 {i + 1} 项缺少栏位名（成员 {assignment.CharacterId}）。");
+                        continue;
+                    }
+
+                    if (string.IsNullOrWhiteSpace(assignment.ItemId))
+                    {
+                        problems.Add($"Equipment 第 {i + 1} 项缺少装备 ID（成员 {assignment.CharacterId} 的 {assignment.SlotId} 栏）。");
+                    }
+
+                    // 同一成员的同一栏位只能有一件，否则「身上到底穿的哪件」会变成读取顺序问题。
+                    var key = assignment.CharacterId.Trim() + "\u001F" + assignment.SlotId.Trim();
+                    if (!occupiedSlots.Add(key))
+                    {
+                        problems.Add($"成员 {assignment.CharacterId} 的 {assignment.SlotId} 栏位重复装备（第 {i + 1} 项）。");
+                    }
+                }
+            }
+
             for (var i = 0; i < data.FlagKeys.Count; i++)
             {
                 if (string.IsNullOrWhiteSpace(data.FlagKeys[i]))
@@ -333,6 +371,45 @@ namespace SamsaraWest.Save
                 data.Version = 2;
             }
 
+            if (data.Version == 2)
+            {
+                // v2 → v3：装备从「每人一件的扁平列表」改为「成员 × 栏位」（8 槽）。
+                // 旧档不记录栏位，一律落到武器栏——v2 时期唯一会被写入的正是武器。
+                // "Weapon" 必须与 Data.EquipmentSlot.Weapon 的名称一致，由 SaveServiceTests 钉住。
+                data.Equipment ??= new List<EquipmentAssignment>();
+                data.EquippedItemIds ??= new List<string>();
+                data.PartyCharacterIds ??= new List<string>();
+
+                var pairs = Math.Min(data.EquippedItemIds.Count, data.PartyCharacterIds.Count);
+                for (var i = 0; i < pairs; i++)
+                {
+                    var itemId = data.EquippedItemIds[i];
+                    if (string.IsNullOrWhiteSpace(itemId))
+                    {
+                        continue;
+                    }
+
+                    data.Equipment.Add(new EquipmentAssignment
+                    {
+                        CharacterId = data.PartyCharacterIds[i],
+                        SlotId = "Weapon",
+                        ItemId = itemId,
+                    });
+                }
+
+                if (data.EquippedItemIds.Count > data.PartyCharacterIds.Count)
+                {
+                    GameLog.Warn(
+                        LogChannel.Save,
+                        $"v2 存档有 {data.EquippedItemIds.Count} 件装备但只有 {data.PartyCharacterIds.Count} 名队员，" +
+                        "多出的装备没有归属对象，已丢弃。");
+                }
+
+                // 迁移完就清空旧字段：同一件事不能留两个真源，否则以后没人知道该读哪个。
+                data.EquippedItemIds.Clear();
+                data.Version = 3;
+            }
+
             data.FlagKeys ??= new List<string>();
             data.FlagValues ??= new List<int>();
             data.PartyCharacterIds ??= new List<string>();
@@ -340,6 +417,7 @@ namespace SamsaraWest.Save
             data.InventoryItemIds ??= new List<string>();
             data.InventoryItemCounts ??= new List<int>();
             data.EquippedItemIds ??= new List<string>();
+            data.Equipment ??= new List<EquipmentAssignment>();
 
             return data.Version == LatestVersion;
         }

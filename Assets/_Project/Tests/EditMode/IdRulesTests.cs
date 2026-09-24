@@ -16,6 +16,8 @@ namespace SamsaraWest.Tests.EditMode
         [TestCase(DefinitionKind.Encounter, "ENC_CH01_001")]
         [TestCase(DefinitionKind.Encounter, "EENC_CH01_002")]
         [TestCase(DefinitionKind.Encounter, "BENC_CH01_003")]
+        [TestCase(DefinitionKind.Encounter, "OPT_CH01_001")]
+        [TestCase(DefinitionKind.Encounter, "OPT_CH05_001")]
         [TestCase(DefinitionKind.BossPhase, "BSP_CH01_001_P2")]
         [TestCase(DefinitionKind.Item, "ITM_HEAL_PILL")]
         [TestCase(DefinitionKind.Equipment, "EQP_SWORD_001")]

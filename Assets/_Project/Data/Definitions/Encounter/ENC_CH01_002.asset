@@ -22,13 +22,14 @@ MonoBehaviour:
   _icon: {fileID: 0}
   _chapterIndex: 1
   _enemyIds:
-  - ENM_BANDIT
-  - ENM_WOLF
+  - ENM_CH01_ROTTEN_PEACH
+  - ENM_CH01_ROTTEN_PEACH
+  - ENM_CH01_VINE_SPIRIT
   _formation: 2x1
   _isElite: 0
   _isBoss: 0
   _bossPhaseIds: []
-  _backgroundKey: bg.ch01.road
+  _backgroundKey: bg.ch01.peach
   _bgmKey: music.battle.normal
   _allowFlee: 1
   _defeatGameOver: 0

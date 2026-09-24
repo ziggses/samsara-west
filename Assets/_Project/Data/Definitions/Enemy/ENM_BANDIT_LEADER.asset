@@ -16,7 +16,7 @@ MonoBehaviour:
   _displayNameKey: enemy.bandit_leader.name
   _descriptionKey: enemy.bandit_leader.desc
   _tags:
-  - ch01
+  - legacy
   - human
   - boss
   _version: 1

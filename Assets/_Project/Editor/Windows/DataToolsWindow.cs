@@ -1,4 +1,6 @@
 using System.Text;
+using SamsaraWest.Battle;
+using SamsaraWest.Core;
 using SamsaraWest.Data;
 using UnityEditor;
 using UnityEngine;
@@ -19,6 +21,60 @@ namespace SamsaraWest.Editor
             var window = GetWindow<DataToolsWindow>("数据工具");
             window.minSize = new Vector2(680f, 420f);
             window.Show();
+        }
+
+        /// <summary>
+        /// 战斗节奏校算：按最低配打法估算每场遭遇打几回合，用来核对「常规 4–6 回合、Boss 10–15 回合」
+        /// 这条设计目标。与 EncounterPacingTests 共用同一套模型，所以这里看到的就是测试断言的口径。
+        /// </summary>
+        [MenuItem("SamsaraWest/数据/战斗节奏校算", priority = 22)]
+        public static void EstimatePacing()
+        {
+            const string context = "战斗节奏校算";
+            var summary = CsvImporter.ImportAll(false);
+            if (summary.Report.HasErrors)
+            {
+                GameLog.Warn(LogChannel.Data, "表格有错误，节奏校算基于可能过期的数据。", context);
+            }
+
+            var catalog = AssetDatabase.LoadAssetAtPath<DefinitionCatalog>(SamsaraWestPaths.DefinitionCatalogAsset);
+            if (catalog == null)
+            {
+                GameLog.Error(LogChannel.Data, "定义目录资产缺失，先执行一次全量重导。", context);
+                return;
+            }
+
+            var config = BattleConfig.CreateDefault();
+            try
+            {
+                var total = 0;
+                for (var chapter = 1; chapter <= 8; chapter++)
+                {
+                    var report = EncounterPacingEstimator.EstimateChapter(config, catalog, chapter);
+                    if (report.Encounters.Count == 0)
+                    {
+                        continue;
+                    }
+
+                    GameLog.Info(LogChannel.Data, $"第 {chapter} 章：{report.Encounters.Count} 场遭遇", context);
+                    foreach (var pacing in report.Encounters)
+                    {
+                        GameLog.Info(LogChannel.Data, "    " + pacing, context);
+                        total++;
+                    }
+
+                    foreach (var problem in report.Problems)
+                    {
+                        GameLog.Warn(LogChannel.Data, problem, context);
+                    }
+                }
+
+                GameLog.Info(LogChannel.Data, $"校算完成，共 {total} 场遭遇；口径见 Docs/战斗数值-v1.md。", context);
+            }
+            finally
+            {
+                Object.DestroyImmediate(config);
+            }
         }
 
         private void OnGUI()

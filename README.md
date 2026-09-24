@@ -14,7 +14,7 @@
 # 1. 挂载外部素材 + 初始化工程（新机器、新克隆跑一次；幂等，可反复执行）
 powershell -NoProfile -ExecutionPolicy Bypass -File E:\tx2\samsara-west\Tools\setup-project.ps1
 
-# 2. 跑全套测试（当前基线：EditMode 270 + PlayMode 10）
+# 2. 跑全套测试（当前基线：EditMode 304 + PlayMode 10）
 powershell -NoProfile -ExecutionPolicy Bypass -File E:\tx2\samsara-west\Tools\run-tests.ps1 -Platform All
 ```
 
@@ -156,14 +156,20 @@ Unity.exe -batchmode -quit -projectPath E:\tx2\samsara-west ^
    （`git diff` 却是空的：内容逐字节相同）。所以导入管线一律「内容没变就不落盘」——清单、数据目录、
    本地化表、本地化常量类都按这条写，新增生成物时请照办，否则每次初始化都会留下假改动。
    注意测试套件里有强制全量导入（`ImportAll(force: true)`），跑完测试清单时间戳会变，这是预期内的。
+7. **PowerShell 单引号字符串里的反引号不是转义符**，它是字面量。`start-tests.ps1` 生成 wrapper 时曾写成
+   `'`$code = $LASTEXITCODE'`，于是 `` `$code `` 被原样写进 wrapper，批处理跑完后在那一行报
+   「无法将“`$code”项识别为 cmdlet」，**测试全绿但状态文件仍写 `error`**。
+   要输出字面 `$code` 就用单引号别加反引号；要插值就用双引号加反引号。判断「后台跑完没有」只认
+   `Logs\TestResults\<Platform>.status.txt` 与结果 XML，两者不一致时先怀疑脚本而不是测试。
 
 ## 设计文档
 
 工程自身的文档在 `Docs/`（随仓库分发）：
 
-- `Docs/架构决策.md`：13 条架构决策（模块与依赖、服务定位、事件总线、随机、日志、存档迁移、生成物不白写盘等）与未决事项。
+- `Docs/架构决策.md`：16 条架构决策（模块与依赖、服务定位、事件总线、随机、日志、存档迁移、生成物不白写盘、UI 框架、装备 8 槽与存档 v3、战斗数学契约等）与未决事项。
 - `Docs/数据管线.md`：17 张表 → 资产的映射、解析与列映射规则、增量导入的跳过条件、校验码表、常用操作与故障排查。
-- `Docs/战斗数值-v1.md`：伤害公式与运算顺序、五行倍率、护体/破防、行动速度、首章数值快照、输出与回合数校算，以及待人工审改的三个方向。
+- `Docs/战斗数值-v1.md`：伤害公式与运算顺序、五行倍率（相克 + 相生）、暴击、护体/破防、行动速度、首章数值快照、输出与回合数校算，以及待人工拍板的遗留（第 7.4 节）。
+- `Docs/待拍板清单.md`：骨架期 P1–P10 的决策结论、依据、落地动作与状态，以及仍未处理的事项清单。
 
 策划与剧情文档不入库，实体在仓库外的 `E:\tx2\开发md文件\`；与本工程配套的评估清单在
 `E:\tx2\项目评估与待确认清单.md`。

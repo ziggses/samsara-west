@@ -16,7 +16,7 @@ MonoBehaviour:
   _displayNameKey: item.wolf_pelt.name
   _descriptionKey: item.wolf_pelt.desc
   _tags:
-  - ch01
+  - legacy
   - material
   _version: 1
   _icon: {fileID: 0}

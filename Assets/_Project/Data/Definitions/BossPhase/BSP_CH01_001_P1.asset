@@ -24,8 +24,8 @@ MonoBehaviour:
   _encounterId: BENC_CH01_001
   _healthThreshold: 1
   _skillIds:
-  - SKL_BANDIT_SLASH
-  - SKL_BANDIT_LEADER_CLEAVE
+  - SKL_KING_EARTH_FIST
+  - SKL_KING_ROAR
   _onEnterStatusIds: []
   _attackMultiplier: 1
   _defenseMultiplier: 1

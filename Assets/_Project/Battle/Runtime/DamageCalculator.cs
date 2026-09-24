@@ -17,7 +17,8 @@ namespace SamsaraWest.Battle
             float defenseModifier = 0f,
             float incomingModifier = 1f,
             int hitIndex = 0,
-            int defenderMaxHealth = 0)
+            int defenderMaxHealth = 0,
+            float criticalRoll = NoCritical)
         {
             Power = power;
             Attack = attack;
@@ -30,7 +31,14 @@ namespace SamsaraWest.Battle
             IncomingModifier = incomingModifier;
             HitIndex = hitIndex;
             DefenderMaxHealth = defenderMaxHealth;
+            CriticalRoll = criticalRoll;
         }
+
+        /// <summary>
+        /// 「必定不暴击」的掷骰值。取 1 是因为判定用「小于」：暴击率封顶 1 时它也仍然不暴击，
+        /// 于是不传掷骰的旧调用方与不掷骰的校算工具都拿到确定的结果。
+        /// </summary>
+        public const float NoCritical = 1f;
 
         public int Power { get; }
 
@@ -57,18 +65,33 @@ namespace SamsaraWest.Battle
         public int HitIndex { get; }
 
         public int DefenderMaxHealth { get; }
+
+        /// <summary>
+        /// 本次结算的暴击掷骰值（0–1）。由战斗流程从「战斗」随机流取出后传进来，
+        /// 而不是让计算器自己去掷——它必须保持纯函数，否则测试无法穷举、录像也无法重放。
+        /// </summary>
+        public float CriticalRoll { get; }
     }
 
     /// <summary>结算结果。把中间项一并带出来，便于战斗日志与调试面板显示「为什么是这个数」。</summary>
     public readonly struct DamageResult
     {
-        public DamageResult(int damage, int rawDamage, float elementMultiplier, float brokenMultiplier, float hitDecay)
+        public DamageResult(
+            int damage,
+            int rawDamage,
+            float elementMultiplier,
+            float brokenMultiplier,
+            float hitDecay,
+            float criticalMultiplier = 1f,
+            ElementRelation elementRelation = ElementRelation.None)
         {
             Damage = damage;
             RawDamage = rawDamage;
             ElementMultiplier = elementMultiplier;
             BrokenMultiplier = brokenMultiplier;
             HitDecay = hitDecay;
+            CriticalMultiplier = criticalMultiplier;
+            ElementRelation = elementRelation;
         }
 
         public int Damage { get; }
@@ -81,12 +104,23 @@ namespace SamsaraWest.Battle
 
         public float HitDecay { get; }
 
-        public bool IsCritical => ElementMultiplier > 1f;
+        /// <summary>暴击倍率，未暴击为 1。</summary>
+        public float CriticalMultiplier { get; }
+
+        /// <summary>本次攻击的五行关系，供战斗日志显示「借势／资敌」而不是一个光秃秃的倍率。</summary>
+        public ElementRelation ElementRelation { get; }
+
+        /// <summary>是否暴击。它<b>只</b>由暴击掷骰决定，与五行克制无关。</summary>
+        public bool IsCritical => CriticalMultiplier > 1f;
+
+        /// <summary>是否吃到五行便宜（克制或借势），即五行倍率压过同属性基准。</summary>
+        public bool IsElementAdvantage => ElementRelation == ElementRelation.Restraining ||
+                                          ElementRelation == ElementRelation.GeneratedBy;
     }
 
     /// <summary>
     /// 纯函数伤害计算。不触碰 Unity 对象、不读时间、不使用全局随机，
-    /// 因此可以被单元测试穷举，也保证「同种子同结果」。
+    /// 连暴击掷骰也由调用方从「战斗」随机流传入，因此可以被单元测试穷举，也保证「同种子同结果」。
     /// </summary>
     public static class DamageCalculator
     {
@@ -106,6 +140,7 @@ namespace SamsaraWest.Battle
             // 防御加成以分母形式生效，避免出现负数与除零式爆炸。
             raw /= 1f + Mathf.Max(0f, input.DefenseModifier);
 
+            var elementRelation = ElementRules.Relate(input.AttackElement, input.DefenderElement);
             var elementMultiplier = config.GetElementMultiplier(input.AttackElement, input.DefenderElement);
             raw *= elementMultiplier;
 
@@ -120,6 +155,11 @@ namespace SamsaraWest.Battle
 
             raw *= Mathf.Max(0f, input.IncomingModifier);
 
+            // 暴击是最后一道独立乘区：它不是五行倍率的一部分，也不会被别的加成漏掉。
+            var isCritical = config.IsCriticalRoll(input.CriticalRoll);
+            var criticalMultiplier = isCritical ? config.CriticalMultiplier : 1f;
+            raw *= criticalMultiplier;
+
             var rounded = Mathf.RoundToInt(raw);
             var damage = Mathf.Max(config.MinimumDamage, rounded);
 
@@ -128,10 +168,16 @@ namespace SamsaraWest.Battle
                 Mathf.RoundToInt(raw),
                 elementMultiplier,
                 input.DefenderIsBroken ? config.BrokenIncomingMultiplier : 1f,
-                hitDecay);
+                hitDecay,
+                criticalMultiplier,
+                elementRelation);
         }
 
-        /// <summary>一段技能的总伤害。多段攻击逐段结算，破防收益更高。</summary>
+        /// <summary>
+        /// 一段技能的总伤害。多段攻击逐段结算，破防收益更高。
+        /// <paramref name="criticalRolls"/> 是逐段的暴击掷骰值（第 i 段用第 i 个），
+        /// 缺省或长度不足的段按不暴击算——多段技能因此有多次暴击机会，而不是一次判定乘以全部段数。
+        /// </summary>
         public static int ComputeSkillTotal(
             BattleConfig config,
             int power,
@@ -143,12 +189,17 @@ namespace SamsaraWest.Battle
             bool defenderIsBroken,
             int defenderMaxHealth,
             float attackModifier = 0f,
-            float defenseModifier = 0f)
+            float defenseModifier = 0f,
+            System.Collections.Generic.IReadOnlyList<float> criticalRolls = null)
         {
             var total = 0;
             var hits = Mathf.Max(1, hitCount);
             for (var i = 0; i < hits; i++)
             {
+                var roll = criticalRolls != null && i < criticalRolls.Count
+                    ? criticalRolls[i]
+                    : DamageInput.NoCritical;
+
                 var result = Compute(
                     config,
                     new DamageInput(
@@ -161,7 +212,8 @@ namespace SamsaraWest.Battle
                         attackModifier,
                         defenseModifier,
                         hitIndex: i,
-                        defenderMaxHealth: defenderMaxHealth));
+                        defenderMaxHealth: defenderMaxHealth,
+                        criticalRoll: roll));
                 total += result.Damage;
             }
 

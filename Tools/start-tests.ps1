@@ -45,7 +45,10 @@ $wrapperBody = @(
     '#Requires -Version 5.1',
     "`$ErrorActionPreference = 'Continue'",
     "& '$runner' -Platform $Platform -UnityPath '$UnityPath' *> '$stdout'",
-    '`$code = $LASTEXITCODE',
+    # Single quotes: a backtick is literal here, so `` `$code `` would be baked into the wrapper
+    # verbatim and the wrapper would die on "无法将“`$code”项识别为 cmdlet" — leaving the status
+    # file stuck at 'error' even when every test passed. Keep this line un-escaped.
+    '$code = $LASTEXITCODE',
     'switch ($code) {',
     "    0 { `$text = 'passed' }",
     "    1 { `$text = 'failed' }",

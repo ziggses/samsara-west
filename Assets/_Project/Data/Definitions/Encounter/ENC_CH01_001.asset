@@ -22,8 +22,9 @@ MonoBehaviour:
   _icon: {fileID: 0}
   _chapterIndex: 1
   _enemyIds:
-  - ENM_BANDIT
-  - ENM_BANDIT
+  - ENM_CH01_DRUNK_MONKEY
+  - ENM_CH01_DRUNK_MONKEY
+  - ENM_CH01_STONE_THROWER
   _formation: 2x1
   _isElite: 0
   _isBoss: 0

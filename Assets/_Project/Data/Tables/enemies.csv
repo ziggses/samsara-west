@@ -1,7 +1,19 @@
 # 《西游：第八十二难》敌人定义表 v1
 # weakToElement 用于「火眼金睛」等探查技能与图鉴提示；留空表示无弱点。
+# breakThreshold（护体）：队伍每回合的破防削减是 36，所以首章杂兵取 90–120 = 约 3 回合破一次，
+# 一场 5–6 回合的战斗只开一次破防窗口——破防因此是「攒出来的奖励」而不是常规状态。
+# 抬护体的代价是总血量下调约 12%（240–350 → 210–305），否则回合数会溢出 4–6 回合的目标。
 id,displayNameKey,descriptionKey,tags,version,maxHealth,attack,defense,speed,element,breakThreshold,weakToElement,skillIds,aiProfileKey,lootTableId,goldReward,experienceReward,isBoss
-ENM_BANDIT,enemy.bandit.name,enemy.bandit.desc,ch01;human,1,60,14,6,11,Wood,20,Metal,SKL_BANDIT_SLASH,ai.basic.bandit,LUT_ENM_BANDIT,8,12,false
-ENM_BANDIT_ARCHER,enemy.bandit_archer.name,enemy.bandit_archer.desc,ch01;human;ranged,1,50,15,4,13,Metal,16,Fire,SKL_BANDIT_SHOT,ai.ranged.bandit,LUT_ENM_BANDIT_ARCHER,9,14,false
-ENM_WOLF,enemy.wolf.name,enemy.wolf.desc,ch01;beast,1,70,16,5,15,Fire,18,Water,SKL_WOLF_BITE,ai.aggressive.beast,LUT_ENM_WOLF,6,16,false
-ENM_BANDIT_LEADER,enemy.bandit_leader.name,enemy.bandit_leader.desc,ch01;human;boss,1,160,20,10,12,Wood,40,Metal,SKL_BANDIT_SLASH;SKL_BANDIT_LEADER_CLEAVE,ai.boss.bandit_leader,LUT_ENM_BANDIT_LEADER,60,80,true
+ENM_BANDIT,enemy.bandit.name,enemy.bandit.desc,legacy;human,1,60,14,6,11,Wood,20,Metal,SKL_BANDIT_SLASH,ai.basic.bandit,LUT_ENM_BANDIT,8,12,false
+ENM_BANDIT_ARCHER,enemy.bandit_archer.name,enemy.bandit_archer.desc,legacy;human;ranged,1,50,15,4,13,Metal,16,Fire,SKL_BANDIT_SHOT,ai.ranged.bandit,LUT_ENM_BANDIT_ARCHER,9,14,false
+ENM_WOLF,enemy.wolf.name,enemy.wolf.desc,legacy;beast,1,70,16,5,15,Fire,18,Water,SKL_WOLF_BITE,ai.aggressive.beast,LUT_ENM_WOLF,6,16,false
+ENM_BANDIT_LEADER,enemy.bandit_leader.name,enemy.bandit_leader.desc,legacy;human;boss,1,160,20,10,12,Wood,40,Metal,SKL_BANDIT_SLASH;SKL_BANDIT_LEADER_CLEAVE,ai.boss.bandit_leader,LUT_ENM_BANDIT_LEADER,60,80,true
+ENM_CH01_DRUNK_MONKEY,enemy.drunk_monkey.name,enemy.drunk_monkey.desc,ch01;monkey,1,300,18,8,11,Earth,100,Wood,SKL_DRUNK_MONKEY_SWING,ai.basic.monkey,LUT_ENM_CH01_DRUNK_MONKEY,18,30,false
+ENM_CH01_STONE_THROWER,enemy.stone_thrower.name,enemy.stone_thrower.desc,ch01;monkey;ranged,1,250,17,6,13,Metal,90,Fire,SKL_STONE_THROW,ai.ranged.monkey,LUT_ENM_CH01_STONE_THROWER,15,24,false
+ENM_CH01_ROTTEN_PEACH,enemy.rotten_peach.name,enemy.rotten_peach.desc,ch01;demon,1,255,16,9,10,Wood,105,Metal,SKL_ROTTEN_MIASMA,ai.support.demon,LUT_ENM_CH01_ROTTEN_PEACH,22,34,false
+ENM_CH01_VINE_SPIRIT,enemy.vine_spirit.name,enemy.vine_spirit.desc,ch01;demon;control,1,245,15,11,9,Wood,115,Metal,SKL_VINE_BIND,ai.control.demon,LUT_ENM_CH01_VINE_SPIRIT,20,30,false
+ENM_CH01_MOUNTAIN_APE,enemy.mountain_ape.name,enemy.mountain_ape.desc,ch01;beast,1,255,19,10,12,Earth,110,Wood,SKL_APE_SMASH,ai.aggressive.beast,LUT_ENM_CH01_MOUNTAIN_APE,24,38,false
+ENM_CH01_BANQUET_MONKEY,enemy.banquet_monkey.name,enemy.banquet_monkey.desc,ch01;monkey,1,265,16,8,11,Earth,95,Wood,SKL_BANQUET_TOAST,ai.support.monkey,LUT_ENM_CH01_BANQUET_MONKEY,18,28,false
+ENM_CH01_MONKEY_GRUNT,enemy.monkey_grunt.name,enemy.monkey_grunt.desc,ch01;monkey,1,245,17,7,12,Earth,90,Wood,SKL_MONKEY_GRUNT_STAB,ai.basic.monkey,LUT_ENM_CH01_MONKEY_GRUNT,14,22,false
+ENM_CH01_NAMELESS_BONE,enemy.nameless_bone.name,enemy.nameless_bone.desc,ch01;undead;hidden,1,210,12,6,8,None,90,,SKL_BONE_ECHO,ai.passive.echo,LUT_ENM_CH01_NAMELESS_BONE,0,26,false
+ENM_CH01_MONKEY_KING,enemy.monkey_king.name,enemy.monkey_king.desc,ch01;monkey;boss,1,1400,26,16,12,Earth,180,Wood,SKL_KING_EARTH_FIST;SKL_KING_ROAR;SKL_KING_RELEASE;SKL_KING_FIFTY_THIRD,ai.boss.monkey_king,LUT_ENM_CH01_MONKEY_KING,220,300,true

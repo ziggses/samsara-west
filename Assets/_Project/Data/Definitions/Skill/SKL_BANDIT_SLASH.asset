@@ -17,7 +17,7 @@ MonoBehaviour:
   _descriptionKey: skill.bandit.slash.desc
   _tags:
   - enemy
-  - ch01
+  - legacy
   _version: 1
   _icon: {fileID: 0}
   _power: 6

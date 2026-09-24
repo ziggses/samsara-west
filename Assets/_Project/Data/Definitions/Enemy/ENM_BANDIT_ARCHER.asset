@@ -16,7 +16,7 @@ MonoBehaviour:
   _displayNameKey: enemy.bandit_archer.name
   _descriptionKey: enemy.bandit_archer.desc
   _tags:
-  - ch01
+  - legacy
   - human
   - ranged
   _version: 1

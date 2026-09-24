@@ -17,11 +17,15 @@ MonoBehaviour:
   _minimumDamage: 1
   _restrainMultiplier: 1.5
   _restrainedMultiplier: 0.75
+  _generationUpMultiplier: 1.15
+  _generationDownMultiplier: 0.85
   _sameElementMultiplier: 1
   _neutralMultiplier: 1
+  _criticalChance: 0.1
+  _criticalMultiplier: 1.5
   _brokenIncomingMultiplier: 1.5
   _brokenDurationTurns: 2
-  _brokenBonusHealthRatio: 0.05
+  _brokenBonusHealthRatio: 0.02
   _multiHitDecay: 0.85
   _actionValueBase: 10000
   _minSpeed: 1

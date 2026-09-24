@@ -54,7 +54,21 @@ namespace SamsaraWest.Tests.EditMode
                 CompletedQuestIds = new List<string> { "QST_CH01_MAIN" },
                 InventoryItemIds = new List<string> { "ITM_HEAL_PILL" },
                 InventoryItemCounts = new List<int> { 3 },
-                EquippedItemIds = new List<string> { "EQP_SWORD_001" },
+                Equipment = new List<EquipmentAssignment>
+                {
+                    new EquipmentAssignment
+                    {
+                        CharacterId = "CHR_WUKONG",
+                        SlotId = "Weapon",
+                        ItemId = "EQP_STAFF_IRON",
+                    },
+                    new EquipmentAssignment
+                    {
+                        CharacterId = "CHR_WUKONG",
+                        SlotId = "Armor",
+                        ItemId = "EQP_ARMOR_LEATHER",
+                    },
+                },
             };
         }
 
@@ -93,6 +107,11 @@ namespace SamsaraWest.Tests.EditMode
             CollectionAssert.AreEqual(original.PartyCharacterIds, loaded.PartyCharacterIds);
             CollectionAssert.AreEqual(original.InventoryItemIds, loaded.InventoryItemIds);
             CollectionAssert.AreEqual(original.InventoryItemCounts, loaded.InventoryItemCounts);
+            Assert.AreEqual(2, loaded.Equipment.Count, "成员 × 栏位的装备分配必须完整往返。");
+            Assert.AreEqual("Weapon", loaded.Equipment[0].SlotId);
+            Assert.AreEqual("EQP_STAFF_IRON", loaded.Equipment[0].ItemId);
+            Assert.AreEqual("Armor", loaded.Equipment[1].SlotId);
+            Assert.AreEqual("EQP_ARMOR_LEATHER", loaded.Equipment[1].ItemId);
         }
 
         [Test]
@@ -164,6 +183,53 @@ namespace SamsaraWest.Tests.EditMode
             Assert.IsNotNull(loaded.FlagKeys);
             Assert.IsNotNull(loaded.InventoryItemCounts);
             Assert.AreEqual(0, loaded.KarmaCompassion);
+        }
+
+        [Test]
+        public void TryLoad_LegacyV2_MigratesEquipmentToSlots()
+        {
+            // v2 的装备是「与队伍成员一一对应的扁平列表」，每件都没有栏位信息。
+            File.WriteAllText(
+                PathOfSlot(8),
+                "{\"Version\":2,\"ChapterIndex\":1,\"MapId\":\"CH01_MAP01\",\"PartyCharacterIds\":[\"CHR_WUKONG\",\"CHR_BAJIE\"],\"EquippedItemIds\":[\"EQP_STAFF_IRON\",\"EQP_ARMOR_LEATHER\"]}",
+                new UTF8Encoding(false));
+
+            Assert.IsTrue(_service.TryLoad(8, out var loaded));
+            Assert.AreEqual(SaveService.LatestVersion, loaded.Version);
+            Assert.AreEqual(2, loaded.Equipment.Count, "旧档的每人一件应被搬进「成员 × 栏位」结构。");
+            Assert.AreEqual("CHR_WUKONG", loaded.Equipment[0].CharacterId);
+            Assert.AreEqual("Weapon", loaded.Equipment[0].SlotId, "旧档没有栏位信息，一律落到武器栏。");
+            Assert.AreEqual("EQP_STAFF_IRON", loaded.Equipment[0].ItemId);
+            Assert.AreEqual("CHR_BAJIE", loaded.Equipment[1].CharacterId);
+            Assert.IsEmpty(loaded.EquippedItemIds, "迁移后旧字段必须清空，否则同一件事有两个真源。");
+        }
+
+        [Test]
+        public void Validate_DuplicateEquipmentSlot_IsRejected()
+        {
+            var data = CreateData();
+            data.Equipment.Add(new EquipmentAssignment
+            {
+                CharacterId = "CHR_WUKONG",
+                SlotId = "Weapon",
+                ItemId = "EQP_STAFF_RUYI",
+            });
+
+            Assert.IsFalse(_service.Validate(data).IsValid, "同一成员的同一栏位不能同时戴两件。");
+        }
+
+        [Test]
+        public void Validate_EquipmentWithMissingField_IsRejected()
+        {
+            var data = CreateData();
+            data.Equipment.Add(new EquipmentAssignment
+            {
+                CharacterId = "CHR_WUKONG",
+                SlotId = "  ",
+                ItemId = "EQP_STAFF_IRON",
+            });
+
+            Assert.IsFalse(_service.Validate(data).IsValid, "栏位名为空的装备分配是坏数据。");
         }
 
         [Test]

@@ -49,7 +49,15 @@ namespace SamsaraWest.Save
         public List<string> InventoryItemIds = new List<string>();
         public List<int> InventoryItemCounts = new List<int>();
 
-        /// <summary>已装备定义 ID，与队伍成员一一对应。</summary>
+        /// <summary>
+        /// v3 起的装备分配：一个成员可同时占用多个栏位（最多 8 槽）。
+        /// </summary>
+        public List<EquipmentAssignment> Equipment = new List<EquipmentAssignment>();
+
+        /// <summary>
+        /// 【仅作迁移输入】v2 及更早的装备列表：与队伍成员一一对应，每人一件。
+        /// v3 起不再写入新值，加载旧档时由迁移搬进 <see cref="Equipment"/> 并清空。
+        /// </summary>
         public List<string> EquippedItemIds = new List<string>();
 
         public SaveData Clone()
@@ -73,9 +81,57 @@ namespace SamsaraWest.Save
                 CompletedQuestIds = new List<string>(CompletedQuestIds),
                 InventoryItemIds = new List<string>(InventoryItemIds),
                 InventoryItemCounts = new List<int>(InventoryItemCounts),
+                Equipment = CloneEquipment(Equipment),
                 EquippedItemIds = new List<string>(EquippedItemIds),
             };
         }
+
+        private static List<EquipmentAssignment> CloneEquipment(List<EquipmentAssignment> source)
+        {
+            var copy = new List<EquipmentAssignment>(source?.Count ?? 0);
+            if (source == null)
+            {
+                return copy;
+            }
+
+            for (var i = 0; i < source.Count; i++)
+            {
+                if (source[i] != null)
+                {
+                    copy.Add(source[i].Clone());
+                }
+            }
+
+            return copy;
+        }
+    }
+
+    /// <summary>
+    /// 一件已穿戴的装备：成员 × 栏位 → 装备定义 ID。
+    /// <para>
+    /// 栏位用字符串名（与 <c>Data.EquipmentSlot</c> 的名称一致，例如 <c>Weapon</c>）而非枚举：
+    /// <c>Save</c> 只依赖 <c>Core</c>（ADR-001），不得反向依赖 <c>Data</c>。
+    /// 这同时让存档在数据层调整栏目时仍可读——无法识别的栏位会被校验拦下，而不是错位。
+    /// </para>
+    /// </summary>
+    [Serializable]
+    public sealed class EquipmentAssignment
+    {
+        /// <summary>队伍成员定义 ID，例如 <c>CHR_WUKONG</c>。</summary>
+        public string CharacterId;
+
+        /// <summary>栏位名，取值见 <c>EquipmentSlot</c> 的名称，例如 <c>Weapon</c>。</summary>
+        public string SlotId;
+
+        /// <summary>装备定义 ID，例如 <c>EQP_STAFF_IRON</c>。</summary>
+        public string ItemId;
+
+        public EquipmentAssignment Clone() => new EquipmentAssignment
+        {
+            CharacterId = CharacterId,
+            SlotId = SlotId,
+            ItemId = ItemId,
+        };
     }
 
     /// <summary>存档元信息，用于存档界面展示，不必加载完整存档。</summary>

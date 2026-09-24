@@ -16,7 +16,7 @@ MonoBehaviour:
   _displayNameKey: item.bandit_token.name
   _descriptionKey: item.bandit_token.desc
   _tags:
-  - ch01
+  - legacy
   - quest
   _version: 1
   _icon: {fileID: 0}

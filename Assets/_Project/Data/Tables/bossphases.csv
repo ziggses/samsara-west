@@ -1,6 +1,9 @@
 # 《西游：第八十二难》Boss 阶段表 v1
 # healthThreshold 为「进入本阶段的生命百分比下限」（1.0 = 开局即进入第一阶段）。
 # ID 末位 P<n> 必须与 phaseIndex 一致，便于日志与截图定位。
+# 首章 Boss 按剧本切成四个阶段；「记忆石」等场地机制的字段不在骨架期引入，另行排期。
 id,displayNameKey,descriptionKey,tags,version,phaseIndex,encounterId,healthThreshold,skillIds,onEnterStatusIds,attackMultiplier,defenseMultiplier,speedMultiplier,tauntKey,bgmSwitchKey,cameraCueKey
-BSP_CH01_001_P1,phase.ch01.boss.p1.name,phase.ch01.boss.p1.desc,ch01;boss,1,1,BENC_CH01_001,1,SKL_BANDIT_SLASH;SKL_BANDIT_LEADER_CLEAVE,,1,1,1,phase.ch01.boss.p1.taunt,bgm.battle.boss.p1,camera.boss.enter
-BSP_CH01_001_P2,phase.ch01.boss.p2.name,phase.ch01.boss.p2.desc,ch01;boss,1,2,BENC_CH01_001,0.5,SKL_BANDIT_LEADER_CLEAVE,STS_HASTE,1.25,1,1.1,phase.ch01.boss.p2.taunt,bgm.battle.boss.p2,camera.boss.rage
+BSP_CH01_001_P1,phase.ch01.boss.p1.name,phase.ch01.boss.p1.desc,ch01;boss,1,1,BENC_CH01_001,1,SKL_KING_EARTH_FIST;SKL_KING_ROAR,,1,1,1,phase.ch01.boss.p1.taunt,bgm.battle.boss.p1,camera.boss.enter
+BSP_CH01_001_P2,phase.ch01.boss.p2.name,phase.ch01.boss.p2.desc,ch01;boss,1,2,BENC_CH01_001,0.7,SKL_KING_EARTH_FIST;SKL_KING_RELEASE,STS_HASTE,1.15,1,1.05,phase.ch01.boss.p2.taunt,bgm.battle.boss.p2,camera.boss.rage
+BSP_CH01_001_P3,phase.ch01.boss.p3.name,phase.ch01.boss.p3.desc,ch01;boss,1,3,BENC_CH01_001,0.4,SKL_KING_RELEASE;SKL_KING_ROAR,,1.25,1,1.1,phase.ch01.boss.p3.taunt,bgm.battle.boss.p3,camera.boss.shatter
+BSP_CH01_001_P4,phase.ch01.boss.p4.name,phase.ch01.boss.p4.desc,ch01;boss,1,4,BENC_CH01_001,0.15,SKL_KING_FIFTY_THIRD,STS_BREAK_VULN,1.3,1,1.15,phase.ch01.boss.p4.taunt,bgm.battle.boss.p4,camera.boss.final

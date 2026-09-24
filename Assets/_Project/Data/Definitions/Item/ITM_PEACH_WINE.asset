@@ -1,0 +1,34 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9894c847c61881f4bb1f42ab3fc7b702, type: 3}
+  m_Name: ITM_PEACH_WINE
+  m_EditorClassIdentifier: 
+  _id: ITM_PEACH_WINE
+  _displayNameKey: item.peach_wine.name
+  _descriptionKey: item.peach_wine.desc
+  _tags:
+  - ch01
+  - material
+  _version: 1
+  _icon: {fileID: 0}
+  _category: 2
+  _tier: 1
+  _stackLimit: 999
+  _price: 5
+  _usableInBattle: 0
+  _usableInField: 0
+  _isConsumedOnUse: 0
+  _effectKey: 
+  _effectMagnitude: 0
+  _effectDurationTurns: 0
+  _effectSkillId: 
+  _spriteKey: sprite.item.peach_wine

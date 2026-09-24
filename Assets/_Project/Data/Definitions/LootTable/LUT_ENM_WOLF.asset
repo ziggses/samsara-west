@@ -16,7 +16,7 @@ MonoBehaviour:
   _displayNameKey: loot.enm.wolf.name
   _descriptionKey: loot.enm.wolf.desc
   _tags:
-  - ch01
+  - legacy
   - loot
   _version: 1
   _icon: {fileID: 0}
