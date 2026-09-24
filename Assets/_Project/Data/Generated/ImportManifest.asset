@@ -15,7 +15,7 @@ MonoBehaviour:
   _entries:
   - _tableName: characters
     _contentHash: 10839727688648563314
-    _importedAtUtc: 2026-09-24T06:11:45.6990838Z
+    _importedAtUtc: 2026-09-24T07:42:16.4987829Z
     _assetPaths:
     - Assets/_Project/Data/Definitions/Character/CHR_WUKONG.asset
     - Assets/_Project/Data/Definitions/Character/CHR_BAJIE.asset
@@ -23,7 +23,7 @@ MonoBehaviour:
     - Assets/_Project/Data/Definitions/Character/CHR_TANGSENG.asset
   - _tableName: skills
     _contentHash: 9980594965144374537
-    _importedAtUtc: 2026-09-24T06:11:45.7000835Z
+    _importedAtUtc: 2026-09-24T07:42:16.5017903Z
     _assetPaths:
     - Assets/_Project/Data/Definitions/Skill/SKL_WUKONG_STAFF.asset
     - Assets/_Project/Data/Definitions/Skill/SKL_WUKONG_RAGE.asset
@@ -51,7 +51,7 @@ MonoBehaviour:
     - Assets/_Project/Data/Definitions/Skill/SKL_KING_FIFTY_THIRD.asset
   - _tableName: statuses
     _contentHash: 14407040072771784344
-    _importedAtUtc: 2026-09-24T06:11:45.7015870Z
+    _importedAtUtc: 2026-09-24T07:42:16.5033872Z
     _assetPaths:
     - Assets/_Project/Data/Definitions/Status/STS_BURN.asset
     - Assets/_Project/Data/Definitions/Status/STS_STUN.asset
@@ -63,7 +63,7 @@ MonoBehaviour:
     - Assets/_Project/Data/Definitions/Status/STS_SWEET_ROT.asset
   - _tableName: enemies
     _contentHash: 1181001522490633636
-    _importedAtUtc: 2026-09-24T06:11:45.7025895Z
+    _importedAtUtc: 2026-09-24T07:42:16.5053912Z
     _assetPaths:
     - Assets/_Project/Data/Definitions/Enemy/ENM_BANDIT.asset
     - Assets/_Project/Data/Definitions/Enemy/ENM_BANDIT_ARCHER.asset
@@ -80,7 +80,7 @@ MonoBehaviour:
     - Assets/_Project/Data/Definitions/Enemy/ENM_CH01_MONKEY_KING.asset
   - _tableName: encounters
     _contentHash: 8757603796232043734
-    _importedAtUtc: 2026-09-24T06:11:45.7035943Z
+    _importedAtUtc: 2026-09-24T07:42:16.5063906Z
     _assetPaths:
     - Assets/_Project/Data/Definitions/Encounter/ENC_CH01_001.asset
     - Assets/_Project/Data/Definitions/Encounter/ENC_CH01_002.asset
@@ -91,7 +91,7 @@ MonoBehaviour:
     - Assets/_Project/Data/Definitions/Encounter/BENC_CH01_001.asset
   - _tableName: bossphases
     _contentHash: 475885847376261012
-    _importedAtUtc: 2026-09-24T06:11:45.7045931Z
+    _importedAtUtc: 2026-09-24T07:42:16.5073912Z
     _assetPaths:
     - Assets/_Project/Data/Definitions/BossPhase/BSP_CH01_001_P1.asset
     - Assets/_Project/Data/Definitions/BossPhase/BSP_CH01_001_P2.asset
@@ -99,7 +99,7 @@ MonoBehaviour:
     - Assets/_Project/Data/Definitions/BossPhase/BSP_CH01_001_P4.asset
   - _tableName: items
     _contentHash: 13826743814627541074
-    _importedAtUtc: 2026-09-24T06:11:45.7060961Z
+    _importedAtUtc: 2026-09-24T07:42:16.5099041Z
     _assetPaths:
     - Assets/_Project/Data/Definitions/Item/ITM_POTION_SMALL.asset
     - Assets/_Project/Data/Definitions/Item/ITM_POTION_SPIRIT.asset
@@ -121,7 +121,7 @@ MonoBehaviour:
     - Assets/_Project/Data/Definitions/Item/ITM_PEACH_CHARM.asset
   - _tableName: equipment
     _contentHash: 3021637098394285228
-    _importedAtUtc: 2026-09-24T06:11:45.7060961Z
+    _importedAtUtc: 2026-09-24T07:42:16.5114115Z
     _assetPaths:
     - Assets/_Project/Data/Definitions/Equipment/EQP_STAFF_IRON.asset
     - Assets/_Project/Data/Definitions/Equipment/EQP_ARMOR_LEATHER.asset
@@ -129,20 +129,20 @@ MonoBehaviour:
     - Assets/_Project/Data/Definitions/Equipment/EQP_STAFF_RUYI.asset
   - _tableName: sutras
     _contentHash: 14106956332098565336
-    _importedAtUtc: 2026-09-24T06:11:45.7070992Z
+    _importedAtUtc: 2026-09-24T07:42:16.5129243Z
     _assetPaths:
     - Assets/_Project/Data/Definitions/Sutra/SUT_STILLNESS.asset
     - Assets/_Project/Data/Definitions/Sutra/SUT_RAGE.asset
   - _tableName: quests
     _contentHash: 4155517793330114827
-    _importedAtUtc: 2026-09-24T06:11:45.7080996Z
+    _importedAtUtc: 2026-09-24T07:42:16.5149281Z
     _assetPaths:
     - Assets/_Project/Data/Definitions/Quest/QST_CH01_MAIN01.asset
     - Assets/_Project/Data/Definitions/Quest/QST_CH01_MAIN02.asset
     - Assets/_Project/Data/Definitions/Quest/QST_CH01_SIDE01.asset
   - _tableName: dialogues
     _contentHash: 2055198045170142386
-    _importedAtUtc: 2026-09-24T06:11:45.7090998Z
+    _importedAtUtc: 2026-09-24T07:42:16.5159296Z
     _assetPaths:
     - Assets/_Project/Data/Definitions/Dialogue/DLG_CH01_001.asset
     - Assets/_Project/Data/Definitions/Dialogue/DLG_CH01_002.asset
@@ -150,20 +150,20 @@ MonoBehaviour:
     - Assets/_Project/Data/Definitions/Dialogue/DLG_CH01_004.asset
   - _tableName: maps
     _contentHash: 1432595886330855676
-    _importedAtUtc: 2026-09-24T06:11:45.7101022Z
+    _importedAtUtc: 2026-09-24T07:42:16.5169313Z
     _assetPaths:
     - Assets/_Project/Data/Definitions/Map/CH01_MAP01.asset
     - Assets/_Project/Data/Definitions/Map/CH01_MAP02.asset
   - _tableName: interactables
     _contentHash: 10816481547433558950
-    _importedAtUtc: 2026-09-24T06:11:45.7101022Z
+    _importedAtUtc: 2026-09-24T07:42:16.5179308Z
     _assetPaths:
     - Assets/_Project/Data/Definitions/Interactable/INT_CH01_001_VILLAGER.asset
     - Assets/_Project/Data/Definitions/Interactable/INT_CH01_002_SIGNPOST.asset
     - Assets/_Project/Data/Definitions/Interactable/INT_CH01_003_CHEST.asset
   - _tableName: loottables
     _contentHash: 11417369122440133753
-    _importedAtUtc: 2026-09-24T06:11:45.7116071Z
+    _importedAtUtc: 2026-09-24T07:42:16.5184360Z
     _assetPaths:
     - Assets/_Project/Data/Definitions/LootTable/LUT_ENM_BANDIT.asset
     - Assets/_Project/Data/Definitions/LootTable/LUT_ENM_BANDIT_ARCHER.asset
@@ -180,19 +180,19 @@ MonoBehaviour:
     - Assets/_Project/Data/Definitions/LootTable/LUT_ENM_CH01_MONKEY_KING.asset
   - _tableName: shops
     _contentHash: 4313046253624030131
-    _importedAtUtc: 2026-09-24T06:11:45.7126124Z
+    _importedAtUtc: 2026-09-24T07:42:16.5194409Z
     _assetPaths:
     - Assets/_Project/Data/Definitions/Shop/SHP_CH01_001.asset
   - _tableName: recipes
     _contentHash: 15602801515593192525
-    _importedAtUtc: 2026-09-24T06:11:45.7126124Z
+    _importedAtUtc: 2026-09-24T07:42:16.5204408Z
     _assetPaths:
     - Assets/_Project/Data/Definitions/Recipe/RCP_POTION_SMALL.asset
     - Assets/_Project/Data/Definitions/Recipe/RCP_POTION_SPIRIT.asset
     - Assets/_Project/Data/Definitions/Recipe/RCP_STAFF_RUYI.asset
   - _tableName: endingconditions
     _contentHash: 12442811382563936215
-    _importedAtUtc: 2026-09-24T06:11:45.7136172Z
+    _importedAtUtc: 2026-09-24T07:42:16.5219490Z
     _assetPaths:
     - Assets/_Project/Data/Definitions/EndingCondition/END_DEFAULT.asset
     - Assets/_Project/Data/Definitions/EndingCondition/END_MERCY.asset

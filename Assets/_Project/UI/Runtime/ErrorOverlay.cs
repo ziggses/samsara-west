@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Text;
 using SamsaraWest.Core;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 namespace SamsaraWest.UI
 {
@@ -30,6 +31,49 @@ namespace SamsaraWest.UI
         /// <summary>发布版（非 Development Build）不显示面板。</summary>
         public static bool IsSupportedInThisBuild => Application.isEditor || Debug.isDebugBuild;
 
+        /// <summary>
+        /// 自挂到运行期：如果还得靠场景接线把它带起来，那么接线漏挂时它恰好不会出现 ——
+        /// 而那一刻正是最需要看到错误的时候。发布版不创建，避免留一个不画任何东西的对象。
+        /// </summary>
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
+        private static void AutoInstall()
+        {
+            if (!IsSupportedInThisBuild)
+            {
+                return;
+            }
+
+            // 场景切换是「谁还在」的天然检查点：面板不随场景销毁，但万一被外力清掉
+            // （测试会重置日志，对象也可能被误删），下一次加载场景时自己长回来。
+            // 一个要等人发现才会出现的错误面板，等于没有面板。
+            SceneManager.sceneLoaded -= OnSceneLoaded;
+            SceneManager.sceneLoaded += OnSceneLoaded;
+            EnsureCreated();
+        }
+
+        private static void OnSceneLoaded(Scene scene, LoadSceneMode mode)
+        {
+            EnsureCreated();
+        }
+
+        /// <summary>
+        /// 幂等地返回一个「活着且已接线」的面板。光有实例还不够：它是 GameLog 的一个 sink，
+        /// 一旦 sink 被清掉（<see cref="GameLog.Reset"/>）而实例还在，它就是一个画不出东西的壳，
+        /// 「日志里记过的错」与「屏幕上看到的错」重新变成两份数据 —— 那正是本组件要修的病根。
+        /// </summary>
+        public static ErrorOverlay EnsureCreated()
+        {
+            if (_instance != null)
+            {
+                _instance.AttachSinkIfSupported();
+                return _instance;
+            }
+
+            var host = new GameObject("ErrorOverlay");
+            DontDestroyOnLoad(host);
+            return host.AddComponent<ErrorOverlay>();
+        }
+
         private void Awake()
         {
             if (_instance != null && _instance != this)
@@ -39,6 +83,11 @@ namespace SamsaraWest.UI
             }
 
             _instance = this;
+            AttachSinkIfSupported();
+        }
+
+        private void AttachSinkIfSupported()
+        {
             if (IsSupportedInThisBuild)
             {
                 GameLog.AddSink(this);

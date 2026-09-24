@@ -576,5 +576,31 @@ MonoBehaviour:
     _text: "\u4E70\u5165"
   - _key: ui.shop.sell
     _text: "\u5356\u51FA"
+  - _key: ui.skeleton.definitions
+    _text: "\u6570\u636E\u5B9A\u4E49 {0} \u6761"
+  - _key: ui.skeleton.duplicates
+    _text: "\u91CD\u590D ID {0} \u6761"
   - _key: ui.skeleton.greeting
     _text: "\u9AA8\u5934\u5DF2\u5C31\u4F4D\uFF0C\u53EF\u4EE5\u5F00\u59CB\u5F80\u91CC\u586B\u8089\u4E86\u3002"
+  - _key: ui.skeleton.hint
+    _text: "\u8FD9\u662F\u9AA8\u67B6\u81EA\u68C0\u753B\u9762\uFF0C\u4E0D\u662F\u6E38\u620F\u5185\u5BB9\uFF1B\u6309
+      F1 \u6536\u8D77\u3002"
+  - _key: ui.skeleton.missing
+    _text: "\u7F3A\u5C11\u670D\u52A1\uFF1A{0}"
+  - _key: ui.skeleton.notready
+    _text: "\u670D\u52A1\u6CE8\u518C\u8868\u5C1A\u672A\u521D\u59CB\u5316\uFF1A\u542F\u52A8\u6D41\u7A0B\u6CA1\u8DD1\u5B8C\u3002"
+  - _key: ui.skeleton.pipeline
+    _text: "\u56FE\u5F62\u7BA1\u7EBF {0}"
+  - _key: ui.skeleton.pipeline.none
+    _text: "\u56FE\u5F62\u7BA1\u7EBF\u672A\u542F\u7528\uFF08\u56DE\u843D\u5230\u5185\u7F6E\u7BA1\u7EBF\uFF09"
+  - _key: ui.skeleton.resolution
+    _text: "\u7A97\u53E3 {0}\xD7{1}\uFF0C\u56FE\u5F62\u63A5\u53E3 {2}"
+  - _key: ui.skeleton.seed
+    _text: "\u968F\u673A\u4E3B\u79CD\u5B50 {0}"
+  - _key: ui.skeleton.services
+    _text: "\u670D\u52A1\u5951\u7EA6 {0} \u4E2A"
+  - _key: ui.skeleton.texts
+    _text: "\u672C\u5730\u5316\u6587\u672C {0} \u6761\uFF08{1}\uFF09\uFF0C\u8FD0\u884C\u671F\u7F3A\u952E
+      {2} \u6761"
+  - _key: ui.skeleton.title
+    _text: "\u9AA8\u67B6\u81EA\u68C0"

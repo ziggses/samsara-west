@@ -285,3 +285,15 @@ ui.equip.slot.sutra,经文,装备栏位
 ui.error.title,运行期异常,错误面板标题
 ui.error.hint,请连同日志文件一并反馈。,错误面板提示
 ui.skeleton.greeting,骨头已就位，可以开始往里填肉了。,工程骨架自检文案
+ui.skeleton.title,骨架自检,自检画面标题
+ui.skeleton.services,服务契约 {0} 个,自检：已注册服务数
+ui.skeleton.definitions,数据定义 {0} 条,自检：定义目录条数
+ui.skeleton.duplicates,重复 ID {0} 条,自检：重复 ID 数（必须为 0）
+ui.skeleton.texts,本地化文本 {0} 条（{1}），运行期缺键 {2} 条,自检：文本表规模
+ui.skeleton.seed,随机主种子 {0},自检：本次运行的母种子
+ui.skeleton.pipeline,图形管线 {0},自检：当前渲染管线资产名
+ui.skeleton.pipeline.none,图形管线未启用（回落到内置管线）,自检：URP 资产没挂上
+ui.skeleton.resolution,窗口 {0}×{1}，图形接口 {2},自检：实际窗口与图形接口
+ui.skeleton.notready,服务注册表尚未初始化：启动流程没跑完。,自检：GameBootstrap 没跑
+ui.skeleton.missing,缺少服务：{0},自检：UI 层解析不到的契约
+ui.skeleton.hint,这是骨架自检画面，不是游戏内容；按 F1 收起。,自检画面提示

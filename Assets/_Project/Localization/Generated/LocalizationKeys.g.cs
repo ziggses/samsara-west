@@ -289,7 +289,19 @@ namespace SamsaraWest.Localization
         public const string UI_SETTINGS_AUDIO = "ui.settings.audio";
         public const string UI_SHOP_BUY = "ui.shop.buy";
         public const string UI_SHOP_SELL = "ui.shop.sell";
+        public const string UI_SKELETON_DEFINITIONS = "ui.skeleton.definitions";
+        public const string UI_SKELETON_DUPLICATES = "ui.skeleton.duplicates";
         public const string UI_SKELETON_GREETING = "ui.skeleton.greeting";
+        public const string UI_SKELETON_HINT = "ui.skeleton.hint";
+        public const string UI_SKELETON_MISSING = "ui.skeleton.missing";
+        public const string UI_SKELETON_NOTREADY = "ui.skeleton.notready";
+        public const string UI_SKELETON_PIPELINE = "ui.skeleton.pipeline";
+        public const string UI_SKELETON_PIPELINE_NONE = "ui.skeleton.pipeline.none";
+        public const string UI_SKELETON_RESOLUTION = "ui.skeleton.resolution";
+        public const string UI_SKELETON_SEED = "ui.skeleton.seed";
+        public const string UI_SKELETON_SERVICES = "ui.skeleton.services";
+        public const string UI_SKELETON_TEXTS = "ui.skeleton.texts";
+        public const string UI_SKELETON_TITLE = "ui.skeleton.title";
     }
 }
 
