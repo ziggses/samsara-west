@@ -14,7 +14,7 @@
 # 1. 挂载外部素材 + 初始化工程（新机器、新克隆跑一次；幂等，可反复执行）
 powershell -NoProfile -ExecutionPolicy Bypass -File E:\tx2\samsara-west\Tools\setup-project.ps1
 
-# 2. 跑全套测试（当前基线：EditMode 269 + PlayMode 10）
+# 2. 跑全套测试（当前基线：EditMode 270 + PlayMode 10）
 powershell -NoProfile -ExecutionPolicy Bypass -File E:\tx2\samsara-west\Tools\run-tests.ps1 -Platform All
 ```
 
@@ -159,7 +159,13 @@ Unity.exe -batchmode -quit -projectPath E:\tx2\samsara-west ^
 
 ## 设计文档
 
-策划与设计文档不入库，实体在仓库外的 `E:\tx2\开发md文件\`；与本工程配套的评估清单在
+工程自身的文档在 `Docs/`（随仓库分发）：
+
+- `Docs/架构决策.md`：13 条架构决策（模块与依赖、服务定位、事件总线、随机、日志、存档迁移、生成物不白写盘等）与未决事项。
+- `Docs/数据管线.md`：17 张表 → 资产的映射、解析与列映射规则、增量导入的跳过条件、校验码表、常用操作与故障排查。
+- `Docs/战斗数值-v1.md`：伤害公式与运算顺序、五行倍率、护体/破防、行动速度、首章数值快照、输出与回合数校算，以及待人工审改的三个方向。
+
+策划与剧情文档不入库，实体在仓库外的 `E:\tx2\开发md文件\`；与本工程配套的评估清单在
 `E:\tx2\项目评估与待确认清单.md`。
 
 ## 提交纪律
