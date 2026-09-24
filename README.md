@@ -131,6 +131,9 @@ Unity.exe -batchmode -quit -projectPath E:\tx2\samsara-west ^
 菜单入口：`SamsaraWest/出包/Windows x64`、`SamsaraWest/出包/WebGL（试玩版）`；
 产物落 `Builds/Windows`、`Builds/WebGL`（在 E 盘，不要落到 C 盘，本机 C 盘空间紧张）。
 
+最近一次实测（2026-09-24，Windows x64）：**成功**，产物 72 MB、耗时 58.0 秒、打入 1 个场景，
+退出码 0，日志中 `error CS` / `warning CS` 均为 0 条。冷启动（无 `Library/`）未测，耗时会更长。
+
 | 无头入口 | 用途 | 退出码 |
 |---|---|---|
 | `SamsaraWest.Editor.HeadlessTasks.ImportAndValidate` | 全量重导入 + 本地化导入 + 全量校验 | 0 通过 / 2 校验有错 |
@@ -161,6 +164,10 @@ Unity.exe -batchmode -quit -projectPath E:\tx2\samsara-west ^
    「无法将“`$code”项识别为 cmdlet」，**测试全绿但状态文件仍写 `error`**。
    要输出字面 `$code` 就用单引号别加反引号；要插值就用双引号加反引号。判断「后台跑完没有」只认
    `Logs\TestResults\<Platform>.status.txt` 与结果 XML，两者不一致时先怀疑脚本而不是测试。
+8. **出包会回写 `Assets/_Project/Settings/SamsaraWest_URP_2D.asset`**：Unity 在构建前后重算该资产的
+   `m_Prefilter*` 关键字预过滤字段，实测会改动 26 行（如 `m_PrefilteringModeMainLightShadows: 1 → 4`）。
+   这些不是策划意图，属于构建期副产物，`git checkout --` 还原即可；**不要把它当成功能改动提交**。
+   出包后的 `git status` 若只多这一条，是正常的。
 
 ## 设计文档
 
