@@ -10,9 +10,12 @@ namespace SamsaraWest.Battle
     }
 
     /// <summary>
-    /// 一场战斗的结果。骨架期只区分「还在打 / 我方胜 / 我方负」三种，
-    /// 逃跑与剧情撤退属于后续排期（需要逃跑概率口径，见 Docs/战斗内核-v1.md 的遗留清单）。
+    /// 一场战斗的结果。
     /// </summary>
+    /// <remarks>
+    /// 逃跑已拍板为<b>单独结局、不算失败</b>，见 <see cref="PlayerEscaped"/>；
+    /// 剧情撤退属于后续排期（见 Docs/战斗内核-v1.md 的遗留清单）。
+    /// </remarks>
     public enum BattleOutcome
     {
         Ongoing = 0,
@@ -22,6 +25,12 @@ namespace SamsaraWest.Battle
 
         /// <summary>我方全灭。双方同时全灭时按「我方负」结算：你方无人站着就是失败。</summary>
         PlayerDefeat = 2,
+
+        /// <summary>
+        /// 我方主动脱离战斗（逃跑掷骰成功）。它不是失败：这场战斗只是没打完。
+        /// 逃跑之后算不算失败、扣不扣资源属于流程侧口径，内核只报结果。
+        /// </summary>
+        PlayerEscaped = 3,
     }
 
     /// <summary>
@@ -99,10 +108,12 @@ namespace SamsaraWest.Battle
     }
 
     /// <summary>
-    /// 一次行动的种类。骨架期只实现技能与换位两类，
-    /// 任务书里列出的道具、防御、逃跑、联合技都还没有口径（见 Docs/战斗内核-v1.md 的遗留清单），
-    /// 因此这里<b>不</b>预留占位枚举值，避免出现一个永远走不通的分支。
+    /// 一次行动的种类。
     /// </summary>
+    /// <remarks>
+    /// 任务书里列出的道具、防御、联合技仍然没有口径，因此<b>不</b>为它们预留占位枚举值，
+    /// 避免出现一个永远走不通的分支。逃跑已经拍板，见 <see cref="Escape"/>。
+    /// </remarks>
     public enum BattleActionKind
     {
         /// <summary>用技能（攻击与法术共用一条数据驱动的路径）。</summary>
@@ -113,6 +124,12 @@ namespace SamsaraWest.Battle
 
         /// <summary>主动结束回合，放弃剩余行动。</summary>
         EndTurn = 2,
+
+        /// <summary>
+        /// 逃跑（主行动）。它是<b>整队撤退</b>：任意我方单位的回合都可以发起，
+        /// 一次掷骰决定整场走人还是失败；失败只是白费这一手，敌人照常行动。
+        /// </summary>
+        Escape = 3,
     }
 
     /// <summary>状态发生变化的方式，用于事件与战斗日志。</summary>

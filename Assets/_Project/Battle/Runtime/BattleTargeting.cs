@@ -29,10 +29,10 @@ namespace SamsaraWest.Battle
         /// 主目标是否必须站在敌对阵营。
         /// </summary>
         /// <remarks>
-        /// 列／排规则本身不含敌我信息——「打那一列」既可以打敌人那一列，也可以给自己人那一列加盾。
-        /// 骨架期的判据是「<see cref="SkillDefinition.Power"/> 大于 0 即为攻击技」，因此以敌营为中心；
-        /// 将来若出现「给同排加护盾」这类技能，就需要给技能表补一个显式的敌我字段，
-        /// 而不是继续在这里加特例（已登记在 Docs/战斗内核-v1.md 的遗留清单）。
+        /// 列／排规则本身不含敌我信息——「打那一列」既可以打敌人那一列，也可以给自己人那一列加盾，
+        /// 所以它读技能表里的显式字段 <see cref="SkillDefinition.HostileOnly"/>。
+        /// 其余规则由 <see cref="TargetRule"/> 直接决定阵营，这个字段对它们无效
+        /// （误配时由 <c>SKL_HOSTILE_REDUNDANT</c> 报出来，而不是静默生效）。
         /// </remarks>
         public static bool RequiresHostilePrimary(SkillDefinition skill)
         {
@@ -52,7 +52,7 @@ namespace SamsaraWest.Battle
 
                 case TargetRule.Column:
                 case TargetRule.Row:
-                    return skill.Power > 0;
+                    return skill.HostileOnly;
 
                 default:
                     return false;

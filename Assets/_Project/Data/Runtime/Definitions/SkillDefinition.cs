@@ -10,6 +10,10 @@ namespace SamsaraWest.Data
         [CsvColumn("element")] [SerializeField] private FiveElement _element = FiveElement.None;
         [CsvColumn("nature")] [SerializeField] private DamageNature _nature = DamageNature.Physical;
         [CsvColumn("target")] [SerializeField] private TargetRule _target = TargetRule.SingleEnemy;
+
+        [Tooltip("主目标是否必须在敌对阵营。只对列／排技能有效：单体与全体规则的阵营由 target 自己决定，"
+            + "在那些规则上配它会被校验报成冗余。")]
+        [CsvColumn("hostileOnly")] [SerializeField] private bool _hostileOnly;
         [CsvColumn("spiritCost")] [SerializeField] private int _spiritCost;
         [CsvColumn("cooldownTurns")] [SerializeField] private int _cooldownTurns;
         [CsvColumn("hitCount")] [SerializeField] private int _hitCount = 1;
@@ -33,6 +37,9 @@ namespace SamsaraWest.Data
         public DamageNature Nature => _nature;
 
         public TargetRule Target => _target;
+
+        /// <summary>列／排技能的主目标是否必须敌对；其余目标规则的阵营由 <see cref="Target"/> 自己决定。</summary>
+        public bool HostileOnly => _hostileOnly;
 
         public int SpiritCost => _spiritCost;
 
@@ -86,6 +93,29 @@ namespace SamsaraWest.Data
             if (!string.IsNullOrWhiteSpace(_appliedStatusId) && _statusChance <= 0f)
             {
                 report.Warn("SKL_STATUS_UNREACHABLE", "配置了附加状态但命中率为 0，该状态永远不会生效。", Id, fieldName: "statusChance");
+            }
+
+            var targetsLine = _target == TargetRule.Column || _target == TargetRule.Row;
+
+            if (_hostileOnly && !targetsLine)
+            {
+                report.Warn(
+                    "SKL_HOSTILE_REDUNDANT",
+                    $"{_target} 的阵营由 target 自己决定，hostileOnly 只对 Column／Row 生效，配了也不会影响选目标。",
+                    Id,
+                    fieldName: "hostileOnly");
+            }
+
+            // 这一条挡的是「列／排技能的敌我漏配」：不勾 hostileOnly 时主目标会被认成自己人，
+            // 于是纯伤害的列技能会对着我方那一列放。宁可报出来让人确认，也不要静默生效。
+            if (!_hostileOnly && targetsLine && _power > 0 && _healPower <= 0)
+            {
+                report.Warn(
+                    "SKL_HOSTILE_SUSPICIOUS",
+                    "列／排技能只有伤害、没有治疗，却没勾 hostileOnly：主目标会被认成自己人那一列。"
+                    + "确认是故意的，否则补上 hostileOnly=true。",
+                    Id,
+                    fieldName: "hostileOnly");
             }
         }
     }

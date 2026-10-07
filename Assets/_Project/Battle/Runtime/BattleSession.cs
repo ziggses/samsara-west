@@ -124,6 +124,13 @@ namespace SamsaraWest.Battle
         public bool IsFinished => Outcome != BattleOutcome.Ongoing;
 
         /// <summary>
+        /// 此刻发起逃跑的成功率（0–1）。界面直接显示它，不要自己再按战力算一遍：
+        /// 战力权重住在配置里，两边各算一次迟早会算出两个数。
+        /// </summary>
+        public float EscapeChance =>
+            _config.GetEscapeChance(CombatPower(BattleSide.Player), CombatPower(BattleSide.Enemy));
+
+        /// <summary>
         /// 当前回合数。
         /// </summary>
         /// <remarks>
@@ -434,6 +441,76 @@ namespace SamsaraWest.Battle
             return BattleActionResult.Succeeded(actor, BattleActionKind.Swap, null);
         }
 
+        /// <summary>
+        /// 逃跑（主行动）：整队撤退。
+        /// </summary>
+        /// <remarks>
+        /// 口径（已拍板）：一次掷骰决定整场走人还是失败，判据是敌我战力比
+        /// （<see cref="BattleConfig.GetEscapeChance"/>，线性、夹在配置的上下限之间）。
+        /// 失败只是白费这一手——敌人照常行动、不额外挨打，与打完技能一样进入
+        /// <see cref="TurnPhase.MoveOrSwap"/>。
+        /// 成功率随战局变化（战力只算站着的单位），所以界面必须每回合重读
+        /// <see cref="EscapeChance"/>，不能在开局缓存一个值。
+        /// </remarks>
+        public BattleActionResult TryEscape()
+        {
+            var actor = CurrentActor;
+            if (Outcome != BattleOutcome.Ongoing)
+            {
+                return BattleActionResult.Rejected(
+                    BattleCommandRejection.BattleFinished, actor, BattleActionKind.Escape);
+            }
+
+            if (actor == null || Phase == TurnPhase.Idle)
+            {
+                return BattleActionResult.Rejected(
+                    BattleCommandRejection.NoActiveTurn, actor, BattleActionKind.Escape);
+            }
+
+            if (_mainActionUsed || Phase != TurnPhase.MainAction)
+            {
+                return BattleActionResult.Rejected(
+                    BattleCommandRejection.WrongPhase, actor, BattleActionKind.Escape);
+            }
+
+            var myPower = CombatPower(BattleSide.Player);
+            var enemyPower = CombatPower(BattleSide.Enemy);
+            var chance = _config.GetEscapeChance(myPower, enemyPower);
+            var roll = _stream.NextFloat();
+
+            // 概率再算一次只是为了把它带进结果与日志：纯函数、不掷随机，两次必然同值。
+            var escaped = _config.IsEscapeRoll(roll, myPower, enemyPower);
+
+            var result = BattleActionResult.Succeeded(actor, BattleActionKind.Escape, null);
+            result.EscapeChance = chance;
+            result.EscapeRoll = roll;
+            result.Escaped = escaped;
+
+            _mainActionUsed = true;
+
+            Publish(new BattleEscapeResolvedEvent(
+                actor.RuntimeId, escaped, chance, roll, myPower, enemyPower));
+
+            if (!escaped)
+            {
+                Phase = TurnPhase.MoveOrSwap;
+                GameLog.Info(
+                    LogChannel.Battle,
+                    $"#{actor.RuntimeId} {actor.DefinitionId} 逃跑失败（成功率 {chance:P0}，掷出 {roll:F3}），白费一手。",
+                    actor.DefinitionId);
+                return result;
+            }
+
+            Phase = TurnPhase.Finished;
+            GameLog.Info(
+                LogChannel.Battle,
+                $"#{actor.RuntimeId} {actor.DefinitionId} 逃跑成功（成功率 {chance:P0}，掷出 {roll:F3}），整队脱离战斗。",
+                _setup.EncounterId);
+            EndBattle(BattleOutcome.PlayerEscaped);
+
+            return result;
+        }
+
         /// <summary>结束当前单位的回合，放弃剩余行动。</summary>
         public void EndTurn()
         {
@@ -512,6 +589,31 @@ namespace SamsaraWest.Battle
             }
 
             return count;
+        }
+
+        /// <summary>
+        /// 某一侧的战力合计（只算站着的单位）。它只服务逃跑判定，不参与伤害公式。
+        /// </summary>
+        /// <remarks>
+        /// 倒下的人不算战力，于是「打掉一个敌人就更容易跑掉」是自然结果，不需要额外规则。
+        /// </remarks>
+        private float CombatPower(BattleSide side)
+        {
+            var list = side == BattleSide.Player ? _players : _enemies;
+            var power = 0f;
+            for (var i = 0; i < list.Count; i++)
+            {
+                var unit = list[i];
+                if (!unit.IsAlive)
+                {
+                    continue;
+                }
+
+                power += _config.GetCombatPower(
+                    unit.EffectiveAttack, unit.EffectiveDefense, unit.EffectiveSpeed, unit.MaxHealth);
+            }
+
+            return power;
         }
 
         // ---------------------------------------------------------------- 内部实现
@@ -883,11 +985,20 @@ namespace SamsaraWest.Battle
                 return;
             }
 
-            Outcome = resolved;
-            Publish(new BattleEndedEvent(resolved, RoundNumber, ActionCount));
+            EndBattle(resolved);
+        }
+
+        /// <summary>
+        /// 写下结局并收尾。<b>唯一的结局出口</b>：全灭与逃跑都走这里，
+        /// 于是「结果被改掉」与「战斗结束事件被发出」不可能只发生一半。
+        /// </summary>
+        private void EndBattle(BattleOutcome outcome)
+        {
+            Outcome = outcome;
+            Publish(new BattleEndedEvent(outcome, RoundNumber, ActionCount));
             GameLog.Info(
                 LogChannel.Battle,
-                $"战斗结束：{resolved}，第 {RoundNumber} 回合、累计 {ActionCount} 手。",
+                $"战斗结束：{outcome}，第 {RoundNumber} 回合、累计 {ActionCount} 手。",
                 _setup.EncounterId);
         }
 

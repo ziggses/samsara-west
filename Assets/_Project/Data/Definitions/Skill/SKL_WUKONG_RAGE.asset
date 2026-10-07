@@ -24,6 +24,7 @@ MonoBehaviour:
   _element: 4
   _nature: 0
   _target: 1
+  _hostileOnly: 0
   _spiritCost: 12
   _cooldownTurns: 3
   _hitCount: 1

@@ -31,3 +31,9 @@ MonoBehaviour:
   _minSpeed: 1
   _maxSpeed: 999
   _intentPreviewLead: 1
+  _escapeMinChance: 0.3
+  _escapeMaxChance: 0.9
+  _powerWeightAttack: 1
+  _powerWeightDefense: 1
+  _powerWeightSpeed: 1
+  _powerWeightHealth: 0.1

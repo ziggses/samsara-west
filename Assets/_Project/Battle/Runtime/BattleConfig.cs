@@ -75,6 +75,19 @@ namespace SamsaraWest.Battle
         [Tooltip("意图预告提前几个行动单位公布敌方下一步。0 表示不预告。")]
         [SerializeField] private int _intentPreviewLead = 1;
 
+        [Header("逃跑")]
+        [Tooltip("逃跑成功率的上下限。敌我战力悬殊时贴到这两端，势均力敌时落在中间，中间线性过渡。")]
+        [SerializeField] [Range(0f, 1f)] private float _escapeMinChance = 0.3f;
+        [SerializeField] [Range(0f, 1f)] private float _escapeMaxChance = 0.9f;
+
+        [Tooltip("战力权重。战力 = Σ 存活单位[攻击 × 此权重 + 防御 × 此权重 + 速度 × 此权重 + 最大生命 × 此权重]，"
+            + "只用来量敌我的强弱比，不参与伤害公式。本作数值口径下生命是攻击的 6–10 倍，"
+            + "所以生命权重取 0.1，四项才同量级。")]
+        [SerializeField] private float _powerWeightAttack = 1f;
+        [SerializeField] private float _powerWeightDefense = 1f;
+        [SerializeField] private float _powerWeightSpeed = 1f;
+        [SerializeField] private float _powerWeightHealth = 0.1f;
+
         public float AttackScale => _attackScale;
 
         public float DefenseScale => _defenseScale;
@@ -112,6 +125,18 @@ namespace SamsaraWest.Battle
         public int MaxSpeed => _maxSpeed;
 
         public int IntentPreviewLead => _intentPreviewLead;
+
+        public float EscapeMinChance => _escapeMinChance;
+
+        public float EscapeMaxChance => _escapeMaxChance;
+
+        public float PowerWeightAttack => _powerWeightAttack;
+
+        public float PowerWeightDefense => _powerWeightDefense;
+
+        public float PowerWeightSpeed => _powerWeightSpeed;
+
+        public float PowerWeightHealth => _powerWeightHealth;
 
         /// <summary>
         /// 五行倍率。这是数值表里唯一「规则性」的一段，其余都是可调参数。
@@ -152,6 +177,50 @@ namespace SamsaraWest.Battle
 
         /// <summary>多段攻击第 <paramref name="hitIndex"/> 段（从 0 起）的衰减系数。</summary>
         public float GetHitDecay(int hitIndex) => Mathf.Pow(_multiHitDecay, Mathf.Max(0, hitIndex));
+
+        /// <summary>
+        /// 一个单位的战力。
+        /// </summary>
+        /// <remarks>
+        /// 它<b>不是玩法数值</b>，只用来量敌我的强弱比，目前的唯一用途是逃跑成功率。
+        /// 四项直接加权求和，权重在上面，调平衡不用改代码。
+        /// 用最大生命而不是当前生命：战力衡量的是「这一侧有多强」，不是「还剩多少血」。
+        /// </remarks>
+        public float GetCombatPower(int attack, int defense, int speed, int maxHealth) =>
+            (attack * _powerWeightAttack)
+            + (defense * _powerWeightDefense)
+            + (speed * _powerWeightSpeed)
+            + (maxHealth * _powerWeightHealth);
+
+        /// <summary>
+        /// 逃跑成功率：按敌我战力比线性给值，再夹到上下限之间。
+        /// </summary>
+        /// <remarks>
+        /// <c>p = 下限 + (上限 - 下限) × 我方战力 / (我方 + 敌方)</c>：
+        /// 势均力敌落在中间（默认 60%），我方越强越容易脱身，敌方越强越难。
+        /// 两边战力都算成 0 时没有比值可言，取中值——默认值必须是确定性的。
+        /// </remarks>
+        public float GetEscapeChance(float myPower, float enemyPower)
+        {
+            var low = Mathf.Min(_escapeMinChance, _escapeMaxChance);
+            var high = Mathf.Max(_escapeMinChance, _escapeMaxChance);
+
+            var total = myPower + enemyPower;
+            if (total <= 0f)
+            {
+                return Mathf.Clamp((low + high) * 0.5f, low, high);
+            }
+
+            var share = Mathf.Clamp01(myPower / total);
+            return Mathf.Clamp(low + ((high - low) * share), low, high);
+        }
+
+        /// <summary>
+        /// 这个 0–1 的随机数是否逃跑成功。与 <see cref="IsCriticalRoll"/> 同一条约定：
+        /// 取「小于」而不是「小于等于」，于是概率贴到下限时结论仍然是确定的。
+        /// </summary>
+        public bool IsEscapeRoll(float roll, float myPower, float enemyPower) =>
+            roll < GetEscapeChance(myPower, enemyPower);
 
         /// <summary>
         /// 代码路径与测试使用的默认配置，数值与本资产的初始值保持一致。

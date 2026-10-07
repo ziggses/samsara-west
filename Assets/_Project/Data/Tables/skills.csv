@@ -1,28 +1,29 @@
 # 《西游：第八十二难》技能定义表 v1
 # nature：Physical/Mystic/True；target：Self/SingleEnemy/SingleAlly/AllEnemies/AllAllies/Column/Row/RandomEnemy
+# hostileOnly：列／排技能的主目标是否必须敌对（单体与全体规则的阵营由 target 决定，这里配了会被校验报成冗余）
 # 伤害公式：floor((power + 攻击力 - 防御力*0.5) * 五行倍率 * 破防倍率)，见 Docs/战斗数值-v1.md
-id,displayNameKey,descriptionKey,tags,version,power,element,nature,target,spiritCost,cooldownTurns,hitCount,breakDamage,appliedStatusId,statusChance,healPower,vfxKey,animationKey,sfxKey
-SKL_WUKONG_STAFF,skill.wukong.staff.name,skill.wukong.staff.desc,ch01;basic,1,8,Fire,Physical,SingleEnemy,0,0,1,10,,0,0,vfx.wukong.staff,anim.wukong.staff,sfx.wukong.staff
-SKL_WUKONG_RAGE,skill.wukong.rage.name,skill.wukong.rage.desc,ch01;signature,1,22,Fire,Physical,SingleEnemy,12,3,1,22,,0,0,vfx.wukong.rage,anim.wukong.rage,sfx.wukong.rage
-SKL_WUKONG_FIRE_EYE,skill.wukong.fire_eye.name,skill.wukong.fire_eye.desc,ch01;mystic,1,16,Fire,Mystic,SingleEnemy,10,2,1,14,STS_BURN,0.6,0,vfx.wukong.fire_eye,anim.wukong.fire_eye,sfx.wukong.fire_eye
-SKL_BAJIE_RAKE,skill.bajie.rake.name,skill.bajie.rake.desc,ch01;basic,1,14,Earth,Physical,Column,8,0,2,9,,0,0,vfx.bajie.rake,anim.bajie.rake,sfx.bajie.rake
-SKL_BAJIE_TAUNT,skill.bajie.taunt.name,skill.bajie.taunt.desc,ch01;control,1,10,Earth,Physical,SingleEnemy,6,2,1,12,STS_STUN,0.35,0,vfx.bajie.taunt,anim.bajie.taunt,sfx.bajie.taunt
-SKL_SHAWUJING_SAND,skill.shawujing.sand.name,skill.shawujing.sand.desc,ch01;mystic,1,12,Water,Mystic,AllEnemies,12,2,1,8,STS_WEAKEN,0.4,0,vfx.shawujing.sand,anim.shawujing.sand,sfx.shawujing.sand
-SKL_TANGSENG_HEAL,skill.tangseng.heal.name,skill.tangseng.heal.desc,ch01;support,1,0,Wood,Mystic,SingleAlly,10,0,1,0,STS_BLESSED,1,40,vfx.tangseng.heal,anim.tangseng.heal,sfx.tangseng.heal
-SKL_TANGSENG_SHIELD,skill.tangseng.shield.name,skill.tangseng.shield.desc,ch01;support,1,0,None,Mystic,SingleAlly,12,2,1,0,STS_SHIELD,1,15,vfx.tangseng.shield,anim.tangseng.shield,sfx.tangseng.shield
-SKL_BANDIT_SLASH,skill.bandit.slash.name,skill.bandit.slash.desc,enemy;legacy,1,6,Metal,Physical,SingleEnemy,0,0,1,6,,0,0,vfx.bandit.slash,anim.bandit.slash,sfx.bandit.slash
-SKL_BANDIT_SHOT,skill.bandit.shot.name,skill.bandit.shot.desc,enemy;legacy,1,7,Metal,Physical,RandomEnemy,0,1,1,4,,0,0,vfx.bandit.shot,anim.bandit.shot,sfx.bandit.shot
-SKL_BANDIT_LEADER_CLEAVE,skill.bandit.leader_cleave.name,skill.bandit.leader_cleave.desc,enemy;legacy;boss,1,14,Wood,Physical,Column,8,2,1,16,STS_WEAKEN,0.5,0,vfx.bandit.cleave,anim.bandit.cleave,sfx.bandit.cleave
-SKL_WOLF_BITE,skill.wolf.bite.name,skill.wolf.bite.desc,enemy;legacy,1,9,Fire,Physical,SingleEnemy,0,1,2,5,,0,0,vfx.wolf.bite,anim.wolf.bite,sfx.wolf.bite
-SKL_DRUNK_MONKEY_SWING,skill.drunk_monkey_swing.name,skill.drunk_monkey_swing.desc,enemy;ch01;monkey,1,9,Earth,Physical,SingleEnemy,0,0,1,6,,0,0,vfx.enemy.swing,anim.enemy.swing,sfx.enemy.swing
-SKL_STONE_THROW,skill.stone_throw.name,skill.stone_throw.desc,enemy;ch01;monkey,1,11,Metal,Physical,RandomEnemy,0,1,1,4,,0,0,vfx.enemy.throw,anim.enemy.throw,sfx.enemy.throw
-SKL_ROTTEN_MIASMA,skill.rotten_miasma.name,skill.rotten_miasma.desc,enemy;ch01;demon,1,6,Wood,Mystic,AllEnemies,0,1,1,4,STS_SWEET_ROT,0.5,0,vfx.enemy.miasma,anim.enemy.miasma,sfx.enemy.miasma
-SKL_VINE_BIND,skill.vine_bind.name,skill.vine_bind.desc,enemy;ch01;demon,1,8,Wood,Physical,SingleEnemy,0,1,1,8,STS_STUN,0.35,0,vfx.enemy.vine,anim.enemy.vine,sfx.enemy.vine
-SKL_APE_SMASH,skill.ape_smash.name,skill.ape_smash.desc,enemy;ch01;beast,1,12,Earth,Physical,SingleEnemy,0,1,1,10,,0,0,vfx.enemy.smash,anim.enemy.smash,sfx.enemy.smash
-SKL_BANQUET_TOAST,skill.banquet_toast.name,skill.banquet_toast.desc,enemy;ch01;monkey,1,7,Earth,Mystic,AllAllies,0,0,1,0,STS_BLESSED,1,10,vfx.enemy.toast,anim.enemy.toast,sfx.enemy.toast
-SKL_MONKEY_GRUNT_STAB,skill.monkey_grunt_stab.name,skill.monkey_grunt_stab.desc,enemy;ch01;monkey,1,9,Earth,Physical,SingleEnemy,0,0,1,6,,0,0,vfx.enemy.stab,anim.enemy.stab,sfx.enemy.stab
-SKL_BONE_ECHO,skill.bone_echo.name,skill.bone_echo.desc,enemy;ch01;hidden,1,5,None,True,SingleEnemy,0,0,1,4,,0,0,vfx.enemy.echo,anim.enemy.echo,sfx.enemy.echo
-SKL_KING_EARTH_FIST,skill.king_earth_fist.name,skill.king_earth_fist.desc,enemy;ch01;boss,1,16,Earth,Physical,SingleEnemy,0,0,1,18,,0,0,vfx.king.fist,anim.king.fist,sfx.king.fist
-SKL_KING_ROAR,skill.king_roar.name,skill.king_roar.desc,enemy;ch01;boss,1,12,Earth,Mystic,AllEnemies,0,2,1,14,STS_WEAKEN,0.4,0,vfx.king.roar,anim.king.roar,sfx.king.roar
-SKL_KING_RELEASE,skill.king_release.name,skill.king_release.desc,enemy;ch01;boss,1,20,Earth,Mystic,AllEnemies,0,3,1,12,STS_SWEET_ROT,0.35,0,vfx.king.release,anim.king.release,sfx.king.release
-SKL_KING_FIFTY_THIRD,skill.king_fifty_third.name,skill.king_fifty_third.desc,enemy;ch01;boss,1,30,Earth,Physical,SingleEnemy,0,2,1,24,,0,0,vfx.king.fifty_third,anim.king.fifty_third,sfx.king.fifty_third
+id,displayNameKey,descriptionKey,tags,version,power,element,nature,target,spiritCost,cooldownTurns,hitCount,breakDamage,appliedStatusId,statusChance,healPower,vfxKey,animationKey,sfxKey,hostileOnly
+SKL_WUKONG_STAFF,skill.wukong.staff.name,skill.wukong.staff.desc,ch01;basic,1,8,Fire,Physical,SingleEnemy,0,0,1,10,,0,0,vfx.wukong.staff,anim.wukong.staff,sfx.wukong.staff,false
+SKL_WUKONG_RAGE,skill.wukong.rage.name,skill.wukong.rage.desc,ch01;signature,1,22,Fire,Physical,SingleEnemy,12,3,1,22,,0,0,vfx.wukong.rage,anim.wukong.rage,sfx.wukong.rage,false
+SKL_WUKONG_FIRE_EYE,skill.wukong.fire_eye.name,skill.wukong.fire_eye.desc,ch01;mystic,1,16,Fire,Mystic,SingleEnemy,10,2,1,14,STS_BURN,0.6,0,vfx.wukong.fire_eye,anim.wukong.fire_eye,sfx.wukong.fire_eye,false
+SKL_BAJIE_RAKE,skill.bajie.rake.name,skill.bajie.rake.desc,ch01;basic,1,14,Earth,Physical,Column,8,0,2,9,,0,0,vfx.bajie.rake,anim.bajie.rake,sfx.bajie.rake,true
+SKL_BAJIE_TAUNT,skill.bajie.taunt.name,skill.bajie.taunt.desc,ch01;control,1,10,Earth,Physical,SingleEnemy,6,2,1,12,STS_STUN,0.35,0,vfx.bajie.taunt,anim.bajie.taunt,sfx.bajie.taunt,false
+SKL_SHAWUJING_SAND,skill.shawujing.sand.name,skill.shawujing.sand.desc,ch01;mystic,1,12,Water,Mystic,AllEnemies,12,2,1,8,STS_WEAKEN,0.4,0,vfx.shawujing.sand,anim.shawujing.sand,sfx.shawujing.sand,false
+SKL_TANGSENG_HEAL,skill.tangseng.heal.name,skill.tangseng.heal.desc,ch01;support,1,0,Wood,Mystic,SingleAlly,10,0,1,0,STS_BLESSED,1,40,vfx.tangseng.heal,anim.tangseng.heal,sfx.tangseng.heal,false
+SKL_TANGSENG_SHIELD,skill.tangseng.shield.name,skill.tangseng.shield.desc,ch01;support,1,0,None,Mystic,SingleAlly,12,2,1,0,STS_SHIELD,1,15,vfx.tangseng.shield,anim.tangseng.shield,sfx.tangseng.shield,false
+SKL_BANDIT_SLASH,skill.bandit.slash.name,skill.bandit.slash.desc,enemy;legacy,1,6,Metal,Physical,SingleEnemy,0,0,1,6,,0,0,vfx.bandit.slash,anim.bandit.slash,sfx.bandit.slash,false
+SKL_BANDIT_SHOT,skill.bandit.shot.name,skill.bandit.shot.desc,enemy;legacy,1,7,Metal,Physical,RandomEnemy,0,1,1,4,,0,0,vfx.bandit.shot,anim.bandit.shot,sfx.bandit.shot,false
+SKL_BANDIT_LEADER_CLEAVE,skill.bandit.leader_cleave.name,skill.bandit.leader_cleave.desc,enemy;legacy;boss,1,14,Wood,Physical,Column,8,2,1,16,STS_WEAKEN,0.5,0,vfx.bandit.cleave,anim.bandit.cleave,sfx.bandit.cleave,true
+SKL_WOLF_BITE,skill.wolf.bite.name,skill.wolf.bite.desc,enemy;legacy,1,9,Fire,Physical,SingleEnemy,0,1,2,5,,0,0,vfx.wolf.bite,anim.wolf.bite,sfx.wolf.bite,false
+SKL_DRUNK_MONKEY_SWING,skill.drunk_monkey_swing.name,skill.drunk_monkey_swing.desc,enemy;ch01;monkey,1,9,Earth,Physical,SingleEnemy,0,0,1,6,,0,0,vfx.enemy.swing,anim.enemy.swing,sfx.enemy.swing,false
+SKL_STONE_THROW,skill.stone_throw.name,skill.stone_throw.desc,enemy;ch01;monkey,1,11,Metal,Physical,RandomEnemy,0,1,1,4,,0,0,vfx.enemy.throw,anim.enemy.throw,sfx.enemy.throw,false
+SKL_ROTTEN_MIASMA,skill.rotten_miasma.name,skill.rotten_miasma.desc,enemy;ch01;demon,1,6,Wood,Mystic,AllEnemies,0,1,1,4,STS_SWEET_ROT,0.5,0,vfx.enemy.miasma,anim.enemy.miasma,sfx.enemy.miasma,false
+SKL_VINE_BIND,skill.vine_bind.name,skill.vine_bind.desc,enemy;ch01;demon,1,8,Wood,Physical,SingleEnemy,0,1,1,8,STS_STUN,0.35,0,vfx.enemy.vine,anim.enemy.vine,sfx.enemy.vine,false
+SKL_APE_SMASH,skill.ape_smash.name,skill.ape_smash.desc,enemy;ch01;beast,1,12,Earth,Physical,SingleEnemy,0,1,1,10,,0,0,vfx.enemy.smash,anim.enemy.smash,sfx.enemy.smash,false
+SKL_BANQUET_TOAST,skill.banquet_toast.name,skill.banquet_toast.desc,enemy;ch01;monkey,1,7,Earth,Mystic,AllAllies,0,0,1,0,STS_BLESSED,1,10,vfx.enemy.toast,anim.enemy.toast,sfx.enemy.toast,false
+SKL_MONKEY_GRUNT_STAB,skill.monkey_grunt_stab.name,skill.monkey_grunt_stab.desc,enemy;ch01;monkey,1,9,Earth,Physical,SingleEnemy,0,0,1,6,,0,0,vfx.enemy.stab,anim.enemy.stab,sfx.enemy.stab,false
+SKL_BONE_ECHO,skill.bone_echo.name,skill.bone_echo.desc,enemy;ch01;hidden,1,5,None,True,SingleEnemy,0,0,1,4,,0,0,vfx.enemy.echo,anim.enemy.echo,sfx.enemy.echo,false
+SKL_KING_EARTH_FIST,skill.king_earth_fist.name,skill.king_earth_fist.desc,enemy;ch01;boss,1,16,Earth,Physical,SingleEnemy,0,0,1,18,,0,0,vfx.king.fist,anim.king.fist,sfx.king.fist,false
+SKL_KING_ROAR,skill.king_roar.name,skill.king_roar.desc,enemy;ch01;boss,1,12,Earth,Mystic,AllEnemies,0,2,1,14,STS_WEAKEN,0.4,0,vfx.king.roar,anim.king.roar,sfx.king.roar,false
+SKL_KING_RELEASE,skill.king_release.name,skill.king_release.desc,enemy;ch01;boss,1,20,Earth,Mystic,AllEnemies,0,3,1,12,STS_SWEET_ROT,0.35,0,vfx.king.release,anim.king.release,sfx.king.release,false
+SKL_KING_FIFTY_THIRD,skill.king_fifty_third.name,skill.king_fifty_third.desc,enemy;ch01;boss,1,30,Earth,Physical,SingleEnemy,0,2,1,24,,0,0,vfx.king.fifty_third,anim.king.fifty_third,sfx.king.fifty_third,false

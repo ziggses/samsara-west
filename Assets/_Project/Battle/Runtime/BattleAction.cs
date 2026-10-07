@@ -156,8 +156,17 @@ namespace SamsaraWest.Battle
 
         public BattleActionKind Kind { get; }
 
-        /// <summary>技能 ID；换位与结束回合为空。</summary>
+        /// <summary>技能 ID；换位、结束回合与逃跑为空。</summary>
         public string SkillId { get; }
+
+        /// <summary>逃跑的成功率（0–1）；非逃跑指令为 0。</summary>
+        public float EscapeChance { get; internal set; }
+
+        /// <summary>这次逃跑掷出的随机数（0–1）。「为什么没跑掉」的答案在这里。</summary>
+        public float EscapeRoll { get; internal set; }
+
+        /// <summary>这次逃跑是否成功。指令成功但没逃脱时，它才是那个 false。</summary>
+        public bool Escaped { get; internal set; }
 
         public IReadOnlyList<BattleUnitEffect> Effects => _effects;
 
@@ -256,6 +265,13 @@ namespace SamsaraWest.Battle
             for (var i = 0; i < _effects.Count; i++)
             {
                 builder.Append(" | ").Append(_effects[i]);
+            }
+
+            if (Kind == BattleActionKind.Escape)
+            {
+                builder.Append(Escaped ? " 逃脱成功" : " 逃脱失败")
+                    .Append("（成功率 ").Append((EscapeChance * 100f).ToString("F0")).Append("%，掷出 ")
+                    .Append(EscapeRoll.ToString("F3")).Append("）");
             }
 
             return builder.ToString();

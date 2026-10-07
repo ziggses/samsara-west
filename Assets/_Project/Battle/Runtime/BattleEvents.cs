@@ -283,4 +283,49 @@ namespace SamsaraWest.Battle
 
         public FormationSlot SlotB { get; }
     }
+
+    /// <summary>
+    /// 一次逃跑的结算结果。
+    /// </summary>
+    /// <remarks>
+    /// 一个事件同时带成功与失败两种结局，因为界面要的东西是一样的：
+    /// 「掷了多少、当时成功率多少、成了没有」。成功与失败各发一个事件只会逼订阅方写两次同样的动画。
+    /// 带上两侧战力是为了让「为什么是这个概率」当场可查，不必回头翻配置。
+    /// </remarks>
+    public readonly struct BattleEscapeResolvedEvent : IGameEvent
+    {
+        public BattleEscapeResolvedEvent(
+            int runtimeId,
+            bool escaped,
+            float chance,
+            float roll,
+            float playerPower,
+            float enemyPower)
+        {
+            RuntimeId = runtimeId;
+            Escaped = escaped;
+            Chance = chance;
+            Roll = roll;
+            PlayerPower = playerPower;
+            EnemyPower = enemyPower;
+        }
+
+        /// <summary>发起逃跑的单位。</summary>
+        public int RuntimeId { get; }
+
+        /// <summary>整队是否脱离战斗。</summary>
+        public bool Escaped { get; }
+
+        /// <summary>当时的成功率（0–1）。</summary>
+        public float Chance { get; }
+
+        /// <summary>这次掷出的随机数（0–1）。</summary>
+        public float Roll { get; }
+
+        /// <summary>我方战力合计（只算站着的单位）。</summary>
+        public float PlayerPower { get; }
+
+        /// <summary>敌方战力合计（只算站着的单位）。</summary>
+        public float EnemyPower { get; }
+    }
 }
