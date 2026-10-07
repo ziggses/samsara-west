@@ -13,8 +13,8 @@ namespace SamsaraWest.Battle
     /// 一场战斗的结果。
     /// </summary>
     /// <remarks>
-    /// 逃跑已拍板为<b>单独结局、不算失败</b>，见 <see cref="PlayerEscaped"/>；
-    /// 剧情撤退属于后续排期（见 Docs/战斗内核-v1.md 的遗留清单）。
+    /// 剧情撤退（由剧本强制结束战斗、不掷骰）已拍板为<b>单独结局、不算失败</b>，
+    /// 见 <see cref="ForcedRetreat"/>。
     /// </remarks>
     public enum BattleOutcome
     {
@@ -31,6 +31,15 @@ namespace SamsaraWest.Battle
         /// 逃跑之后算不算失败、扣不扣资源属于流程侧口径，内核只报结果。
         /// </summary>
         PlayerEscaped = 3,
+
+        /// <summary>
+        /// 剧情强制结束这场战斗（剧本判定这场打不下去，不掷骰、不判胜负）。
+        /// </summary>
+        /// <remarks>
+        /// 它<b>不是失败</b>：流程侧据此回到该战斗之前的剧情节点，不结算奖励、也不写战败。
+        /// 内核只负责写下结局并收尾；「回到剧情前」是流程侧的职责。
+        /// </remarks>
+        ForcedRetreat = 4,
     }
 
     /// <summary>

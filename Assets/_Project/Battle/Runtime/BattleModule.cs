@@ -107,10 +107,9 @@ namespace SamsaraWest.Battle
 
     /// <summary>Battle 层的组合入口，与 <c>DataModule.Install</c> 保持同一种写法。</summary>
     /// <remarks>
-    /// 骨架期<b>尚未</b>由 <c>Flow.GameBootstrap</c> 调用：Bootstrap 的已装模块名单
-    /// （Core / Data / Localization / Save）被 PlayMode 断言锁住，而「探索遇敌 → 进战斗」
-    /// 这条接线属于后续任务。因此这里先把装配入口准备好并由测试覆盖，
-    /// 等接线任务落地时，Bootstrap 里加一行即可，不必改战斗内核。
+    /// 已由 <c>Flow.GameBootstrap</c> 安装（「探索遇敌 → 进战斗」接线的第一步）：
+    /// 战斗服务在引导期就位，上层拿到 <see cref="IBattleService"/> 即可用
+    /// <c>BattleFactory.FromEncounter</c> 开一场真实遭遇，不必等战斗场景存在。
     /// </remarks>
     public static class BattleModule
     {
@@ -119,6 +118,17 @@ namespace SamsaraWest.Battle
             if (registry == null)
             {
                 throw new ArgumentNullException(nameof(registry));
+            }
+
+            // 漏挂数值资产时退回代码默认值，而不是抛异常：
+            // 「缺资产」必须留下可追溯的警告，但不能让整条引导链崩掉
+            // （PlayMode 的生命周期用例就是故意不挂任何资产的）。
+            if (config == null)
+            {
+                config = BattleConfig.CreateDefault();
+                GameLog.Warn(
+                    LogChannel.Battle,
+                    "未指定 BattleConfig，战斗模块已退回代码默认值。请在启动场景补挂资产。");
             }
 
             registry.Register<IBattleService>(new BattleService(config));

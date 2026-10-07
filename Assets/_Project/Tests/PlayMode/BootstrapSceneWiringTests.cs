@@ -1,5 +1,6 @@
 using System.Collections;
 using NUnit.Framework;
+using SamsaraWest.Battle;
 using SamsaraWest.Core;
 using SamsaraWest.Data;
 using SamsaraWest.Flow;
@@ -109,6 +110,46 @@ namespace SamsaraWest.Tests.PlayMode
             var right = new RandomService(random.MasterSeed).GetStream(RandomStreams.Battle).NextUInt();
 
             Assert.AreEqual(left, right, "母种子来自场景配置：同种子同流必须给出同一结果，否则读档重放无从谈起。");
+        }
+
+        /// <summary>
+        /// 「探索遇敌 → 进战斗」的第一步：真实启动场景 + 真实数据表，
+        /// 从一条真遭遇开出一场真战斗。它锁两件事——战斗服务确实被装进了容器，
+        /// 以及它拿到的是启动场景里那一份数值资产（而不是悄悄退回代码默认值）。
+        /// </summary>
+        [UnityTest]
+        public IEnumerator BootstrapScene_StartsBattleFromRealEncounter()
+        {
+            yield return LoadBootstrapScene();
+
+            var registry = GameServices.Registry;
+            var battle = registry.Resolve<IBattleService>();
+            Assert.IsNotNull(battle, "启动场景必须装上战斗模块。");
+            Assert.AreSame(
+                GameBootstrap.Instance.BattleConfig,
+                battle.Config,
+                "战斗服务必须拿到启动场景里那份数值资产，否则调平衡会改在一个没人读的对象上。");
+            Assert.IsFalse(battle.HasActiveBattle);
+
+            var definitions = registry.Resolve<IDefinitionRegistry>();
+            Assert.IsTrue(
+                definitions.TryGet("ENC_CH01_001", out EncounterDefinition encounter),
+                "第一章首场遭遇必须在定义目录里。");
+
+            var party = BattleFactory.DefaultParty(definitions);
+            Assert.Greater(party.Count, 0, "骨架期必须能从目录里取出一支可操作队伍。");
+
+            var session = battle.StartBattle(BattleFactory.FromEncounter(encounter, party));
+
+            Assert.IsTrue(battle.HasActiveBattle);
+            Assert.AreEqual(encounter.Id, session.Setup.EncounterId);
+            Assert.AreEqual(party.Count, session.PlayerUnits.Count, "队伍里每个角色都应落成一个单位。");
+            Assert.Greater(session.EnemyUnits.Count, 0, "遭遇里必须真的有敌人。");
+            Assert.AreEqual(BattleOutcome.Ongoing, session.Outcome);
+
+            battle.EndBattle();
+            Assert.IsFalse(battle.HasActiveBattle);
+            Assert.IsNull(battle.Current);
         }
 
         private static IEnumerator LoadBootstrapScene()

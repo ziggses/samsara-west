@@ -511,6 +511,33 @@ namespace SamsaraWest.Battle
             return result;
         }
 
+        /// <summary>
+        /// 剧情强制结束这场战斗（撤退）。
+        /// </summary>
+        /// <remarks>
+        /// 由剧本调用，不掷骰、不判胜负：它<b>不是失败</b>，流程侧据此回到该战斗之前的剧情节点。
+        /// 与全灭、逃跑一样走唯一的结局出口，因此「结局被写下」与
+        /// <see cref="BattleEndedEvent"/> 被发出不会只发生一半。
+        /// 幂等：战斗已经结束时返回 false，既不改写结局，也不重复发事件。
+        /// </remarks>
+        /// <returns>true 表示这一次调用结束了战斗；false 表示战斗早已结束。</returns>
+        public bool ForceRetreat()
+        {
+            if (Outcome != BattleOutcome.Ongoing)
+            {
+                return false;
+            }
+
+            Phase = TurnPhase.Finished;
+            GameLog.Info(
+                LogChannel.Battle,
+                "剧情强制撤退：本场按「回到剧情前」收场，不判失败、不结算。",
+                _setup.EncounterId);
+            EndBattle(BattleOutcome.ForcedRetreat);
+
+            return true;
+        }
+
         /// <summary>结束当前单位的回合，放弃剩余行动。</summary>
         public void EndTurn()
         {

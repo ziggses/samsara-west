@@ -3,6 +3,7 @@ using System.Collections;
 using System.IO;
 using System.Reflection;
 using NUnit.Framework;
+using SamsaraWest.Battle;
 using SamsaraWest.Core;
 using SamsaraWest.Data;
 using SamsaraWest.Flow;
@@ -60,7 +61,7 @@ namespace SamsaraWest.Tests.PlayMode
         }
 
         [UnityTest]
-        public IEnumerator Bootstrap_InstallsCoreDataLocalizationAndSaveModules()
+        public IEnumerator Bootstrap_InstallsCoreDataLocalizationSaveAndBattleModules()
         {
             yield return null;
 
@@ -68,7 +69,7 @@ namespace SamsaraWest.Tests.PlayMode
             Assert.IsNotNull(bootstrap, "创建启动器后应当存在实例。");
             Assert.IsTrue(bootstrap.IsReady);
             CollectionAssert.AreEqual(
-                new[] { "Core", "Data", "Localization", "Save" },
+                new[] { "Core", "Data", "Localization", "Save", "Battle" },
                 bootstrap.InstalledModules,
                 "模块安装顺序即依赖顺序，改动顺序要同步改这里。");
 
@@ -83,6 +84,7 @@ namespace SamsaraWest.Tests.PlayMode
             Assert.IsNotNull(registry.Resolve<IDefinitionRegistry>());
             Assert.IsNotNull(registry.Resolve<ILocalizationService>());
             Assert.IsNotNull(registry.Resolve<ISaveService>());
+            Assert.IsNotNull(registry.Resolve<IBattleService>(), "战斗服务必须在引导期就位，否则「探索遇敌 → 进战斗」没有落点。");
             Assert.AreEqual(TestSeed, registry.Resolve<IRandomService>().MasterSeed, "母种子必须一路传到随机服务，否则读档后无法复现。");
         }
 
@@ -134,7 +136,7 @@ namespace SamsaraWest.Tests.PlayMode
             bootstrap.Bootstrap();
 
             Assert.AreEqual(before, GameBootstrap.BootstrapCount, "重复引导不得再装一遍服务。");
-            Assert.AreEqual(4, bootstrap.InstalledModules.Count);
+            Assert.AreEqual(5, bootstrap.InstalledModules.Count);
         }
 
         [UnityTest]

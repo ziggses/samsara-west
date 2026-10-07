@@ -137,6 +137,11 @@ namespace SamsaraWest.Flow
                 SaveModule.Install(registry, _saveDirectoryOverride);
                 Track("Save");
 
+                // 「探索遇敌 → 进战斗」接线的第一步：战斗服务在引导期就位。
+                // 它依赖 Core（随机流）与 Data（技能／角色定义），所以排在两者之后。
+                Battle.BattleModule.Install(registry, _battleConfig);
+                Track("Battle");
+
                 ModuleInstalled?.Invoke(registry);
             }
             catch (Exception exception)
