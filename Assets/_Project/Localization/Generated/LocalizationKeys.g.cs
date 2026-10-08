@@ -273,6 +273,8 @@ namespace SamsaraWest.Localization
         public const string UI_BATTLE_ESCAPE = "ui.battle.escape";
         public const string UI_BATTLE_HP = "ui.battle.hp";
         public const string UI_BATTLE_INTENT_PREVIEW = "ui.battle.intent.preview";
+        public const string UI_BATTLE_MOVE_PROMPT = "ui.battle.move.prompt";
+        public const string UI_BATTLE_MOVE_SLOT = "ui.battle.move.slot";
         public const string UI_BATTLE_REJECTION_NOT_ENOUGH_SPIRIT = "ui.battle.rejection.not_enough_spirit";
         public const string UI_BATTLE_REJECTION_SKILL_ON_COOLDOWN = "ui.battle.rejection.skill_on_cooldown";
         public const string UI_BATTLE_RESULT_DEFEAT = "ui.battle.result.defeat";
@@ -281,8 +283,10 @@ namespace SamsaraWest.Localization
         public const string UI_BATTLE_RESULT_VICTORY = "ui.battle.result.victory";
         public const string UI_BATTLE_ROUND = "ui.battle.round";
         public const string UI_BATTLE_STATUS_BREAK = "ui.battle.status.break";
+        public const string UI_BATTLE_SWAP_PROMPT = "ui.battle.swap.prompt";
         public const string UI_BATTLE_TARGET_PROMPT = "ui.battle.target.prompt";
         public const string UI_BATTLE_TITLE = "ui.battle.title";
+        public const string UI_BATTLE_VIEW_HINT = "ui.battle.view.hint";
         public const string UI_COMMON_CANCEL = "ui.common.cancel";
         public const string UI_COMMON_CONFIRM = "ui.common.confirm";
         public const string UI_DIALOGUE_CONTINUE = "ui.dialogue.continue";

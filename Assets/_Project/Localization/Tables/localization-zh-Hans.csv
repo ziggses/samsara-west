@@ -315,3 +315,7 @@ ui.skeleton.resolution,窗口 {0}×{1}，图形接口 {2},自检：实际窗口�
 ui.skeleton.notready,服务注册表尚未初始化：启动流程没跑完。,自检：GameBootstrap 没跑
 ui.skeleton.missing,缺少服务：{0},自检：UI 层解析不到的契约
 ui.skeleton.hint,这是骨架自检画面，不是游戏内容；按 F1 收起。,自检画面提示
+ui.battle.move.prompt,选择落点,战斗界面：移动子选择提示
+ui.battle.move.slot,空位 {0},战斗界面：移动落点按钮，{0} 为阵型序号（从 1 起）
+ui.battle.swap.prompt,选择换位同伴,战斗界面：换位子选择提示
+ui.battle.view.hint,诊断用战斗面板：按 F2 开一场首章遭遇，F3 收起。,战斗界面诊断层提示
