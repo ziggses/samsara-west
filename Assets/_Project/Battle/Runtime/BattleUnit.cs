@@ -295,6 +295,49 @@ namespace SamsaraWest.Battle
         }
 
         /// <summary>
+        /// 回灵，返回真正生效的量（会被灵力上限夹住）。与 <see cref="Heal"/> 对称：
+        /// 已经倒下的单位不回灵，敌人不走灵力因此恒为 0（<see cref="UsesSpirit"/>）。
+        /// </summary>
+        internal int RestoreSpirit(int amount)
+        {
+            if (amount <= 0 || !UsesSpirit || !IsAlive)
+            {
+                return 0;
+            }
+
+            var applied = Mathf.Min(MaxSpirit - Spirit, amount);
+            Spirit += applied;
+            return applied;
+        }
+
+        /// <summary>
+        /// 解除身上的全部负面状态，把被摘掉的那些写进 <paramref name="removedSink"/>，
+        /// 返回解除的个数。增益一律保留——「祛毒」不该顺手把守势也洗掉。
+        /// </summary>
+        /// <remarks>
+        /// 从后往前遍历并当场移除，与 <see cref="TickStatuses"/> 的写法一致；
+        /// 倒序是为了让「移除即重排」不会漏掉元素。
+        /// </remarks>
+        internal int RemoveDebuffs(List<BattleStatusInstance> removedSink)
+        {
+            var removed = 0;
+            for (var i = _statuses.Count - 1; i >= 0; i--)
+            {
+                var status = _statuses[i];
+                if (!status.IsDebuff)
+                {
+                    continue;
+                }
+
+                _statuses.RemoveAt(i);
+                removedSink?.Add(status);
+                removed++;
+            }
+
+            return removed;
+        }
+
+        /// <summary>
         /// 记冷却。当回合结束时<b>不</b>递减这一次记下的冷却，
         /// 于是 <c>cooldownTurns = 3</c> 恰好等于「用完之后还要等 3 个自己的回合」。
         /// </summary>

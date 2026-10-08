@@ -120,14 +120,32 @@ namespace SamsaraWest.Battle
         /// 指的状态没登记）。这是<b>数据错误</b>而不是玩家操作错误，界面不必给文案。
         /// </summary>
         DefinitionMissing = 16,
+
+        /// <summary>
+        /// 这件道具不存在，或它不是一件「战斗内可用」的道具。
+        /// 界面只列出可用的道具，所以这一条正常玩不出来——它是数据与界面不同步的报警。
+        /// </summary>
+        ItemNotUsable = 17,
+
+        /// <summary>
+        /// 背包里没有这件道具了。界面只画还有存货的那几件，所以正常玩不出来。
+        /// </summary>
+        ItemOutOfStock = 18,
+
+        /// <summary>
+        /// 道具的效果键内核不认识（例如引用了尚未实现的 <c>effectSkillId</c>，
+        /// 或写了拼错的效果键）。这是<b>数据错误</b>而不是玩家操作错误，界面不必给文案。
+        /// </summary>
+        ItemEffectUnknown = 19,
     }
 
     /// <summary>
     /// 一次行动的种类。
     /// </summary>
     /// <remarks>
-    /// 任务书里列出的道具与联合技仍然没有口径，因此<b>不</b>为它们预留占位枚举值，
-    /// 避免出现一个永远走不通的分支。逃跑见 <see cref="Escape"/>，防御见 <see cref="Defend"/>。
+    /// 任务书里列出的联合技仍然没有口径，因此<b>不</b>为它预留占位枚举值，
+    /// 避免出现一个永远走不通的分支。逃跑见 <see cref="Escape"/>，防御见 <see cref="Defend"/>，
+    /// 道具见 <see cref="UseItem"/>。
     /// </remarks>
     public enum BattleActionKind
     {
@@ -152,6 +170,17 @@ namespace SamsaraWest.Battle
         /// 它<b>不</b>走技能表：防御是每个单位都有的通用指令，不该在 12 个角色的技能表里各写一份。
         /// </summary>
         Defend = 4,
+
+        /// <summary>
+        /// 用道具（主行动）：对<b>我方单体</b>（含自己）用掉一件 <c>Items</c> 表里
+        /// <c>usableInBattle</c> 的道具，效果按 <c>effectKey</c> 解释。
+        /// </summary>
+        /// <remarks>
+        /// 它和技能、防御共用同一道主行动门，因此「一回合只能用一件道具」不需要另外计时——
+        /// 主行动只有一次，用掉就没有第二次。它<b>不吃灵力、不进冷却</b>，
+        /// 代价全写在「扣背包里那一个」和「占掉主行动」上。
+        /// </remarks>
+        UseItem = 5,
     }
 
     /// <summary>状态发生变化的方式，用于事件与战斗日志。</summary>

@@ -221,6 +221,59 @@ namespace SamsaraWest.Tests.PlayMode
                 "点了落点，单位就必须真的挪过去——否则按钮只是画着好看。");
         }
 
+        [UnityTest]
+        public IEnumerator Screen_ItemButtonActuallyUsesAnItem()
+        {
+            yield return LoadBootstrapScene();
+
+            var screen = BattleScreenView.Instance;
+            screen.Tick();
+            Assert.IsTrue(screen.StartDiagnosticBattle());
+
+            var controller = screen.Controller;
+            Assert.IsNotNull(
+                controller.Session.Inventory,
+                "诊断战斗必须发下道具，否则这块界面没得点、也就等于没做。");
+
+            var index = FindCommandIndex(controller, BattleCommandId.Item);
+            Assert.GreaterOrEqual(
+                index,
+                0,
+                "背包里有战斗可用的道具时，指令栏就该给出道具按钮。");
+
+            var localization = GameServices.Registry.Resolve<ILocalizationService>();
+            var command = controller.Hud.Commands[index];
+            Assert.AreEqual(
+                localization.Get(command.LabelKey),
+                screen.CommandLabels[index],
+                "道具按钮的文案同样来自文本表，取的是道具自己的名字。");
+            Assert.AreEqual(BattleScreenView.DiagnosticItemStock, command.ItemCount);
+
+            var itemId = command.ItemId;
+            var before = controller.Session.Inventory.CountOf(itemId);
+            Assert.Greater(before, 0, "按钮画出来了，背包里就得真的有货。");
+
+            Assert.IsTrue(screen.ActivateCommand(index), "点道具应当进入选目标。");
+            Assert.AreEqual(BattlePrompt.PlayerTarget, controller.Prompt);
+            Assert.AreEqual(itemId, controller.PendingItemId, "待定的应当是刚点的那件道具。");
+            Assert.Greater(screen.PickLabels.Count, 0, "进了选目标就必须画出目标按钮。");
+
+            var targetId = controller.TargetCandidateIds[0];
+            Assert.IsTrue(screen.ActivateTarget(targetId), "点第一个我方目标应当被接受。");
+
+            Assert.IsTrue(controller.LastResult.Success);
+            Assert.AreEqual(itemId, controller.LastResult.ItemId);
+            Assert.AreEqual(
+                before - 1,
+                controller.Session.Inventory.CountOf(itemId),
+                "按钮点下去必须真的少一个道具，否则道具只是画着好看。");
+            Assert.AreEqual(
+                BattlePrompt.PlayerMoveOrSwap,
+                controller.Prompt,
+                "道具占掉主行动，点完只剩一次移动／换位。");
+            Assert.AreEqual(0, localization.MissingKeys.Count, "道具按钮的文案必须命中文本表。");
+        }
+
         private static int FindCommandIndex(BattleScreenController controller, BattleCommandId id)
         {
             var commands = controller.Hud.Commands;

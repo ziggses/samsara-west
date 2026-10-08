@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using NUnit.Framework;
 using SamsaraWest.Battle;
 using SamsaraWest.Data;
@@ -349,6 +350,105 @@ namespace SamsaraWest.Tests.EditMode
             Assert.IsTrue(screen.LastResult.Escaped);
         }
 
+        [Test]
+        public void 选道具_点我方目标_结算后进移动窗口()
+        {
+            using var lab = new BattleLab();
+            lab.AttackSkill("SKL_HIT", power: 20, breakDamage: 0);
+            lab.Item("ITM_POTION", ItemEffectKeys.HealHealth, 40);
+            lab.Character("CHR_A", 300, 10, 5, 30, FiveElement.None, 30, 50, "SKL_HIT");
+            lab.Enemy("ENM_A", 3000, 1, 0, 20, FiveElement.None, 900, false, "SKL_HIT");
+
+            var inventory = new BattleInventory();
+            inventory.Add("ITM_POTION", 2);
+
+            var screen = BuildScreen(lab, Line("CHR_A"), Line("ENM_A"), out var session, inventory);
+            screen.Start();
+            Assert.AreEqual(BattlePrompt.PlayerCommand, screen.Prompt);
+
+            Assert.IsTrue(screen.ChooseItem("ITM_POTION"));
+            Assert.AreEqual(BattlePrompt.PlayerTarget, screen.Prompt, "道具一律先让玩家点人。");
+            Assert.AreEqual("ITM_POTION", screen.PendingItemId);
+            Assert.IsNull(screen.PendingSkillId, "技能与道具的待定值互斥。");
+            Assert.AreEqual(
+                new[] { session.PlayerUnits[0].RuntimeId },
+                screen.TargetCandidateIds.ToArray(),
+                "本版道具只作用于我方单体，候选就是我方还站着的人。");
+
+            var target = session.PlayerUnits[0];
+            Assert.IsTrue(screen.ChooseTarget(target.RuntimeId));
+
+            Assert.IsTrue(screen.LastResult.Success);
+            Assert.AreEqual(BattleActionKind.UseItem, screen.LastResult.Kind);
+            Assert.AreEqual("ITM_POTION", screen.LastResult.ItemId);
+            Assert.AreEqual(1, inventory.CountOf("ITM_POTION"), "用掉一件就少一个。");
+            Assert.IsNull(screen.PendingItemId, "结算完就该把待定值清掉。");
+            Assert.AreEqual(BattlePrompt.PlayerMoveOrSwap, screen.Prompt, "道具同样占掉主行动。");
+        }
+
+        [Test]
+        public void 选了技能再取消改选道具_结算的是道具()
+        {
+            using var lab = new BattleLab();
+            lab.AttackSkill("SKL_HIT", power: 20, breakDamage: 0);
+            lab.Item("ITM_POTION", ItemEffectKeys.HealHealth, 40);
+            lab.Character("CHR_A", 300, 10, 5, 30, FiveElement.None, 30, 50, "SKL_HIT");
+            lab.Enemy("ENM_A", 3000, 1, 0, 20, FiveElement.None, 900, false, "SKL_HIT");
+
+            var inventory = new BattleInventory();
+            inventory.Add("ITM_POTION", 1);
+
+            var screen = BuildScreen(lab, Line("CHR_A"), Line("ENM_A"), out var session, inventory);
+            screen.Start();
+
+            Assert.IsTrue(screen.ChooseSkill("SKL_HIT"));
+            Assert.AreEqual(BattlePrompt.PlayerTarget, screen.Prompt);
+            Assert.IsFalse(
+                screen.ChooseItem("ITM_POTION"),
+                "正在给技能点目标时，道具不该插队——先取消再改主意。");
+            Assert.AreEqual("SKL_HIT", screen.PendingSkillId, "被拒的输入不许动待定值。");
+            Assert.IsNull(screen.PendingItemId);
+
+            Assert.IsTrue(screen.CancelTargeting());
+            Assert.IsTrue(screen.ChooseItem("ITM_POTION"));
+            Assert.IsNull(screen.PendingSkillId, "技能那一笔待定值必须被清掉，否则会拿它去结算。");
+            Assert.AreEqual("ITM_POTION", screen.PendingItemId);
+
+            Assert.IsTrue(screen.ChooseTarget(session.PlayerUnits[0].RuntimeId));
+
+            Assert.AreEqual(BattleActionKind.UseItem, screen.LastResult.Kind);
+            Assert.IsNull(screen.LastResult.SkillId);
+            Assert.AreEqual(
+                session.PlayerUnits[0].MaxHealth,
+                session.PlayerUnits[0].Health,
+                "结算的是道具（回血），不是那个打向敌人的技能。");
+        }
+
+        [Test]
+        public void 选了道具再取消_回到下令且不动背包()
+        {
+            using var lab = new BattleLab();
+            lab.AttackSkill("SKL_HIT", power: 20, breakDamage: 0);
+            lab.Item("ITM_POTION", ItemEffectKeys.HealHealth, 40);
+            lab.Character("CHR_A", 300, 10, 5, 30, FiveElement.None, 30, 50, "SKL_HIT");
+            lab.Enemy("ENM_A", 3000, 1, 0, 20, FiveElement.None, 900, false, "SKL_HIT");
+
+            var inventory = new BattleInventory();
+            inventory.Add("ITM_POTION", 1);
+
+            var screen = BuildScreen(lab, Line("CHR_A"), Line("ENM_A"), out var session, inventory);
+            screen.Start();
+
+            Assert.IsTrue(screen.ChooseItem("ITM_POTION"));
+            Assert.IsTrue(screen.CancelTargeting());
+
+            Assert.AreEqual(BattlePrompt.PlayerCommand, screen.Prompt);
+            Assert.IsNull(screen.PendingItemId);
+            Assert.IsEmpty(screen.TargetCandidateIds);
+            Assert.AreEqual(1, inventory.CountOf("ITM_POTION"), "取消不该扣背包。");
+            Assert.AreEqual(TurnPhase.MainAction, session.Phase, "取消也不该吃掉主行动。");
+        }
+
         private static BattleScreenController NewScreen(BattleLab lab, out BattleSession session) =>
             BuildScreen(lab, Line("CHR_A"), Line("ENM_A"), out session);
 
@@ -356,7 +456,8 @@ namespace SamsaraWest.Tests.EditMode
             BattleLab lab,
             List<BattleUnitBlueprint> party,
             List<BattleUnitBlueprint> enemies,
-            out BattleSession session)
+            out BattleSession session,
+            IBattleInventory inventory = null)
         {
             // 会话与界面共用同一个目录实例：各取一个虽然结果相同，但那是两处会各自漂移的来源。
             var registry = lab.Registry();
@@ -364,7 +465,7 @@ namespace SamsaraWest.Tests.EditMode
                 lab.Config,
                 registry,
                 BattleLab.Stream(),
-                new BattleSetup(Encounter, party, enemies));
+                new BattleSetup(Encounter, party, enemies, inventory: inventory));
             return new BattleScreenController(session, registry);
         }
 

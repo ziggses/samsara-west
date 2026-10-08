@@ -19,7 +19,7 @@ namespace SamsaraWest.UI
         /// <summary>轮到我方下主行动指令。</summary>
         PlayerCommand = 1,
 
-        /// <summary>技能已经选中，等我方点一个目标。</summary>
+        /// <summary>技能或道具已经选中，等我方点一个目标（两者共用这块界面）。</summary>
         PlayerTarget = 2,
 
         /// <summary>打完了，读 <see cref="BattleScreenController.Session"/> 的结局。</summary>
@@ -77,6 +77,9 @@ namespace SamsaraWest.UI
 
         /// <summary>已选中、正在等目标的技能 ID；不在选目标时为空。</summary>
         public string PendingSkillId { get; private set; }
+
+        /// <summary>已选中、正在等目标的道具 ID；不在选目标时为空（与技能互斥）。</summary>
+        public string PendingItemId { get; private set; }
 
         /// <summary>合法目标的单位编号，顺序为 <see cref="BattleUnit.RuntimeId"/> 升序。</summary>
         public IReadOnlyList<int> TargetCandidateIds => _candidateIds;
@@ -144,10 +147,47 @@ namespace SamsaraWest.UI
             return true;
         }
 
+        /// <summary>
+        /// 选一件道具。道具一律作用于我方单体（含自己），因此不必像技能那样分
+        /// 「要目标／不要目标」两路，永远先进 <see cref="BattlePrompt.PlayerTarget"/> 让玩家点人。
+        /// </summary>
+        /// <remarks>
+        /// 这里只挡「点错东西」（界面不该出现的道具 ID）。背包够不够、相位对不对，
+        /// 一律留给内核在 <see cref="ApplyItem"/> 里判——界面不替内核下结论。
+        /// </remarks>
+        /// <returns>true 表示这次输入被接受（已进目标选择）。</returns>
+        public bool ChooseItem(string itemId)
+        {
+            if (Prompt != BattlePrompt.PlayerCommand || string.IsNullOrEmpty(itemId))
+            {
+                return false;
+            }
+
+            var actor = _session.CurrentActor;
+            if (actor == null || actor.Side != BattleSide.Player)
+            {
+                return false;
+            }
+
+            if (!_registry.TryGet(itemId, out ItemDefinition item) || item == null || !item.UsableInBattle)
+            {
+                // 注意：UI 层的字面量一律是 ASCII，中文只走本地化文本键。
+                GameLog.Warn(LogChannel.UI, $"Battle screen asked for unknown battle item id '{itemId}'.", itemId);
+                return false;
+            }
+
+            ClearPendingTarget();
+            FillAllyCandidates();
+            PendingItemId = itemId;
+            Prompt = BattlePrompt.PlayerTarget;
+            return true;
+        }
+
         /// <summary>在 <see cref="BattlePrompt.PlayerTarget"/> 下点一个目标，交给内核结算。</summary>
+        /// <remarks>技能与道具共用这块选目标界面，结算走哪条路由 <see cref="PendingItemId"/> 决定。</remarks>
         public bool ChooseTarget(int runtimeId)
         {
-            if (Prompt != BattlePrompt.PlayerTarget || PendingSkillId == null)
+            if (Prompt != BattlePrompt.PlayerTarget || (PendingSkillId == null && PendingItemId == null))
             {
                 return false;
             }
@@ -167,6 +207,12 @@ namespace SamsaraWest.UI
                 return false;
             }
 
+            if (PendingItemId != null)
+            {
+                ApplyItem(PendingItemId, runtimeId);
+                return true;
+            }
+
             ApplySkill(PendingSkillId, runtimeId);
             return true;
         }
@@ -179,8 +225,7 @@ namespace SamsaraWest.UI
                 return false;
             }
 
-            PendingSkillId = null;
-            _candidateIds.Clear();
+            ClearPendingTarget();
             Prompt = BattlePrompt.PlayerCommand;
             return true;
         }
@@ -194,8 +239,7 @@ namespace SamsaraWest.UI
             }
 
             LastResult = _session.TryEscape();
-            PendingSkillId = null;
-            _candidateIds.Clear();
+            ClearPendingTarget();
 
             if (!_session.IsFinished && _session.Phase == TurnPhase.MainAction)
             {
@@ -224,8 +268,7 @@ namespace SamsaraWest.UI
             }
 
             LastResult = _session.TryDefend();
-            PendingSkillId = null;
-            _candidateIds.Clear();
+            ClearPendingTarget();
 
             if (!_session.IsFinished && _session.Phase == TurnPhase.MainAction)
             {
@@ -252,8 +295,7 @@ namespace SamsaraWest.UI
                 return false;
             }
 
-            PendingSkillId = null;
-            _candidateIds.Clear();
+            ClearPendingTarget();
             _session.EndTurn();
             Pump();
             return true;
@@ -314,8 +356,7 @@ namespace SamsaraWest.UI
         private void ApplySkill(string skillId, int primaryTargetRuntimeId)
         {
             LastResult = _session.UseSkill(skillId, primaryTargetRuntimeId);
-            PendingSkillId = null;
-            _candidateIds.Clear();
+            ClearPendingTarget();
 
             if (!_session.IsFinished && _session.Phase == TurnPhase.MainAction)
             {
@@ -326,6 +367,38 @@ namespace SamsaraWest.UI
             }
 
             AdvanceAfterMainAction();
+        }
+
+        /// <summary>把选好的道具连同目标交给内核结算。</summary>
+        /// <remarks>
+        /// 与 <see cref="ApplySkill"/> 同形：被拒（主行动还在）就原地等我方改点别的，
+        /// 成功就走同一条 <see cref="AdvanceAfterMainAction"/>——道具同样占掉主行动。
+        /// </remarks>
+        private void ApplyItem(string itemId, int targetRuntimeId)
+        {
+            LastResult = _session.UseItem(itemId, targetRuntimeId);
+            ClearPendingTarget();
+
+            if (!_session.IsFinished && _session.Phase == TurnPhase.MainAction)
+            {
+                // 被内核拒了（例如背包里的最后一件刚好没了），主行动还在：原地等我方重新下令。
+                _hud.Refresh();
+                Prompt = BattlePrompt.PlayerCommand;
+                return;
+            }
+
+            AdvanceAfterMainAction();
+        }
+
+        /// <summary>
+        /// 丢掉「已选中、正等目标」的状态。技能与道具共用同一块选目标界面，
+        /// 因此两处待定值必须一起清——只清一个，下一次选目标就会拿上一次的残留去结算。
+        /// </summary>
+        private void ClearPendingTarget()
+        {
+            PendingSkillId = null;
+            PendingItemId = null;
+            _candidateIds.Clear();
         }
 
         /// <summary>
@@ -415,6 +488,27 @@ namespace SamsaraWest.UI
             for (var i = 0; i < _unitScratch.Count; i++)
             {
                 _candidateIds.Add(_unitScratch[i].RuntimeId);
+            }
+        }
+
+        /// <summary>
+        /// 道具的候选目标：我方所有还站着的单位，含自己。
+        /// </summary>
+        /// <remarks>
+        /// 不走 <see cref="BattleTargeting"/>——道具本版一律作用于我方单体，
+        /// 没有目标规则要算；顺序沿用 <see cref="BattleSession.Units"/>（我方在前、编号升序）。
+        /// </remarks>
+        private void FillAllyCandidates()
+        {
+            _candidateIds.Clear();
+            var units = _session.Units;
+            for (var i = 0; i < units.Count; i++)
+            {
+                var unit = units[i];
+                if (unit.Side == BattleSide.Player && unit.IsAlive)
+                {
+                    _candidateIds.Add(unit.RuntimeId);
+                }
             }
         }
     }

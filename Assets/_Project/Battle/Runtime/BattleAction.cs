@@ -51,6 +51,12 @@ namespace SamsaraWest.Battle
         /// <summary>本次行动对该目标的治疗合计。</summary>
         public int Healing { get; internal set; }
 
+        /// <summary>本次行动为该目标回复的灵力（回灵道具走这里，与技能共用同一个读数位）。</summary>
+        public int SpiritRestored { get; internal set; }
+
+        /// <summary>本次行动为该目标解除的负面状态个数（祛毒道具走这里）。</summary>
+        public int CuredDebuffs { get; internal set; }
+
         /// <summary>被削减的护体值。</summary>
         public int BreakDamage { get; internal set; }
 
@@ -77,7 +83,8 @@ namespace SamsaraWest.Battle
         public ElementRelation ElementRelation { get; internal set; }
 
         internal bool IsEmpty =>
-            Damage == 0 && Healing == 0 && BreakDamage == 0 && AppliedStatusId == null && !EnteredBroken;
+            Damage == 0 && Healing == 0 && SpiritRestored == 0 && CuredDebuffs == 0 &&
+            BreakDamage == 0 && AppliedStatusId == null && !EnteredBroken;
 
         public override string ToString()
         {
@@ -95,6 +102,16 @@ namespace SamsaraWest.Battle
             if (Healing > 0)
             {
                 builder.Append(" 治疗 ").Append(Healing);
+            }
+
+            if (SpiritRestored > 0)
+            {
+                builder.Append(" 回灵 ").Append(SpiritRestored);
+            }
+
+            if (CuredDebuffs > 0)
+            {
+                builder.Append(" 祛负面 ").Append(CuredDebuffs);
             }
 
             if (BreakDamage > 0)
@@ -138,13 +155,15 @@ namespace SamsaraWest.Battle
             BattleCommandRejection rejection,
             BattleUnit actor,
             BattleActionKind kind,
-            string skillId)
+            string skillId,
+            string itemId)
         {
             Success = success;
             Rejection = rejection;
             Actor = actor;
             Kind = kind;
             SkillId = skillId;
+            ItemId = itemId;
         }
 
         public bool Success { get; }
@@ -156,8 +175,11 @@ namespace SamsaraWest.Battle
 
         public BattleActionKind Kind { get; }
 
-        /// <summary>技能 ID；换位、结束回合与逃跑为空。</summary>
+        /// <summary>技能 ID；换位、结束回合、逃跑与用道具为空。</summary>
         public string SkillId { get; }
+
+        /// <summary>用掉的道具 ID；其它行动为空。</summary>
+        public string ItemId { get; }
 
         /// <summary>逃跑的成功率（0–1）；非逃跑指令为 0。</summary>
         public float EscapeChance { get; internal set; }
@@ -237,11 +259,16 @@ namespace SamsaraWest.Battle
             BattleCommandRejection rejection,
             BattleUnit actor = null,
             BattleActionKind kind = BattleActionKind.Skill,
-            string skillId = null) =>
-            new BattleActionResult(false, rejection, actor, kind, skillId);
+            string skillId = null,
+            string itemId = null) =>
+            new BattleActionResult(false, rejection, actor, kind, skillId, itemId);
 
-        public static BattleActionResult Succeeded(BattleUnit actor, BattleActionKind kind, string skillId) =>
-            new BattleActionResult(true, BattleCommandRejection.None, actor, kind, skillId);
+        public static BattleActionResult Succeeded(
+            BattleUnit actor,
+            BattleActionKind kind,
+            string skillId,
+            string itemId = null) =>
+            new BattleActionResult(true, BattleCommandRejection.None, actor, kind, skillId, itemId);
 
         internal BattleUnitEffect AddEffect(BattleUnit target, string skillId)
         {
@@ -260,7 +287,7 @@ namespace SamsaraWest.Battle
 
             var builder = new StringBuilder();
             builder.Append(Actor?.DefinitionId ?? "?").Append(" 执行 ")
-                .Append(SkillId ?? Kind.ToString());
+                .Append(SkillId ?? ItemId ?? Kind.ToString());
 
             for (var i = 0; i < _effects.Count; i++)
             {

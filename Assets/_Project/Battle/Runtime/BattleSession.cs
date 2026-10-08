@@ -41,6 +41,7 @@ namespace SamsaraWest.Battle
         private readonly List<BattleUnit> _targetScratch = new List<BattleUnit>(FormationSlot.Capacity);
         private readonly List<BattleUnit> _primaryScratch = new List<BattleUnit>(FormationSlot.Capacity);
         private readonly List<BattleStatusInstance> _expiredScratch = new List<BattleStatusInstance>(4);
+        private readonly List<BattleStatusInstance> _curedScratch = new List<BattleStatusInstance>(4);
         private readonly List<BattleIntent> _intentScratch = new List<BattleIntent>(FormationSlot.Capacity);
         private readonly Dictionary<int, BattlePlan> _plans = new Dictionary<int, BattlePlan>(12);
         private readonly ActionQueue _queue;
@@ -104,6 +105,12 @@ namespace SamsaraWest.Battle
         public BattleConfig Config => _config;
 
         public BattleSetup Setup => _setup;
+
+        /// <summary>
+        /// 这一战能吃到哪些道具。为 null 表示这场没有道具可用（界面据此不画道具按钮）。
+        /// 它是活背包的引用，用掉一个之后数量当场就少——界面读它就能给出最新的剩余数。
+        /// </summary>
+        public IBattleInventory Inventory => _setup.Inventory;
 
         public BattleOutcome Outcome { get; private set; }
 
@@ -680,6 +687,197 @@ namespace SamsaraWest.Battle
             }
 
             return result;
+        }
+
+        /// <summary>
+        /// 用道具（主行动）。目标是我方单体（含自己），效果由数据表的 <c>effectKey</c> 解释。
+        /// </summary>
+        /// <remarks>
+        /// <para>口径（已拍板，2026-10-08）：<b>占主行动、不吃灵力、一回合一件、扣背包、
+        /// 复用既有的治疗／状态通路、只在战斗内用</b>。</para>
+        ///
+        /// <para><b>为什么没有「本回合已用过道具」的计时器</b>：道具与技能、防御共用同一道主行动门
+        /// （<see cref="TurnPhase.MainAction"/> 且主行动尚未用掉），而主行动每回合只有一次。
+        /// 再记一个「用过道具没有」的布尔值，得到的是一个永远走不到的分支——
+        /// 那是死代码，不是安全网。</para>
+        ///
+        /// <para><b>不吃灵力</b>：这条路径完全不碰 <c>TryPaySpirit</c>，也不碰冷却与伤害公式。
+        /// 代价只有两样：扣掉背包里那一个、占掉这一手。</para>
+        ///
+        /// <para><b>效果的落点复用既有通路</b>：回血照旧发 <see cref="BattleHealedEvent"/>，
+        /// 挂状态照旧发 <see cref="BattleStatusAppliedEvent"/>，祛负面发
+        /// <see cref="BattleStatusExpiredEvent"/>——界面读血条与状态图标的那几条通路一行都不用改。
+        /// 另外发一条 <see cref="BattleItemUsedEvent"/> 交代「用掉了什么、还剩几个」。</para>
+        ///
+        /// <para><b>本版只作用于我方单体</b>：伤害类道具需要目标规则、命中段数与五行克制，
+        /// 那整套在技能表里（<c>skills.csv</c>）。给道具另开一条伤害通路等于把伤害公式抄第二份，
+        /// 所以攻击性道具留到「道具引用技能」那一步再做，本版的效果键只有
+        /// <see cref="ItemEffectKeys"/> 里的三种。</para>
+        ///
+        /// <para>数据错误（效果键不认识）给 <see cref="BattleCommandRejection.ItemEffectUnknown"/>
+        /// 并记一条 <c>Warn</c>，<b>不吃掉这一手</b>——与 <see cref="TryDefend"/> 遇到
+        /// <see cref="BattleCommandRejection.DefinitionMissing"/> 是同一条口径。</para>
+        /// </remarks>
+        /// <param name="itemId">数据表里的道具 ID。</param>
+        /// <param name="targetRuntimeId">目标的我方单位编号；-1 表示对自己用。</param>
+        public BattleActionResult UseItem(string itemId, int targetRuntimeId = -1)
+        {
+            var actor = CurrentActor;
+            if (Outcome != BattleOutcome.Ongoing)
+            {
+                return BattleActionResult.Rejected(
+                    BattleCommandRejection.BattleFinished, actor, BattleActionKind.UseItem, itemId: itemId);
+            }
+
+            if (actor == null || Phase == TurnPhase.Idle)
+            {
+                return BattleActionResult.Rejected(
+                    BattleCommandRejection.NoActiveTurn, actor, BattleActionKind.UseItem, itemId: itemId);
+            }
+
+            if (_mainActionUsed || Phase != TurnPhase.MainAction)
+            {
+                return BattleActionResult.Rejected(
+                    BattleCommandRejection.WrongPhase, actor, BattleActionKind.UseItem, itemId: itemId);
+            }
+
+            if (string.IsNullOrEmpty(itemId) ||
+                !_registry.TryGet(itemId, out ItemDefinition item) ||
+                item == null ||
+                !item.UsableInBattle)
+            {
+                GameLog.Warn(
+                    LogChannel.Battle,
+                    $"道具 '{itemId}' 不在数据表里，或没有标记 usableInBattle，本手被拒。",
+                    itemId);
+                return BattleActionResult.Rejected(
+                    BattleCommandRejection.ItemNotUsable, actor, BattleActionKind.UseItem, itemId: itemId);
+            }
+
+            var inventory = _setup.Inventory;
+            if (item.IsConsumedOnUse && (inventory == null || inventory.CountOf(itemId) <= 0))
+            {
+                return BattleActionResult.Rejected(
+                    BattleCommandRejection.ItemOutOfStock, actor, BattleActionKind.UseItem, itemId: itemId);
+            }
+
+            var target = targetRuntimeId < 0 ? actor : FindUnit(targetRuntimeId);
+            if (target == null)
+            {
+                return BattleActionResult.Rejected(
+                    BattleCommandRejection.NoValidTarget, actor, BattleActionKind.UseItem, itemId: itemId);
+            }
+
+            if (!target.IsAlive)
+            {
+                return BattleActionResult.Rejected(
+                    BattleCommandRejection.TargetDead, actor, BattleActionKind.UseItem, itemId: itemId);
+            }
+
+            if (target.Side != actor.Side)
+            {
+                return BattleActionResult.Rejected(
+                    BattleCommandRejection.TargetSideMismatch, actor, BattleActionKind.UseItem, itemId: itemId);
+            }
+
+            if (!ItemEffectKeys.IsKnown(item.EffectKey))
+            {
+                GameLog.Warn(
+                    LogChannel.Battle,
+                    $"道具 '{item.Id}' 的效果键 '{item.EffectKey}' 内核不认识（本版只解释 "
+                    + $"{ItemEffectKeys.HealHealth}／{ItemEffectKeys.HealSpirit}／{ItemEffectKeys.CureStatus}），本手被拒。",
+                    item.Id);
+                return BattleActionResult.Rejected(
+                    BattleCommandRejection.ItemEffectUnknown, actor, BattleActionKind.UseItem, itemId: itemId);
+            }
+
+            // 数据全部验完才扣背包：被拒的指令不该让玩家白白少一个道具。
+            if (item.IsConsumedOnUse && !inventory.TryConsume(itemId))
+            {
+                return BattleActionResult.Rejected(
+                    BattleCommandRejection.ItemOutOfStock, actor, BattleActionKind.UseItem, itemId: itemId);
+            }
+
+            var result = BattleActionResult.Succeeded(
+                actor, BattleActionKind.UseItem, skillId: null, itemId: item.Id);
+            var effect = result.AddEffect(target, null);
+            effect.TargetWasBroken = target.IsBroken;
+
+            var amount = ApplyItemEffect(actor, item, target, effect);
+            effect.HealthAfter = target.Health;
+
+            Publish(new BattleItemUsedEvent(
+                actor.RuntimeId,
+                actor.Side,
+                item.Id,
+                item.EffectKey,
+                target.RuntimeId,
+                target.Side,
+                amount,
+                inventory?.CountOf(item.Id) ?? 0));
+
+            GameLog.Info(
+                LogChannel.Battle,
+                $"#{actor.RuntimeId} {actor.DefinitionId} 用掉 {item.Id}（{item.EffectKey}）于 "
+                + $"#{target.RuntimeId} {target.DefinitionId}，生效 {amount}，"
+                + $"背包还剩 {inventory?.CountOf(item.Id) ?? 0}。",
+                item.Id);
+
+            _mainActionUsed = true;
+            _plansDirty = true;
+
+            // 与 UseSkill／TryDefend 同一条：主行动用掉之后只剩一次移动／换位；
+            // 战斗已经结算完毕时不再改阶段。
+            if (Outcome == BattleOutcome.Ongoing)
+            {
+                Phase = TurnPhase.MoveOrSwap;
+            }
+
+            return result;
+        }
+
+        /// <summary>
+        /// 按效果键把这一次道具结算完，返回实际生效量（回血／回灵的点数，或解除的负面状态个数）。
+        /// </summary>
+        /// <remarks>
+        /// 调用方已经保证 <paramref name="item"/> 的效果键是认识的，这里的 <c>default</c>
+        /// 因此只是一道编译期兜底，正常走不到。
+        /// </remarks>
+        private int ApplyItemEffect(BattleUnit actor, ItemDefinition item, BattleUnit target, BattleUnitEffect effect)
+        {
+            switch (item.EffectKey)
+            {
+                case ItemEffectKeys.HealHealth:
+                    var healed = target.Heal(item.EffectMagnitude);
+                    effect.Healing = healed;
+                    if (healed > 0)
+                    {
+                        Publish(new BattleHealedEvent(
+                            actor.RuntimeId, target.RuntimeId, item.Id, healed, target.Health));
+                    }
+
+                    return healed;
+
+                case ItemEffectKeys.HealSpirit:
+                    var restored = target.RestoreSpirit(item.EffectMagnitude);
+                    effect.SpiritRestored = restored;
+                    return restored;
+
+                case ItemEffectKeys.CureStatus:
+                    _curedScratch.Clear();
+                    var removed = target.RemoveDebuffs(_curedScratch);
+                    effect.CuredDebuffs = removed;
+                    for (var i = 0; i < _curedScratch.Count; i++)
+                    {
+                        Publish(new BattleStatusExpiredEvent(target.RuntimeId, _curedScratch[i].StatusId));
+                    }
+
+                    _curedScratch.Clear();
+                    return removed;
+
+                default:
+                    return 0;
+            }
         }
 
         /// <summary>

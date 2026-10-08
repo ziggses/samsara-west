@@ -314,6 +314,98 @@ namespace SamsaraWest.Tests.EditMode
             Assert.IsEmpty(hud.EnemyRows[0].Statuses, "守势只挂在自己身上。");
         }
 
+        [Test]
+        public void 道具按钮_只画还有存货的那几件_文案取道具自己的名字()
+        {
+            using var lab = new BattleLab();
+            BuildBasic(lab);
+            lab.Item("ITM_A", ItemEffectKeys.HealHealth, 40, displayNameKey: "test.battle.itm.a.name");
+            lab.Item("ITM_B", ItemEffectKeys.HealSpirit, 25, displayNameKey: "test.battle.itm.b.name");
+            lab.Item("ITM_C", ItemEffectKeys.HealHealth, 40, displayNameKey: "test.battle.itm.c.name");
+            lab.Item("ITM_D", ItemEffectKeys.HealHealth, 40, usableInBattle: false);
+
+            var inventory = new BattleInventory();
+            inventory.Add("ITM_B", 2);
+            inventory.Add("ITM_A", 1);
+            inventory.Add("ITM_D", 5);
+
+            var session = NewSession(lab, Setup(Line("CHR_A"), Line("ENM_A"), inventory));
+            var hud = new BattleHudModel(session, lab.Registry());
+            session.BeginNextTurn();
+            hud.Refresh();
+
+            var items = ItemCommands(hud);
+            Assert.AreEqual(
+                2,
+                items.Count,
+                "只画还有存货、且标了 usableInBattle 的那两件：ITM_C 没货，ITM_D 战斗内不能用。");
+            Assert.AreEqual("ITM_A", items[0].ItemId, "顺序按道具 ID 升序，不跟着数据目录的加载顺序漂。");
+            Assert.AreEqual("ITM_B", items[1].ItemId);
+            Assert.AreEqual(1, items[0].ItemCount);
+            Assert.AreEqual(2, items[1].ItemCount);
+            Assert.AreEqual(
+                "test.battle.itm.a.name",
+                items[0].LabelKey,
+                "一件道具一个按钮，文案取道具自己的名字（不是通用的「道具」）。");
+            Assert.IsTrue(items[0].Enabled, "道具不吃灵力也不进冷却，有货就是可点的。");
+            Assert.AreEqual(BattleCommandRejection.None, items[0].Rejection);
+            Assert.IsNull(items[0].SkillId, "道具按钮不是技能按钮。");
+        }
+
+        [Test]
+        public void 没接背包时_一件道具按钮都不给()
+        {
+            using var lab = new BattleLab();
+            BuildBasic(lab);
+            lab.Item("ITM_A", ItemEffectKeys.HealHealth, 40);
+
+            var session = NewSession(lab, Setup(Line("CHR_A"), Line("ENM_A")));
+            var hud = new BattleHudModel(session, lab.Registry());
+            session.BeginNextTurn();
+            hud.Refresh();
+
+            Assert.IsEmpty(ItemCommands(hud), "这场没接背包，一件都点不了，就不该画按钮。");
+        }
+
+        [Test]
+        public void 主行动用掉之后_道具按钮也收起()
+        {
+            using var lab = new BattleLab();
+            BuildBasic(lab);
+            lab.Item("ITM_A", ItemEffectKeys.HealHealth, 40);
+
+            var inventory = new BattleInventory();
+            inventory.Add("ITM_A", 3);
+
+            var session = NewSession(lab, Setup(Line("CHR_A"), Line("ENM_A"), inventory));
+            var hud = new BattleHudModel(session, lab.Registry());
+            session.BeginNextTurn();
+            hud.Refresh();
+            Assert.AreEqual(1, ItemCommands(hud).Count);
+
+            Assert.IsTrue(session.UseSkill("SKL_HIT", session.EnemyUnits[0].RuntimeId).Success);
+            hud.Refresh();
+
+            Assert.AreEqual(TurnPhase.MoveOrSwap, hud.Phase);
+            Assert.IsEmpty(ItemCommands(hud), "道具也是主行动，技能用掉之后同样该收起。");
+            Assert.AreEqual(3, inventory.CountOf("ITM_A"), "技能不该动背包。");
+        }
+
+        /// <summary>快照里所有道具按钮，按界面给出的顺序。</summary>
+        private static List<BattleCommandOption> ItemCommands(BattleHudModel hud)
+        {
+            var items = new List<BattleCommandOption>(4);
+            for (var i = 0; i < hud.Commands.Count; i++)
+            {
+                if (hud.Commands[i].Id == BattleCommandId.Item)
+                {
+                    items.Add(hud.Commands[i]);
+                }
+            }
+
+            return items;
+        }
+
         /// <summary>与 <see cref="Find"/> 同形，但找不到时返回 null 而不是判定失败。</summary>
         private static BattleCommandOption? FindOrNull(BattleHudModel hud, BattleCommandId id, string skillId)
         {
@@ -367,8 +459,11 @@ namespace SamsaraWest.Tests.EditMode
                 isDebuff: false,
                 incomingDamageModifier: 0.5f);
 
-        private static BattleSetup Setup(List<BattleUnitBlueprint> party, List<BattleUnitBlueprint> enemies) =>
-            new BattleSetup(Encounter, party, enemies);
+        private static BattleSetup Setup(
+            List<BattleUnitBlueprint> party,
+            List<BattleUnitBlueprint> enemies,
+            IBattleInventory inventory = null) =>
+            new BattleSetup(Encounter, party, enemies, inventory: inventory);
 
         private static List<BattleUnitBlueprint> Line(params string[] definitionIds)
         {

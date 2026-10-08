@@ -196,6 +196,42 @@ namespace SamsaraWest.Tests.EditMode
             return enemy;
         }
 
+        /// <summary>
+        /// 造一件战斗内可用的消耗品。
+        /// </summary>
+        /// <remarks>
+        /// <c>stackLimit</c> 默认 99：测试关心的是「用掉之后少一个」，不是堆叠规则。
+        /// <c>usableInField</c> 默认 <c>false</c>——本版的口径就是「道具只在战斗内用」。
+        /// </remarks>
+        internal ItemDefinition Item(
+            string id,
+            string effectKey,
+            int effectMagnitude = 0,
+            bool usableInBattle = true,
+            bool isConsumedOnUse = true,
+            string displayNameKey = null)
+        {
+            var item = New<ItemDefinition>(id, "itm");
+            if (!string.IsNullOrEmpty(displayNameKey))
+            {
+                Set(item, "_displayNameKey", displayNameKey);
+            }
+
+            Set(item, "_category", ItemCategory.Consumable);
+            Set(item, "_tier", RarityTier.Common);
+            Set(item, "_stackLimit", 99);
+            Set(item, "_price", 0);
+            Set(item, "_usableInBattle", usableInBattle);
+            Set(item, "_usableInField", false);
+            Set(item, "_isConsumedOnUse", isConsumedOnUse);
+            Set(item, "_effectKey", effectKey);
+            Set(item, "_effectMagnitude", effectMagnitude);
+            Set(item, "_effectDurationTurns", 0);
+            Set(item, "_effectSkillId", null);
+            Set(item, "_spriteKey", null);
+            return item;
+        }
+
         /// <summary>把已登记的定义装进数据目录，返回运行期查询入口。</summary>
         internal IDefinitionRegistry Registry()
         {

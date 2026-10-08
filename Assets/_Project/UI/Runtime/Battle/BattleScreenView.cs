@@ -39,6 +39,15 @@ namespace SamsaraWest.UI
         /// <summary>兜底刷新间隔。状态没变时不重算，但它保证「数字总归会跟上」。</summary>
         public const float RefreshIntervalSeconds = 0.5f;
 
+        /// <summary>
+        /// 诊断战斗发给队伍的每种道具各几个。
+        /// </summary>
+        /// <remarks>
+        /// 这只是让诊断层「有道具可点」：正式流程的存货来自存档，不是这个常数。
+        /// 给 3 个是为了能连着用几手，把「用光了按钮就消失」也看得见。
+        /// </remarks>
+        public const int DiagnosticItemStock = 3;
+
         /// <summary>「一场仗都没有」这个状态对应的快照键。</summary>
         private const int NoBattleSnapshotKey = -1;
 
@@ -286,6 +295,10 @@ namespace SamsaraWest.UI
             {
                 case BattleCommandId.Skill:
                     return Submit(_controller.ChooseSkill(option.SkillId));
+                case BattleCommandId.Item:
+                    // 道具的结算与技能共用同一条「选目标」界面：
+                    // 之后玩家点的人由 ActivateTarget 转给 ChooseTarget。
+                    return Submit(_controller.ChooseItem(option.ItemId));
                 case BattleCommandId.Defend:
                     return Submit(_controller.ChooseDefend());
                 case BattleCommandId.Flee:
@@ -400,7 +413,7 @@ namespace SamsaraWest.UI
                 return false;
             }
 
-            var setup = BattleFactory.FromEncounter(encounter, party);
+            var setup = BattleFactory.FromEncounter(encounter, party, BuildDiagnosticInventory());
             if (!setup.Validate(out var error))
             {
                 GameLog.Warn(LogChannel.UI, $"Diagnostic battle setup rejected: {error}", id);
@@ -410,6 +423,30 @@ namespace SamsaraWest.UI
             _battle.StartBattle(setup);
             Tick();
             return HasBattle;
+        }
+
+        /// <summary>
+        /// 诊断战斗的道具来源：数据表里每一件<b>战斗内可用</b>的道具各
+        /// <see cref="DiagnosticItemStock"/> 个。
+        /// </summary>
+        /// <remarks>
+        /// 不硬编码道具 ID——数据表加了新的战斗道具，诊断层自动就能点到，
+        /// 这也顺带成了「新道具接进战斗通路了吗」的一根探针。
+        /// </remarks>
+        private BattleInventory BuildDiagnosticInventory()
+        {
+            var inventory = new BattleInventory();
+            foreach (var item in _definitions.OfKind<ItemDefinition>())
+            {
+                if (item == null || string.IsNullOrEmpty(item.Id) || !item.UsableInBattle)
+                {
+                    continue;
+                }
+
+                inventory.Add(item.Id, DiagnosticItemStock);
+            }
+
+            return inventory;
         }
 
         private bool Submit(bool accepted)

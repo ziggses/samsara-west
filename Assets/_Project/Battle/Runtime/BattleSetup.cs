@@ -40,7 +40,8 @@ namespace SamsaraWest.Battle
             IReadOnlyList<BattleUnitBlueprint> enemies,
             bool isBoss = false,
             string backgroundKey = null,
-            string bgmKey = null)
+            string bgmKey = null,
+            IBattleInventory inventory = null)
         {
             EncounterId = encounterId;
             Party = party ?? Array.Empty<BattleUnitBlueprint>();
@@ -48,6 +49,7 @@ namespace SamsaraWest.Battle
             IsBoss = isBoss;
             BackgroundKey = backgroundKey;
             BgmKey = bgmKey;
+            Inventory = inventory;
         }
 
         /// <summary>遭遇 ID，来自 <c>ENC_CH01_001</c> 这类既有约定。手工构造时可以为空。</summary>
@@ -64,6 +66,16 @@ namespace SamsaraWest.Battle
 
         /// <summary>战斗音乐资源键，交给音频层解析。</summary>
         public string BgmKey { get; }
+
+        /// <summary>
+        /// 这一战能吃到哪些道具。为 null 表示「这场没有道具可用」——
+        /// 界面据此不画道具按钮，内核遇到用道具的指令直接给 <see cref="BattleCommandRejection.ItemOutOfStock"/>。
+        /// </summary>
+        /// <remarks>
+        /// 它是<b>引用</b>而不是清单：背包是活的，用掉一个之后数量要留在原处，
+        /// 所以这里持的是 <see cref="IBattleInventory"/> 本身，不是一份拷贝。
+        /// </remarks>
+        public IBattleInventory Inventory { get; }
 
         /// <summary>
         /// 入场清单自检。不合法时返回 false 并把原因写进 <paramref name="error"/>，
@@ -149,9 +161,14 @@ namespace SamsaraWest.Battle
         /// <param name="partyCharacterIds">
         /// 我方角色的定义 ID，按<b>玩家决定的出场顺序</b>给。四人队伍时前三个进前排。
         /// </param>
+        /// <param name="inventory">
+        /// 这一战能吃到哪些道具。省略表示「这场没有道具可用」。
+        /// 正式流程会传存档背包；诊断层传一个现搭的 <see cref="BattleInventory"/>。
+        /// </param>
         public static BattleSetup FromEncounter(
             EncounterDefinition encounter,
-            IReadOnlyList<string> partyCharacterIds)
+            IReadOnlyList<string> partyCharacterIds,
+            IBattleInventory inventory = null)
         {
             if (encounter == null)
             {
@@ -192,7 +209,8 @@ namespace SamsaraWest.Battle
                 enemies,
                 encounter.IsBoss,
                 encounter.BackgroundKey,
-                encounter.BgmKey);
+                encounter.BgmKey,
+                inventory);
         }
 
         /// <summary>

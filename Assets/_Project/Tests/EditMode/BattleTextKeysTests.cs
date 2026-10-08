@@ -149,6 +149,13 @@ namespace SamsaraWest.Tests.EditMode
 
                     // 数据错误：配置指的定义没登记，属于「该去修数据」而不是「该去劝玩家」。
                     BattleCommandRejection.DefinitionMissing,
+
+                    // 道具的三条同理，而且更硬：界面只画「背包里还有存货」的道具，
+                    // 因此这三条既不是玩法限制（一回合一件由主行动管着），
+                    // 也不是玩家能靠改操作绕开的东西——撞上它们就是数据与界面不同步。
+                    BattleCommandRejection.ItemNotUsable,
+                    BattleCommandRejection.ItemOutOfStock,
+                    BattleCommandRejection.ItemEffectUnknown,
                 },
                 silent,
                 "拒绝原因的显隐名单变了：要么给新原因补文本键，要么把它写进这份名单。");

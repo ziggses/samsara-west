@@ -11,8 +11,9 @@ namespace SamsaraWest.UI
     /// </summary>
     /// <remarks>
     /// 数值只增不改：它会进入界面状态机与录屏脚本。
-    /// 任务书里的道具与联合技还没有口径，因此不占位（同 <see cref="BattleActionKind"/> 的注释）；
-    /// 防御已经拍板并落进内核（<see cref="BattleSession.TryDefend"/>），因此有按钮。
+    /// 任务书里的联合技还没有口径，因此不占位（同 <see cref="BattleActionKind"/> 的注释）；
+    /// 防御已经拍板并落进内核（<see cref="BattleSession.TryDefend"/>），因此有按钮；
+    /// 道具同样已落进内核（<see cref="BattleSession.UseItem"/>）。
     /// </remarks>
     public enum BattleCommandId
     {
@@ -33,6 +34,9 @@ namespace SamsaraWest.UI
 
         /// <summary>与同阵营同伴换位（不占主行动，每回合一次）。</summary>
         Swap = 5,
+
+        /// <summary>用一件道具（主行动）。一件道具一个按钮，与「一个技能一个按钮」同画法。</summary>
+        Item = 6,
     }
 
     /// <summary>
@@ -52,6 +56,25 @@ namespace SamsaraWest.UI
             int spiritCost,
             bool enabled,
             BattleCommandRejection rejection)
+            : this(id, labelKey, skillId, spiritCost, enabled, rejection, null, 0)
+        {
+        }
+
+        /// <summary>道具按钮：文案是道具自己的名字，另外带上背包里还剩几个。</summary>
+        public BattleCommandOption(BattleCommandId id, string labelKey, string itemId, int itemCount)
+            : this(id, labelKey, null, 0, true, BattleCommandRejection.None, itemId, itemCount)
+        {
+        }
+
+        private BattleCommandOption(
+            BattleCommandId id,
+            string labelKey,
+            string skillId,
+            int spiritCost,
+            bool enabled,
+            BattleCommandRejection rejection,
+            string itemId,
+            int itemCount)
         {
             Id = id;
             LabelKey = labelKey;
@@ -59,6 +82,8 @@ namespace SamsaraWest.UI
             SpiritCost = spiritCost;
             Enabled = enabled;
             Rejection = rejection;
+            ItemId = itemId;
+            ItemCount = itemCount;
         }
 
         public BattleCommandId Id { get; }
@@ -72,12 +97,22 @@ namespace SamsaraWest.UI
         /// <summary>灵力消耗，仅技能有意义；非灵力单位恒为 0。</summary>
         public int SpiritCost { get; }
 
+        /// <summary>仅 <see cref="BattleCommandId.Item"/> 非空。</summary>
+        public string ItemId { get; }
+
+        /// <summary>
+        /// 背包里还剩几个；仅 <see cref="BattleCommandId.Item"/> 有意义。
+        /// 道具按钮只画还有存货的那几件，因此这里恒大于 0。
+        /// </summary>
+        public int ItemCount { get; }
+
         public bool Enabled { get; }
 
         /// <summary>为 <see cref="BattleCommandRejection.None"/> 表示可用，否则是按钮置灰的原因。</summary>
         public BattleCommandRejection Rejection { get; }
 
-        public override string ToString() => $"{Id}:{LabelKey}({Rejection})";
+        public override string ToString() =>
+            $"{Id}:{LabelKey}({Rejection}{(ItemId == null ? string.Empty : $",{ItemId}×{ItemCount}")})";
     }
 
     /// <summary>状态图标的一枚。堆叠数与剩余回合一起给，界面不再回头找定义。</summary>
@@ -218,6 +253,7 @@ namespace SamsaraWest.UI
         private readonly List<BattleCommandOption> _commands = new List<BattleCommandOption>(8);
         private readonly List<FormationSlot> _moveCandidates = new List<FormationSlot>(FormationSlot.Capacity);
         private readonly List<int> _swapCandidates = new List<int>(FormationSlot.Capacity);
+        private readonly List<ItemDefinition> _itemScratch = new List<ItemDefinition>(8);
         private readonly List<BattleIntentRow> _intentRows = new List<BattleIntentRow>(FormationSlot.Capacity);
         private readonly Dictionary<int, BattleIntentRow> _intentPool = new Dictionary<int, BattleIntentRow>(FormationSlot.Capacity);
 
@@ -429,6 +465,10 @@ namespace SamsaraWest.UI
             {
                 AppendSkillCommands(actor);
 
+                // 道具与技能同属「打出去的那一手」，排在技能后面、防御前面：
+                // 它同样占掉主行动，因此一回合只可能出现一次。
+                AppendItemCommands();
+
                 // 防御与逃跑是「不打」的那两手，排在技能后面：代价都落在占掉主行动上。
                 // 防御永远可用（不吃灵力、不进冷却），内核只在相位不对时才拒。
                 _commands.Add(new BattleCommandOption(
@@ -523,5 +563,61 @@ namespace SamsaraWest.UI
                     rejection));
             }
         }
+
+        /// <summary>
+        /// 把背包里<b>还有存货</b>的、战斗内可用的道具逐个翻成按钮。
+        /// </summary>
+        /// <remarks>
+        /// <para>只画还有存货的那几件：与「没地方可去就不给移动按钮」同一条口径——
+        /// 点了必然被拒的按钮不该占着位置。没接背包（<see cref="BattleSetup.Inventory"/>
+        /// 为 null）时一件都不画。</para>
+        /// <para>文案用道具自己的 <see cref="ItemDefinition.DisplayNameKey"/>：
+        /// 一件道具一个按钮，与「一个技能一个按钮」是同一套画法，
+        /// 因此不需要给「道具」再单开一个二级菜单。</para>
+        /// <para>永远可用：道具不吃灵力、不进冷却，目标又恒有（至少能对自己用），
+        /// 因此没有「必然被拒」的余地，<see cref="BattleCommandOption.Rejection"/> 恒为
+        /// <see cref="BattleCommandRejection.None"/>。</para>
+        /// <para>顺序按道具 ID 升序，不跟着数据目录的加载顺序走——
+        /// 按钮顺序要是随加载顺序漂，录屏脚本与截图对不上。</para>
+        /// </remarks>
+        private void AppendItemCommands()
+        {
+            var inventory = _session.Inventory;
+            if (inventory == null)
+            {
+                return;
+            }
+
+            _itemScratch.Clear();
+            foreach (var item in _registry.OfKind<ItemDefinition>())
+            {
+                if (item == null || string.IsNullOrEmpty(item.Id) || !item.UsableInBattle)
+                {
+                    continue;
+                }
+
+                if (inventory.CountOf(item.Id) <= 0)
+                {
+                    continue;
+                }
+
+                _itemScratch.Add(item);
+            }
+
+            _itemScratch.Sort(CompareItemsById);
+
+            for (var i = 0; i < _itemScratch.Count; i++)
+            {
+                var item = _itemScratch[i];
+                _commands.Add(new BattleCommandOption(
+                    BattleCommandId.Item,
+                    item.DisplayNameKey,
+                    item.Id,
+                    inventory.CountOf(item.Id)));
+            }
+        }
+
+        private static int CompareItemsById(ItemDefinition left, ItemDefinition right) =>
+            string.CompareOrdinal(left.Id, right.Id);
     }
 }

@@ -174,6 +174,58 @@ namespace SamsaraWest.Battle
         public int HealthAfter { get; }
     }
 
+    /// <summary>
+    /// 用掉一件道具。
+    /// </summary>
+    /// <remarks>
+    /// 它<b>不替代</b>效果自己的事件：回血照旧发 <see cref="BattleHealedEvent"/>，
+    /// 挂状态照旧发 <see cref="BattleStatusAppliedEvent"/>，祛负面发 <see cref="BattleStatusExpiredEvent"/>，
+    /// 于是界面读血条与状态图标的那几条通路一行都不用改。
+    /// 这一条只回答「谁、用掉了什么、还剩几个」——战斗日志与录屏回放要的就是这个。
+    /// </remarks>
+    public readonly struct BattleItemUsedEvent : IGameEvent
+    {
+        public BattleItemUsedEvent(
+            int actorRuntimeId,
+            BattleSide actorSide,
+            string itemId,
+            string effectKey,
+            int targetRuntimeId,
+            BattleSide targetSide,
+            int amount,
+            int remaining)
+        {
+            ActorRuntimeId = actorRuntimeId;
+            ActorSide = actorSide;
+            ItemId = itemId;
+            EffectKey = effectKey;
+            TargetRuntimeId = targetRuntimeId;
+            TargetSide = targetSide;
+            Amount = amount;
+            Remaining = remaining;
+        }
+
+        /// <summary>用掉道具的单位。</summary>
+        public int ActorRuntimeId { get; }
+
+        public BattleSide ActorSide { get; }
+
+        public string ItemId { get; }
+
+        /// <summary>数据表里那条 <c>effectKey</c>。带上它是为了让「这一手到底做了什么」不必回头查表。</summary>
+        public string EffectKey { get; }
+
+        public int TargetRuntimeId { get; }
+
+        public BattleSide TargetSide { get; }
+
+        /// <summary>实际生效量：回血／回灵的数值，或解除的负面状态个数。</summary>
+        public int Amount { get; }
+
+        /// <summary>用完之后背包里还剩几个。没接背包时为 0。</summary>
+        public int Remaining { get; }
+    }
+
     /// <summary>进入破防。</summary>
     public readonly struct BattleBrokenEvent : IGameEvent
     {
@@ -232,7 +284,10 @@ namespace SamsaraWest.Battle
         public int RemainingTurns { get; }
     }
 
-    /// <summary>状态到时间被移除。</summary>
+    /// <summary>
+    /// 状态离开这个单位。两种来路：持续时间走完，或被祛负面的道具摘掉。
+    /// 界面要做的动作是同一条（撤掉那枚图标），因此不另立事件。
+    /// </summary>
     public readonly struct BattleStatusExpiredEvent : IGameEvent
     {
         public BattleStatusExpiredEvent(int runtimeId, string statusId)
