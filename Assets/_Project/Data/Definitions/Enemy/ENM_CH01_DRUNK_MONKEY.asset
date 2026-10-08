@@ -20,7 +20,7 @@ MonoBehaviour:
   - monkey
   _version: 1
   _icon: {fileID: 0}
-  _maxHealth: 300
+  _maxHealth: 150
   _attack: 18
   _defense: 8
   _speed: 11

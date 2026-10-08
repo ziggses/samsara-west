@@ -61,7 +61,7 @@ namespace SamsaraWest.Editor
 
         /// <summary>
         /// 战斗节奏校算：全量重导入后按最低配打法打印每场遭遇打几回合，
-        /// 让「常规 4–6 回合、Boss 10–15 回合」这条设计目标在不打开编辑器的前提下也能一眼核对。
+        /// 让「常规 4–6 回合、隐藏 3 回合内、Boss 10–15 回合」这套设计目标在不打开编辑器的前提下也能一眼核对。
         /// 越界只报警告：判死的红线由 <c>EncounterPacingTests</c> 持有，这里不做第二套断言。
         /// 退出码：0 校算完整，2 有遭遇算不出来（缺敌人、血量写坏导致回合数不收敛）。
         /// </summary>
@@ -136,6 +136,15 @@ namespace SamsaraWest.Editor
                 if (pacing.PeakRoundHealthShare > 0.25f)
                 {
                     note = $"{pacing.EncounterId} 单回合峰值 {pacing.PeakRoundHealthShare:P0}，超过阶段间距 25%。";
+                    return true;
+                }
+            }
+            else if (pacing.IsHidden)
+            {
+                // 隐藏遭遇没有 EXP、属「愿者上钩」的内容，目标是短而险：3 回合内解决。
+                if (pacing.Rounds > 3)
+                {
+                    note = $"{pacing.EncounterId} 是隐藏遭遇，设计目标是 3 回合内，当前 {pacing.Rounds} 回合。";
                     return true;
                 }
             }

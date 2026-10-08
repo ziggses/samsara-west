@@ -21,7 +21,7 @@ MonoBehaviour:
   - boss
   _version: 1
   _icon: {fileID: 0}
-  _maxHealth: 1400
+  _maxHealth: 1500
   _attack: 26
   _defense: 16
   _speed: 12

@@ -20,7 +20,7 @@ MonoBehaviour:
   - beast
   _version: 1
   _icon: {fileID: 0}
-  _maxHealth: 255
+  _maxHealth: 235
   _attack: 19
   _defense: 10
   _speed: 12

@@ -12,6 +12,7 @@ namespace SamsaraWest.Editor
             string encounterId,
             bool isBoss,
             bool isElite,
+            bool isHidden,
             int enemyCount,
             int totalHealth,
             int rounds,
@@ -20,11 +21,13 @@ namespace SamsaraWest.Editor
             int totalDamage,
             int brokenDamage,
             int maxEnemyHealth,
-            int peakRoundDamage)
+            int peakRoundDamage,
+            IReadOnlyList<int> roundEndTotalHealth)
         {
             EncounterId = encounterId;
             IsBoss = isBoss;
             IsElite = isElite;
+            IsHidden = isHidden;
             EnemyCount = enemyCount;
             TotalHealth = totalHealth;
             Rounds = rounds;
@@ -34,6 +37,7 @@ namespace SamsaraWest.Editor
             BrokenDamage = brokenDamage;
             MaxEnemyHealth = maxEnemyHealth;
             PeakRoundDamage = peakRoundDamage;
+            RoundEndTotalHealth = roundEndTotalHealth;
         }
 
         public string EncounterId { get; }
@@ -41,6 +45,12 @@ namespace SamsaraWest.Editor
         public bool IsBoss { get; }
 
         public bool IsElite { get; }
+
+        /// <summary>
+        /// 隐藏遭遇（<c>tags</c> 里带 <c>hidden</c>）。它没有 EXP、属「愿者上钩」的内容，
+        /// 节奏目标与常规遭遇不同，所以校算与断言都必须能把它单独拎出来。
+        /// </summary>
+        public bool IsHidden { get; }
 
         public int EnemyCount { get; }
 
@@ -80,9 +90,20 @@ namespace SamsaraWest.Editor
         /// </summary>
         public float PeakRoundHealthShare => MaxEnemyHealth <= 0 ? 0f : (float)PeakRoundDamage / MaxEnemyHealth;
 
+        /// <summary>
+        /// 每个回合结束时的<b>剩余总血</b>（第 i 项 = 第 i+1 回合结束时剩多少）。它把回合数拆成一条时间线，
+        /// 于是「Boss 的某一阶段停留了几个回合」这种问题可以直接算出来，而不是靠人手推。
+        /// 1 个敌人的遭遇（Boss）下，它就是那一个敌人的血条。
+        /// </summary>
+        public IReadOnlyList<int> RoundEndTotalHealth { get; }
+
         public override string ToString() =>
-            $"{EncounterId}：{EnemyCount} 敌、总血 {TotalHealth}、{Rounds} 回合、破防 {BreakWindows} 次、" +
+            $"{EncounterId}{KindLabel}：{EnemyCount} 敌、总血 {TotalHealth}、{Rounds} 回合、破防 {BreakWindows} 次、" +
             $"首回合集火 {FocusDamageFirstRound}、单回合峰值 {PeakRoundHealthShare:P0}、破防伤害占比 {BrokenDamageShare:P0}";
+
+        /// <summary>日志里的类型后缀。三种遭遇的节奏目标不一样，混在一行里会看错。</summary>
+        private string KindLabel =>
+            IsBoss ? "（Boss）" : IsHidden ? "（隐藏）" : IsElite ? "（精英）" : string.Empty;
     }
 
     /// <summary>整章的校算结果：正常算出来的遭遇 + 算不出来的原因。</summary>
@@ -226,6 +247,7 @@ namespace SamsaraWest.Editor
             var totalDamage = 0;
             var brokenDamage = 0;
             var peakRoundDamage = 0;
+            var roundEndTotalHealth = new List<int>(16);
             var aliveCount = enemies.Count;
             var focusIndexOfFirstRound = -1;
 
@@ -268,17 +290,26 @@ namespace SamsaraWest.Editor
                             isBrokenHit,
                             enemy.MaxHealth);
 
-                        enemy.Health -= damage;
-                        totalDamage += damage;
-                        roundDamage[index] += damage;
+                        // 只统计真正扣掉的血：最后一击的溢出伤害不算。
+                        // 不截断会把终局那一回合记成一次「完整的破防增伤」，把破防占比凭空抬高若干个百分点
+                        // （Boss 实测从 47% 被抬到 51%），而设计目标判的是「破防吃掉了多少血」。
+                        var applied = enemy.Health < damage ? enemy.Health : damage;
+                        if (applied < 0)
+                        {
+                            applied = 0;
+                        }
+
+                        enemy.Health -= applied;
+                        totalDamage += applied;
+                        roundDamage[index] += applied;
                         if (isBrokenHit)
                         {
-                            brokenDamage += damage;
+                            brokenDamage += applied;
                         }
 
                         if (rounds == 1 && index == focusIndexOfFirstRound)
                         {
-                            focusDamageFirstRound += damage;
+                            focusDamageFirstRound += applied;
                         }
 
                         if (enemy.Health <= 0 && enemy.Alive)
@@ -340,6 +371,17 @@ namespace SamsaraWest.Editor
                         peakRoundDamage = roundDamage[i];
                     }
                 }
+
+                var roundEndHealth = 0;
+                foreach (var enemy in enemies)
+                {
+                    if (enemy.Alive)
+                    {
+                        roundEndHealth += enemy.Health;
+                    }
+                }
+
+                roundEndTotalHealth.Add(roundEndHealth);
             }
 
             if (aliveCount > 0)
@@ -352,6 +394,7 @@ namespace SamsaraWest.Editor
                 encounter.Id,
                 encounter.IsBoss,
                 encounter.IsElite,
+                HasTag(encounter, "hidden"),
                 enemies.Count,
                 totalHealth,
                 rounds,
@@ -360,7 +403,8 @@ namespace SamsaraWest.Editor
                 totalDamage,
                 brokenDamage,
                 maxEnemyHealth,
-                peakRoundDamage);
+                peakRoundDamage,
+                roundEndTotalHealth);
             return true;
         }
 
@@ -398,6 +442,20 @@ namespace SamsaraWest.Editor
             }
 
             return null;
+        }
+
+        private static bool HasTag(EncounterDefinition encounter, string tag)
+        {
+            var tags = encounter.Tags;
+            for (var i = 0; i < tags.Length; i++)
+            {
+                if (string.Equals(tags[i], tag, StringComparison.OrdinalIgnoreCase))
+                {
+                    return true;
+                }
+            }
+
+            return false;
         }
 
         private static int FirstAliveIndex(List<EnemyState> enemies)

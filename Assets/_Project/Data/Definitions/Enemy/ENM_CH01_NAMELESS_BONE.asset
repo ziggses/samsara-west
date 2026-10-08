@@ -21,7 +21,7 @@ MonoBehaviour:
   - hidden
   _version: 1
   _icon: {fileID: 0}
-  _maxHealth: 210
+  _maxHealth: 150
   _attack: 12
   _defense: 6
   _speed: 8

@@ -20,7 +20,7 @@ MonoBehaviour:
   - demon
   _version: 1
   _icon: {fileID: 0}
-  _maxHealth: 255
+  _maxHealth: 210
   _attack: 16
   _defense: 9
   _speed: 10
