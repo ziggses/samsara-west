@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using SamsaraWest.Core;
 using SamsaraWest.Data;
 using SamsaraWest.Economy;
+using SamsaraWest.Equipment;
 using SamsaraWest.Exploration;
 using SamsaraWest.Narrative;
 using SamsaraWest.Save;
@@ -14,7 +15,8 @@ namespace SamsaraWest.Flow
     /// </summary>
     /// <remarks>
     /// <para>它为什么必须长在组合根：左手是探索（人站在哪张图的哪一格）、右手是剧情（那本状态账）、
-    /// 手上还拎着钱袋与背包、兜里还有随机服务的母种子，而这些都<b>不许</b>被 <c>Save</c> 认识。
+    /// 手上还拎着钱袋与背包、身上还穿着装备与经文、兜里还有随机服务的母种子，
+    /// 而这些都<b>不许</b>被 <c>Save</c> 认识。
     /// 与三条 Link 同一处境，区别只在它是「按接口被调用」而不是「订阅事件」。</para>
     ///
     /// <para>两处顺序是有意的：<b>先校验再动状态</b>（目标图查不到时整体拒绝，
@@ -24,6 +26,9 @@ namespace SamsaraWest.Flow
     /// <para><b>钱与物是第二十一轮接上的</b>：<c>SaveData</c> 里 <c>Gold</c> 与
     /// <c>InventoryItemIds/Counts</c> 早就备好了字段，缺的从来是运行期真源（ADR-025 的代价栏）。
     /// 经济模块落地之后，这里才第一次有东西可搬——搬运方式与状态账完全一样：整本进、整本出。</para>
+    ///
+    /// <para><b>在身清单是第二十二轮接上的</b>（ADR-028）：<c>EquipmentAssignment</c> 字段的来头更早
+    /// （v3 就留好了，ADR-015），缺的同样是运行期真源。三组东西的搬法一模一样，所以这里没有第四种写法。</para>
     /// </remarks>
     public sealed class SaveCoordinator : ISaveCoordinator
     {
@@ -33,6 +38,7 @@ namespace SamsaraWest.Flow
         private readonly IDefinitionRegistry _definitions;
         private readonly IRandomService _random;
         private readonly IEconomyService _economy;
+        private readonly IEquipmentService _equipment;
 
         /// <param name="saves">存档读写（落盘与校验）。</param>
         /// <param name="state">剧情状态账：整本进、整本出。</param>
@@ -42,13 +48,17 @@ namespace SamsaraWest.Flow
         /// <param name="economy">
         /// 钱袋与背包；给了就搬运金钱与物品（缺省则不搬，钱与物不进档、读档也换不回来）。
         /// </param>
+        /// <param name="equipment">
+        /// 在身清单；给了就搬运「谁穿了什么」（缺省则不搬，一身装备不进档、读档也换不回来）。
+        /// </param>
         public SaveCoordinator(
             ISaveService saves,
             IStoryState state,
             IExplorationService exploration,
             IDefinitionRegistry definitions = null,
             IRandomService random = null,
-            IEconomyService economy = null)
+            IEconomyService economy = null,
+            IEquipmentService equipment = null)
         {
             _saves = saves ?? throw new ArgumentNullException(nameof(saves));
             _state = state ?? throw new ArgumentNullException(nameof(state));
@@ -56,6 +66,7 @@ namespace SamsaraWest.Flow
             _definitions = definitions;
             _random = random;
             _economy = economy;
+            _equipment = equipment;
         }
 
         /// <summary>最近一次成功存／读的槽位；一次都没动过时为 -1。诊断面板显示用。</summary>
@@ -114,9 +125,27 @@ namespace SamsaraWest.Flow
                 }
             }
 
+            // 在身清单：字段同样是「早就在档里躺着、缺个真源」，第二十二轮才有第一个持有者（ADR-028）。
+            // 顺序也不必再排：IEquipmentService.Snapshot 本身就是按「成员 ID → 栏位展示顺序」排好的，
+            // 理由同上——同一身装备两次采集必须得到同样的排列，否则会写出两份「内容相同、顺序不同」的档。
+            if (_equipment != null)
+            {
+                var equipped = _equipment.Snapshot;
+                for (var i = 0; i < equipped.Count; i++)
+                {
+                    data.Equipment.Add(new EquipmentAssignment
+                    {
+                        CharacterId = equipped[i].CharacterId,
+                        SlotId = equipped[i].SlotId,
+                        ItemId = equipped[i].ItemId,
+                    });
+                }
+            }
+
             GameLog.Info(
                 LogChannel.Save,
-                $"已采集运行状态：地图 {data.MapId ?? "（不在图上）"}，状态键 {data.FlagKeys.Count} 个，主种子 {data.RandomSeed}。");
+                $"已采集运行状态：地图 {data.MapId ?? "（不在图上）"}，状态键 {data.FlagKeys.Count} 个，"
+                + $"在身 {data.Equipment.Count} 件，主种子 {data.RandomSeed}。");
 
             return data;
         }
@@ -177,6 +206,27 @@ namespace SamsaraWest.Flow
                 }
 
                 _economy.Restore(data.Gold, stacks);
+            }
+
+            // 在身清单跟账本、钱物一起整本换掉：读档是「换成存档里那一身」，
+            // 不是在现在这一身外面再套一件。进不来的条目（栏位名认不出、定义查不到、
+            // 限定角色不符、或数据表已经改过）由服务自己跳过并留错误日志——
+            // 半身装备不该让整份存档读不进来。
+            if (_equipment != null)
+            {
+                var assigned = data.Equipment ?? new List<EquipmentAssignment>();
+                var equipped = new List<EquippedItem>(assigned.Count);
+                for (var i = 0; i < assigned.Count; i++)
+                {
+                    if (assigned[i] == null)
+                    {
+                        continue;
+                    }
+
+                    equipped.Add(new EquippedItem(assigned[i].CharacterId, assigned[i].SlotId, assigned[i].ItemId));
+                }
+
+                _equipment.Restore(equipped);
             }
 
             // 母种子先复位、再进图：探索流是进图那一刻取的（ExplorationService.EnterMapCore），

@@ -232,6 +232,32 @@ namespace SamsaraWest.Data
         /// <summary>该栏位是否可装备；<see cref="EquipmentSlot.None"/> 与越界值一律 false。</summary>
         public static bool IsEquippable(EquipmentSlot slot) => Array.IndexOf(DisplayOrder, slot) >= 0;
 
+        /// <summary>
+        /// 解析栏位名（严格：只认与枚举成员名完全一致的写法），认不出来时 <paramref name="slot"/> 为 <see cref="EquipmentSlot.None"/>。
+        /// </summary>
+        /// <remarks>
+        /// 只认「名字 → 值 → 名字」完全一致的写法：<c>Enum.TryParse</c> 会把 <c>"99"</c>、
+        /// <c>"Weapon, Armor"</c> 这类串也解析成功（后者还会凑出 <c>Talisman</c>），
+        /// 因此解析完必须回写一次名字比对。大小写敏感，与存档写入的名称严格一致。
+        /// 进场画像（<c>CharacterStatsResolver</c>）与在身清单（<c>EquipmentService</c>）共用这一份口径。
+        /// </remarks>
+        public static bool TryParse(string slotId, out EquipmentSlot slot)
+        {
+            slot = EquipmentSlot.None;
+            if (string.IsNullOrEmpty(slotId))
+            {
+                return false;
+            }
+
+            var trimmed = slotId.Trim();
+            if (!Enum.TryParse(trimmed, out slot) || !IsEquippable(slot))
+            {
+                return false;
+            }
+
+            return string.Equals(slot.ToString(), trimmed, StringComparison.Ordinal);
+        }
+
         /// <summary>栏位名称的文本键，例如 <c>ui.equip.slot.weapon</c>；未知栏位返回空串。</summary>
         public static string LocalizationKey(EquipmentSlot slot)
         {

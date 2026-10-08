@@ -36,6 +36,7 @@ namespace SamsaraWest.Core
         Localization = 10,
         Audio = 11,
         Tools = 12,
+        Equipment = 13,
     }
 
     /// <summary>结构化日志记录。不可变，避免环形缓冲区里被后续写入污染。</summary>

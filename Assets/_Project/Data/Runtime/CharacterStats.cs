@@ -491,19 +491,10 @@ namespace SamsaraWest.Data
         /// 解析栏位名。
         /// </summary>
         /// <remarks>
-        /// 只认「名字 → 值 → 名字」完全一致的写法：<c>Enum.TryParse</c> 会把 <c>"99"</c>、
-        /// <c>"Weapon, Armor"</c> 这类串也解析成功（后者还会凑出 <c>Talisman</c>），
-        /// 因此解析完必须回写一次名字比对。大小写敏感，与存档写入的名称严格一致。
+        /// 口径统一放在 <see cref="EquipmentSlots.TryParse"/>：在身清单（<c>EquipmentService</c>）
+        /// 也要用同一条规矩，两处各写一份迟早会分叉。
         /// </remarks>
-        private static bool TryParseSlot(string slotId, out EquipmentSlot slot)
-        {
-            var trimmed = slotId.Trim();
-            if (!Enum.TryParse(trimmed, out slot) || !EquipmentSlots.IsEquippable(slot))
-            {
-                return false;
-            }
-
-            return string.Equals(slot.ToString(), trimmed, StringComparison.Ordinal);
-        }
+        private static bool TryParseSlot(string slotId, out EquipmentSlot slot) =>
+            EquipmentSlots.TryParse(slotId, out slot);
     }
 }

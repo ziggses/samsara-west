@@ -15,6 +15,7 @@
         "SamsaraWest.Narrative",
         "SamsaraWest.Progression",
         "SamsaraWest.Economy",
+        "SamsaraWest.Equipment",
         "SamsaraWest.Audio",
         "SamsaraWest.UI"
     ],

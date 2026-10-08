@@ -10,6 +10,7 @@
         "SamsaraWest.Exploration",
         "SamsaraWest.Narrative",
         "SamsaraWest.Economy",
+        "SamsaraWest.Equipment",
         "Unity.InputSystem"
     ],
     "includePlatforms": [],

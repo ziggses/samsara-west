@@ -18,7 +18,7 @@ namespace SamsaraWest.Tests.EditMode
         private static readonly string[] ModuleFolders =
         {
             "Core", "Data", "Flow", "Exploration", "Battle", "Narrative",
-            "Progression", "Economy", "UI", "Save", "Localization", "Audio",
+            "Progression", "Economy", "Equipment", "UI", "Save", "Localization", "Audio",
         };
 
         /// <summary>只允许依赖 Core 的叶子模块。</summary>
@@ -27,7 +27,7 @@ namespace SamsaraWest.Tests.EditMode
         /// <summary>允许依赖 Core + Data 的玩法模块。</summary>
         private static readonly string[] CoreAndDataModules =
         {
-            "Battle", "Exploration", "Narrative", "Progression", "Economy",
+            "Battle", "Exploration", "Narrative", "Progression", "Economy", "Equipment",
         };
 
         [Serializable]
@@ -161,6 +161,11 @@ namespace SamsaraWest.Tests.EditMode
                     // 经济同样只在组合根被认识（ADR-027）：战斗内核与存档都不该认识钱袋与背包，
                     // 于是 Flow 认识 Economy，而 Economy 仍只依赖 Core + Data。
                     "SamsaraWest.Economy",
+
+                    // 在身清单同理（ADR-028）：内核要「谁带了哪些件」、存档要「整本进整本出」，
+                    // 两边都由组合根转述（EquipmentLoadoutAdapter 与 SaveCoordinator），
+                    // 而 Equipment 自己仍只依赖 Core + Data。
+                    "SamsaraWest.Equipment",
                 },
                 references);
 

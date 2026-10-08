@@ -209,6 +209,13 @@ namespace SamsaraWest.Flow
                 Economy.EconomyModule.Install(registry);
                 Track("Economy");
 
+                // 玩家的在身清单就位：谁身上穿了什么，第一次有了运行期真源（ADR-028）。
+                // 它同样只依赖 Core 与 Data（角色、装备、经文定义），所以也跟在数据之后。
+                // 战斗与存档都要读它，但都不认识它——两边分别由 EquipmentLoadoutAdapter
+                // 与 SaveCoordinator 在组合根接上。
+                Equipment.EquipmentModule.Install(registry, registry.Resolve<IDefinitionRegistry>());
+                Track("Equipment");
+
                 LocModule.Install(registry, _localizationTable);
                 Track("Localization");
 
@@ -244,11 +251,17 @@ namespace SamsaraWest.Flow
                     registry.Resolve<Exploration.IExplorationService>(),
                     registry.Resolve<IDefinitionRegistry>(),
                     registry.Resolve<IRandomService>(),
-                    registry.Resolve<Economy.IEconomyService>()));
+                    registry.Resolve<Economy.IEconomyService>(),
+                    registry.Resolve<Equipment.IEquipmentService>()));
 
                 // 内核要的「还有几个、扣掉一个」由这里转述给真背包：两边都不必认识对方
                 // （与 NarrativeStateSourceAdapter 同一种手法）。
                 var vault = new VaultBattleInventory(registry.Resolve<Economy.IEconomyService>());
+
+                // 内核要的「这个人带了哪些件」由这里转述给在身清单：同一种手法，同一个理由。
+                // 它有意不做缓存——在身清单可能在两场战斗之间被换过（换装只影响下一场，ADR-017），
+                // 缓存会让它拖着旧的一身进场。
+                var loadout = new EquipmentLoadoutAdapter(registry.Resolve<Equipment.IEquipmentService>());
 
                 // 接线最后装：它要同时拿到探索与战斗两个服务。
                 // 它不是一个模块（没有服务要注册），所以不计进 InstalledModules —— 那份清单只说「装上了哪些服务」。
@@ -257,7 +270,8 @@ namespace SamsaraWest.Flow
                     registry.Resolve<IDefinitionRegistry>(),
                     registry.Resolve<IEventBus>(),
                     registry.Resolve<Exploration.IExplorationService>(),
-                    vault);
+                    vault,
+                    loadout);
 
                 // 剧情状态接线：账本（flag 或心念）一变就重建探索的可行格，让条件交互物当场显隐。
                 _narrativeStateLink = new NarrativeStateLink(

@@ -30,6 +30,7 @@ namespace SamsaraWest.Flow
         private readonly IDefinitionRegistry _definitions;
         private readonly IExplorationService _exploration;
         private readonly IBattleInventory _inventory;
+        private readonly IBattleLoadout _loadout;
         private readonly SubscriptionBag _subscriptions = new SubscriptionBag();
         private bool _disposed;
 
@@ -43,12 +44,18 @@ namespace SamsaraWest.Flow
         /// 这场战斗能用的道具来源（正式流程传 <see cref="VaultBattleInventory"/>）。
         /// 允许为空——为空时道具指令问谁都要不到东西，战斗其余部分照常。
         /// </param>
+        /// <param name="loadout">
+        /// 队伍成员的在身清单来源（正式流程传 <see cref="EquipmentLoadoutAdapter"/>）。
+        /// 允许为空——为空时全员按裸装进场，战斗其余部分照常；
+        /// 与背包那条线同一个处境：内核只认接口，谁真持有它们由组合根在这里接。
+        /// </param>
         public ExplorationBattleLink(
             IBattleService battle,
             IDefinitionRegistry definitions,
             IEventBus bus,
             IExplorationService exploration = null,
-            IBattleInventory inventory = null)
+            IBattleInventory inventory = null,
+            IBattleLoadout loadout = null)
         {
             _battle = battle ?? throw new ArgumentNullException(nameof(battle));
             _definitions = definitions ?? throw new ArgumentNullException(nameof(definitions));
@@ -59,6 +66,7 @@ namespace SamsaraWest.Flow
 
             _exploration = exploration;
             _inventory = inventory;
+            _loadout = loadout;
 
             _subscriptions.Add(bus.Subscribe<EncounterTriggeredEvent>(
                 ExplorationEventChannel.Channel,
@@ -108,8 +116,10 @@ namespace SamsaraWest.Flow
             }
 
             // 队伍口径仍是骨架期的：目录里全部可操作角色（BattleFactory.DefaultParty）。
-            // 背包已经不是了——第二十一轮起，从这里开出的战斗带的是真正的钱袋与背包
-            // （VaultBattleInventory 转述给 IEconomyService），打赢得来的丹药当场就能用。
+            // 背包与在身清单已经不是了——第二十一轮起这里带的是真正的钱袋与背包
+            // （VaultBattleInventory 转述给 IEconomyService），打赢得来的丹药当场就能用；
+            // 第二十二轮起还带上真正的在身清单（EquipmentLoadoutAdapter 转述给 IEquipmentService），
+            // 装备与经文的加成、技能挂载与被动第一次在正式流程里进场（ADR-028）。
             var party = BattleFactory.DefaultParty(_definitions);
             if (party.Count == 0)
             {
@@ -121,7 +131,7 @@ namespace SamsaraWest.Flow
                 return;
             }
 
-            var setup = BattleFactory.FromEncounter(encounter, party, _inventory);
+            var setup = BattleFactory.FromEncounter(encounter, party, _inventory, _loadout);
             if (!setup.Validate(out var error))
             {
                 IgnoredEncounters++;
