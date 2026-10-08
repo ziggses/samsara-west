@@ -40,7 +40,9 @@ namespace SamsaraWest.Battle
             FiveElement element,
             int breakThreshold,
             string[] skillIds,
-            bool isBoss)
+            bool isBoss,
+            int spiritRegenPerTurn,
+            int healthCostPerTurn)
         {
             RuntimeId = runtimeId;
             Side = side;
@@ -58,6 +60,10 @@ namespace SamsaraWest.Battle
             BreakThreshold = Mathf.Max(1, breakThreshold);
             _skillIds = skillIds ?? Array.Empty<string>();
             IsBoss = isBoss;
+
+            // 每回合效果不是上限类的数，只需非负：负的回灵等于每次白掉几口血，没有这样的设计。
+            SpiritRegenPerTurn = Mathf.Max(0, spiritRegenPerTurn);
+            HealthCostPerTurn = Mathf.Max(0, healthCostPerTurn);
 
             Health = MaxHealth;
             Spirit = MaxSpirit;
@@ -109,6 +115,19 @@ namespace SamsaraWest.Battle
 
         /// <summary>护体值上限。</summary>
         public int BreakThreshold { get; }
+
+        /// <summary>
+        /// 每个「自己的回合」结束时回复的灵力（来自经文）。
+        /// </summary>
+        /// <remarks>
+        /// 与 <see cref="AttackModifier"/> 这类状态修正不同，它是<b>进场快照</b>的一部分：
+        /// 换装不改进行中的战斗（见 <c>CharacterStatsResolver</c>）。结算时机在战斗侧，
+        /// 与状态持续伤害、破防计时同挂「自己的回合收尾」那一处。
+        /// </remarks>
+        public int SpiritRegenPerTurn { get; }
+
+        /// <summary>每个「自己的回合」结束时流失的生命（苦修）。0 表示这本经文不要代价。</summary>
+        public int HealthCostPerTurn { get; }
 
         /// <summary>当前护体值。归零即进入破防。</summary>
         public int BreakValue { get; private set; }

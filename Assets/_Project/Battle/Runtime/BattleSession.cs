@@ -1334,6 +1334,10 @@ namespace SamsaraWest.Battle
                     actor.DefinitionId);
             }
 
+            // 经文的每回合效果：回灵与苦修失血。与状态结算同属「自己的回合收尾」那一处，
+            // 于是「每回合」的口径在整个内核里只有一个：走完自己一手。
+            var upkeepHealthDelta = ApplySutraUpkeep(actor);
+
             if (actor.TickBrokenTurn())
             {
                 Publish(new BattleBreakRecoveredEvent(actor.RuntimeId, actor.Side, actor.BreakValue));
@@ -1343,9 +1347,9 @@ namespace SamsaraWest.Battle
                     actor.DefinitionId);
             }
 
-            // 只有「被自己身上的持续伤害打死」才在这里播报死亡；
+            // 只有「被自己身上的伤害打死」才在这里播报死亡——状态持续伤害与苦修都算这一路；
             // 被技能打死的那一次已经在 ApplySkillToTarget 里播过了，避免同一场死亡报两次。
-            if (healthDelta < 0 && !actor.IsAlive)
+            if (healthDelta + upkeepHealthDelta < 0 && !actor.IsAlive)
             {
                 Publish(new BattleUnitDiedEvent(actor.RuntimeId, actor.Side, null));
             }
@@ -1360,6 +1364,60 @@ namespace SamsaraWest.Battle
             Phase = TurnPhase.Finished;
 
             ResolveOutcome();
+        }
+
+        /// <summary>
+        /// 结算经文带来的每回合效果：先回灵，再付苦修的生命代价。返回生命净变化（0 或负数）。
+        /// </summary>
+        /// <remarks>
+        /// <para>
+        /// 时机是<b>自己的回合收尾</b>，与状态持续伤害、破防计时同挂一处。ATB 行动值制下速度高的单位
+        /// 一场仗里走的手数更多，因此「每回合」= 「走完自己一手」——速度买来的不只是出手次数。
+        /// 被控跳过的那一手同样结算（<see cref="BeginNextTurn"/> 也会走到这里），与状态、冷却的既有口径一致。
+        /// </para>
+        /// <para>
+        /// <b>苦修不致死</b>：生命代价最多扣到剩 1 点。代价类经文的设计意图是「扣血换增益」的交易，
+        /// 不是自杀机制——真让它把人扣死，玩家会看到「因为带了一本经文而在自己回合结束时倒下」，
+        /// 而且这一手会被算进我方全灭。这条是刻意的保守口径，放开之前要先拍板。
+        /// </para>
+        /// <para>
+        /// 回灵只对我方有意义：<see cref="BattleUnit.UsesSpirit"/> 为假时回灵恒为 0，而敌人身上本来
+        /// 也不会带经文（见 <c>BattleFactory.CreateUnit</c>）。
+        /// </para>
+        /// </remarks>
+        private int ApplySutraUpkeep(BattleUnit actor)
+        {
+            if (actor.SpiritRegenPerTurn > 0)
+            {
+                var restored = actor.RestoreSpirit(actor.SpiritRegenPerTurn);
+                if (restored > 0)
+                {
+                    GameLog.Debug(
+                        LogChannel.Battle,
+                        $"#{actor.RuntimeId} {actor.DefinitionId} 经文回灵 +{restored}（当前 {actor.Spirit}/{actor.MaxSpirit}）。",
+                        actor.DefinitionId);
+                }
+            }
+
+            if (actor.HealthCostPerTurn <= 0 || !actor.IsAlive)
+            {
+                return 0;
+            }
+
+            // 留 1 点生命：苦修可以把自己逼到濒死，但收人头这件事得留给对手。
+            var cost = Mathf.Min(actor.HealthCostPerTurn, actor.Health - 1);
+            if (cost <= 0)
+            {
+                return 0;
+            }
+
+            var applied = actor.ApplyDamage(cost);
+            GameLog.Debug(
+                LogChannel.Battle,
+                $"#{actor.RuntimeId} {actor.DefinitionId} 苦修失血 -{applied}（当前 {actor.Health}/{actor.MaxHealth}）。",
+                actor.DefinitionId);
+
+            return -applied;
         }
 
         private void ResolveOutcome()

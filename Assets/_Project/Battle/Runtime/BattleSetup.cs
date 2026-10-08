@@ -309,7 +309,9 @@ namespace SamsaraWest.Battle
                         character.Element,
                         stats.BreakThreshold,
                         character.StartingSkillIds,
-                        isBoss: false);
+                        isBoss: false,
+                        stats.SpiritRegenPerTurn,
+                        stats.HealthCostPerTurn);
 
                 case EnemyDefinition enemy:
                     return new BattleUnit(
@@ -328,7 +330,10 @@ namespace SamsaraWest.Battle
                         enemy.Element,
                         enemy.BreakThreshold,
                         enemy.SkillIds,
-                        enemy.IsBoss);
+                        enemy.IsBoss,
+                        // 敌人不穿经文：每回合的回灵与苦修都只有我方成员可能非零。
+                        spiritRegenPerTurn: 0,
+                        healthCostPerTurn: 0);
 
                 default:
                     GameLog.Error(

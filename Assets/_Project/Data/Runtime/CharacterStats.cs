@@ -44,7 +44,9 @@ namespace SamsaraWest.Data
             int attack,
             int defense,
             int speed,
-            int breakThreshold)
+            int breakThreshold,
+            int spiritRegenPerTurn,
+            int healthCostPerTurn)
         {
             MaxHealth = maxHealth;
             MaxSpirit = maxSpirit;
@@ -52,6 +54,8 @@ namespace SamsaraWest.Data
             Defense = defense;
             Speed = speed;
             BreakThreshold = breakThreshold;
+            SpiritRegenPerTurn = spiritRegenPerTurn;
+            HealthCostPerTurn = healthCostPerTurn;
         }
 
         public int MaxHealth { get; }
@@ -67,8 +71,35 @@ namespace SamsaraWest.Data
         /// <summary>护体值上限，达到后进入破防状态。</summary>
         public int BreakThreshold { get; }
 
-        public override string ToString() =>
-            $"生命 {MaxHealth} · 灵力 {MaxSpirit} · 攻 {Attack} · 防 {Defense} · 速 {Speed} · 护体 {BreakThreshold}";
+        /// <summary>
+        /// 每个「自己的回合」结束时回复的灵力。
+        /// </summary>
+        /// <remarks>
+        /// 它<b>不是</b>上限类的数，而是每回合反复发生的量，因此不参与加算后的夹下限口径
+        /// （只保证非负）。谁在什么时机用它，由战斗侧（<c>BattleSession</c>）决定——
+        /// <c>Data</c> 不认识战斗内核，这里只回答「这身装备每回合回多少灵」。
+        /// </remarks>
+        public int SpiritRegenPerTurn { get; }
+
+        /// <summary>每个「自己的回合」结束时流失的生命（苦修）。0 表示这本经文不要代价。</summary>
+        public int HealthCostPerTurn { get; }
+
+        /// <summary>把每回合效果附在数值末尾——只在非零时出现，免得裸装单位的日志被两个零拖长。</summary>
+        public override string ToString()
+        {
+            var text = $"生命 {MaxHealth} · 灵力 {MaxSpirit} · 攻 {Attack} · 防 {Defense} · 速 {Speed} · 护体 {BreakThreshold}";
+            if (SpiritRegenPerTurn > 0)
+            {
+                text += $" · 每回合回灵 {SpiritRegenPerTurn}";
+            }
+
+            if (HealthCostPerTurn > 0)
+            {
+                text += $" · 每回合失血 {HealthCostPerTurn}";
+            }
+
+            return text;
+        }
     }
 
     /// <summary>
@@ -85,11 +116,17 @@ namespace SamsaraWest.Data
     /// 单位构造再兜一次，避免别的入口绕过聚合层时造出「速度为 0」的单位。
     /// </para>
     /// <para>
+    /// <b>每回合效果</b>：经文的 <c>spiritRegenPerTurn</c>（每回合回灵）与 <c>healthCostPerTurn</c>（苦修扣血）
+    /// 不是上限类的数，而是「走完自己一手就发生一次」的量，所以它们<b>照旧加算进快照、但不参与夹下限</b>
+    /// （只保证非负）；真正结算的时机在战斗侧的回合收尾，由 <c>BattleSession</c> 统一处理。
+    ///
+    /// <para>
     /// <b>暂不生效的字段</b>（本层不假装算过，留待各自接进伤害公式或回合回路）：
-    /// <c>EquipmentDefinition.breakDamageBonus</c>（破防伤害加成）、<c>resistElement</c>（五行承伤减免）、
-    /// <c>passiveSkillId</c>（被动技能）、<c>SutraDefinition.spiritRegenPerTurn</c>（每回合回灵）
-    /// 与 <c>healthCostPerTurn</c>（苦修扣血），以及两者的 <c>requiredLevel</c>——角色目前没有等级来源，
-    /// 因此等级校验无处可施，不臆造一套等级系统。
+    /// <c>EquipmentDefinition.breakDamageBonus</c>（破防伤害加成）与 <c>resistElement</c>（五行承伤减免）——
+    /// 这两个都要先拍板「加成是百分点还是倍率、抗性减伤多少」，口径定下来再接；
+    /// <c>passiveSkillId</c>（被动技能）需要先有技能挂载机制；两者的 <c>requiredLevel</c>——
+    /// 角色目前没有等级来源，因此等级校验无处可施，不臆造一套等级系统。
+    /// </para>
     /// </para>
     /// <para>
     /// <b>坏数据不毁战斗</b>：栏位对不上、限定角色不符、定义缺失的件一律跳过并记进报告，
@@ -112,7 +149,9 @@ namespace SamsaraWest.Data
                 character.Attack,
                 character.Defense,
                 character.Speed,
-                character.BreakThreshold);
+                character.BreakThreshold,
+                spiritRegenPerTurn: 0,
+                healthCostPerTurn: 0);
         }
 
         /// <summary>
@@ -155,6 +194,11 @@ namespace SamsaraWest.Data
             var defense = baseStats.Defense;
             var speed = baseStats.Speed;
             var breakThreshold = baseStats.BreakThreshold;
+
+            // 每回合效果从 0 起算而不是从基础值起算：角色自身没有「每回合回灵」这条设定，
+            // 它只可能是装备带来的。
+            var spiritRegenPerTurn = 0;
+            var healthCostPerTurn = 0;
 
             // 一个栏位只算一件：谁先占上算谁的，重复的那件按警告跳过（存档侧同样禁止重复栏位）。
             var usedSlots = new HashSet<EquipmentSlot>();
@@ -270,6 +314,8 @@ namespace SamsaraWest.Data
                         attack += sutra.AttackBonus;
                         defense += sutra.DefenseBonus;
                         breakThreshold += sutra.BreakThresholdBonus;
+                        spiritRegenPerTurn += sutra.SpiritRegenPerTurn;
+                        healthCostPerTurn += sutra.HealthCostPerTurn;
                         break;
                 }
             }
@@ -280,7 +326,9 @@ namespace SamsaraWest.Data
                 Math.Max(0, attack),
                 Math.Max(0, defense),
                 Math.Max(1, speed),
-                Math.Max(1, breakThreshold));
+                Math.Max(1, breakThreshold),
+                Math.Max(0, spiritRegenPerTurn),
+                Math.Max(0, healthCostPerTurn));
         }
 
         /// <summary>

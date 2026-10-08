@@ -196,7 +196,9 @@ namespace SamsaraWest.Tests.EditMode
                 FiveElement.None,
                 30,
                 Array.Empty<string>(),
-                false);
+                false,
+                spiritRegenPerTurn: 0,
+                healthCostPerTurn: 0);
 
         /// <summary>一直推进到「指定单位活着且已掉血」为止，再交还控制权。</summary>
         private static void AdvanceUntilDamaged(BattleSession session, BattleUnit target)

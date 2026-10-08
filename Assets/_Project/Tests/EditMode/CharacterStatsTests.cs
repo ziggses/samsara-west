@@ -304,6 +304,66 @@ namespace SamsaraWest.Tests.EditMode
             Assert.AreEqual(15, snapshot.Attack, "10 + 5：等级暂不拦人。");
         }
 
+        [Test]
+        public void 经文的每回合效果也进快照()
+        {
+            using var lab = new BattleLab();
+            var character = lab.Character(
+                "CHR_TEST_A", 100, 10, 5, 8, FiveElement.None, breakThreshold: 30, maxSpirit: 40);
+            lab.Sutra("SUT_TEST_STILLNESS", spiritBonus: 5, spiritRegenPerTurn: 3);
+
+            var report = new ValidationReport();
+            var snapshot = CharacterStatsResolver.Resolve(
+                character,
+                new[] { new LoadoutEntry("Sutra", "SUT_TEST_STILLNESS") },
+                lab.Registry(),
+                report);
+
+            Assert.IsTrue(report.IsClean);
+            Assert.AreEqual(45, snapshot.MaxSpirit, "灵力上限照旧加算。");
+            Assert.AreEqual(3, snapshot.SpiritRegenPerTurn, "每回合回灵原样带出去，等战斗侧按自己的时机结算。");
+            Assert.AreEqual(0, snapshot.HealthCostPerTurn, "这本经文不要代价。");
+        }
+
+        [Test]
+        public void 苦修的生命代价进快照_与上限的夹下限各管各的()
+        {
+            using var lab = new BattleLab();
+            var character = lab.Character(
+                "CHR_TEST_A", 100, 10, 5, 8, FiveElement.None, breakThreshold: 30, maxSpirit: 40);
+            lab.Sutra("SUT_TEST_ASCETIC", healthBonus: -999, healthCostPerTurn: 4);
+
+            var report = new ValidationReport();
+            var snapshot = CharacterStatsResolver.Resolve(
+                character,
+                new[] { new LoadoutEntry("Sutra", "SUT_TEST_ASCETIC") },
+                lab.Registry(),
+                report);
+
+            Assert.IsTrue(report.IsClean);
+            Assert.AreEqual(1, snapshot.MaxHealth, "生命上限照旧夹在下限 1。");
+            Assert.AreEqual(4, snapshot.HealthCostPerTurn, "代价是每回合 4 点：它是反复发生的量，不跟着上限一起夹。");
+        }
+
+        [Test]
+        public void 没穿经文时_每回合效果都是零()
+        {
+            using var lab = new BattleLab();
+            var character = lab.Character("CHR_TEST_A", 100, 10, 5, 8);
+            lab.Equipment("EQP_TEST_STAFF", EquipmentSlot.Weapon, attackBonus: 5);
+
+            var report = new ValidationReport();
+            var snapshot = CharacterStatsResolver.Resolve(
+                character,
+                new[] { new LoadoutEntry("Weapon", "EQP_TEST_STAFF") },
+                lab.Registry(),
+                report);
+
+            Assert.IsTrue(report.IsClean);
+            Assert.AreEqual(0, snapshot.SpiritRegenPerTurn, "装备没有「每回合效果」这一说，只有经文有。");
+            Assert.AreEqual(0, snapshot.HealthCostPerTurn);
+        }
+
         private static void AssertHasCode(ValidationReport report, string code)
         {
             var codes = new List<string>(report.Issues.Count);
