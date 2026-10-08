@@ -153,6 +153,10 @@ namespace SamsaraWest.Tests.EditMode
                     "SamsaraWest.Localization",
                     "SamsaraWest.Save",
                     "SamsaraWest.Battle",
+
+                    // 探索也在这一份清单里：组合根要替「遇敌 → 开战」接线（ADR-021），
+                    // 于是 Flow 认识 Exploration，而 Exploration 仍只依赖 Core + Data（见上一个用例）。
+                    "SamsaraWest.Exploration",
                 },
                 references);
 
@@ -172,6 +176,29 @@ namespace SamsaraWest.Tests.EditMode
                     references.Contains("SamsaraWest.UI"),
                     $"{module} 不得依赖 UI：界面是消费方，反向依赖会把表现层焊进逻辑层。");
             }
+        }
+
+        /// <summary>
+        /// 界面层是唯一允许「往外看」的：它要读战斗服务与探索会话，才能把正在发生的事画出来
+        /// （ADR-014 的诊断层、ADR-022 的探索面板都是这么长出来的）。但有两样东西它不许碰：
+        /// 编辑器程序集，与 <c>Flow</c>。
+        /// </summary>
+        /// <remarks>
+        /// 不许依赖 <c>Flow</c> 这条最容易在赶工时被破：界面想「按一下就直接开一场仗」时，
+        /// 最顺手的做法就是去抓组合根。可那样一来，界面的可用性就绑死在「谁先装、装到哪一步」上，
+        /// 启动顺序一改就静默失效。界面只该认服务注册表里的能力。
+        /// </remarks>
+        [Test]
+        public void Ui_MayReadGameplayModules_ButNotFlowOrEditor()
+        {
+            var references = ProjectReferences(ReadAssemblyDefinition("UI"));
+
+            Assert.IsFalse(references.Contains("SamsaraWest.Editor"), "UI 不得依赖编辑器程序集。");
+            Assert.IsFalse(
+                references.Contains("SamsaraWest.Flow"),
+                "UI 不得依赖 Flow：组合根是装配者，界面反向指挥流程会把启动顺序焊死。");
+            Assert.IsTrue(references.Contains("SamsaraWest.Battle"), "战斗界面要读战斗服务。");
+            Assert.IsTrue(references.Contains("SamsaraWest.Exploration"), "探索界面要读探索会话（ADR-022）。");
         }
 
         [Test]

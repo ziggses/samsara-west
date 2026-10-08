@@ -14,7 +14,7 @@
 # 1. 挂载外部素材 + 初始化工程（新机器、新克隆跑一次；幂等，可反复执行）
 powershell -NoProfile -ExecutionPolicy Bypass -File E:\tx2\samsara-west\Tools\setup-project.ps1
 
-# 2. 跑全套测试（当前基线：EditMode 473 + PlayMode 22）
+# 2. 跑全套测试（当前基线：EditMode 552 + PlayMode 39）
 powershell -NoProfile -ExecutionPolicy Bypass -File E:\tx2\samsara-west\Tools\run-tests.ps1 -Platform All
 ```
 
@@ -27,6 +27,17 @@ powershell -NoProfile -ExecutionPolicy Bypass -File E:\tx2\samsara-west\Tools\ru
 
 只缺素材、不想动工程时单独跑 `Tools\setup-external-assets.ps1`（见下节）。
 
+## 点 Play 之后会看到什么
+
+三个诊断层会自己挂上来，场景里不需要挂任何东西：
+
+- `F1` 自检面板；`F2` 打一场首章遭遇、`F3` 收起
+- `F4` 进首章野外图 `CH01_MAP01`（再按一次离图）：方向键／`WASD` 走格、`E` 交互。左上角是格子图
+  （`@` 自己、`*` 面朝、`#` 交互物、`.` 空地），下方一行报「刚才那下为什么被拒」。
+
+它们是**诊断层，不是正式界面**：字符格子图、按键直接走格、没有移动表现与镜头（ADR-014、ADR-022）。
+正式界面要一套带中文字形的字体资产，正式场景还要瓦片图与角色图，工程里都还没有。
+
 ## 目录结构
 
 模块边界由 asmdef 约束成**编译期错误**，不是文档里的君子协定。
@@ -35,19 +46,22 @@ powershell -NoProfile -ExecutionPolicy Bypass -File E:\tx2\samsara-west\Tools\ru
 |---|---|---|
 | `Core/` | 服务定位、事件总线、时间、可复现随机、对象池、日志 | InputSystem |
 | `Data/` | ID 规则、定义基类、CSV 解析、导入映射、校验 | Core |
-| `Flow/` | 启动装配、场景与章节状态 | Core, Data, Localization, Save, Battle, InputSystem |
+| `Flow/` | 启动装配、场景与章节状态、探索与战斗的接线 | Core, Data, Localization, Save, Battle, Exploration, InputSystem |
 | `Battle/` | 战斗内核（行动队列、意图预告、护体/破防、状态与冷却）、伤害计算、战斗数值配置 | Core, Data |
 | `Save/` | 版本化 JSON 存档 + 迁移钩子 | Core |
 | `Localization/` | 文本键服务、表资产、常量生成 | Core |
-| `UI/` | 本地化标签、运行期错误面板 | Core, Data, Localization, TextMeshPro |
-| `Exploration/` `Narrative/` `Progression/` `Economy/` | 骨架占位（目录 + asmdef + 接口契约） | Core, Data |
+| `UI/` | 本地化标签、运行期错误面板、战斗与探索的诊断界面 | Core, Data, Battle, Exploration, Localization, TextMeshPro |
+| `Exploration/` | 探索运行时：走格、交互、遭遇掷骰（不认识战斗，遇敌只发事件） | Core, Data |
+| `Narrative/` | 剧情状态账：状态键 → 整数、心念三轴（对话与任务运行时仍未做） | Core, Data |
+| `Progression/` `Economy/` | 骨架占位（目录 + asmdef + 接口契约） | Core, Data |
 | `Audio/` | 骨架占位 | Core |
 | `Editor/` | 导入、校验、出包、工具窗口 | 全部运行时模块 |
 | `Tests/EditMode` `Tests/PlayMode` | 自动化测试 | Editor / 运行时模块 |
 | `Assets/_External/` | 外部素材 junction，**不入库** | — |
 
 方向约定：`Core` 不依赖任何模块；`Data` 只依赖 `Core`；`Flow`/`Battle`/`UI` 消费 `Data`；
-`Editor` 只读消费全部运行时模块，运行时模块不反向依赖 `Editor`。
+`UI` 是唯一允许读玩法模块（`Battle`、`Exploration`）的层——界面要读服务才画得出正在发生的事——
+但它不碰 `Flow` 与 `Editor`；`Editor` 只读消费全部运行时模块，运行时模块不反向依赖 `Editor`。
 
 ## 外部素材（junction）
 

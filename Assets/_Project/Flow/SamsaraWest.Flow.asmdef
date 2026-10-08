@@ -7,6 +7,8 @@
         "SamsaraWest.Localization",
         "SamsaraWest.Save",
         "SamsaraWest.Battle",
+        "SamsaraWest.Exploration",
+        "SamsaraWest.Narrative",
         "Unity.InputSystem"
     ],
     "includePlatforms": [],

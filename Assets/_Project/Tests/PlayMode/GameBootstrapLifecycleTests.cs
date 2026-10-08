@@ -61,7 +61,7 @@ namespace SamsaraWest.Tests.PlayMode
         }
 
         [UnityTest]
-        public IEnumerator Bootstrap_InstallsCoreDataLocalizationSaveAndBattleModules()
+        public IEnumerator Bootstrap_InstallsCoreDataLocalizationSaveBattleNarrativeAndExplorationModules()
         {
             yield return null;
 
@@ -69,7 +69,7 @@ namespace SamsaraWest.Tests.PlayMode
             Assert.IsNotNull(bootstrap, "创建启动器后应当存在实例。");
             Assert.IsTrue(bootstrap.IsReady);
             CollectionAssert.AreEqual(
-                new[] { "Core", "Data", "Localization", "Save", "Battle" },
+                new[] { "Core", "Data", "Localization", "Save", "Battle", "Narrative", "Exploration" },
                 bootstrap.InstalledModules,
                 "模块安装顺序即依赖顺序，改动顺序要同步改这里。");
 
@@ -85,6 +85,23 @@ namespace SamsaraWest.Tests.PlayMode
             Assert.IsNotNull(registry.Resolve<ILocalizationService>());
             Assert.IsNotNull(registry.Resolve<ISaveService>());
             Assert.IsNotNull(registry.Resolve<IBattleService>(), "战斗服务必须在引导期就位，否则「探索遇敌 → 进战斗」没有落点。");
+            Assert.IsNotNull(
+                registry.Resolve<Exploration.IExplorationService>(),
+                "探索服务必须在引导期就位，否则「探索遇敌 → 进战斗」的起点不存在。");
+            Assert.IsNotNull(
+                bootstrap.ExplorationLink,
+                "接线要装在引导末尾，否则遇敌只会挂起、没人开战。");
+            Assert.IsNotNull(
+                bootstrap.MapChange,
+                "换图接线也要装在引导末尾：探索只会发出换图请求，没人接的话首章走到门口也出不去。");
+
+            var storyState = registry.Resolve<Narrative.IStoryState>();
+            Assert.IsNotNull(storyState, "剧情状态账必须在引导期就位，否则条件类交互物永远隐藏。");
+            storyState.SetValue("flag.bootstrap.probe", 3);
+            Assert.AreEqual(
+                3,
+                registry.Resolve<Exploration.IExplorationService>().StateSource.GetValue("flag.bootstrap.probe"),
+                "探索的条件源必须来自剧情状态账，而不是「全读 0」的替身。");
             Assert.AreEqual(TestSeed, registry.Resolve<IRandomService>().MasterSeed, "母种子必须一路传到随机服务，否则读档后无法复现。");
         }
 
@@ -136,7 +153,7 @@ namespace SamsaraWest.Tests.PlayMode
             bootstrap.Bootstrap();
 
             Assert.AreEqual(before, GameBootstrap.BootstrapCount, "重复引导不得再装一遍服务。");
-            Assert.AreEqual(5, bootstrap.InstalledModules.Count);
+            Assert.AreEqual(7, bootstrap.InstalledModules.Count);
         }
 
         [UnityTest]

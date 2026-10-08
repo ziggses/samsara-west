@@ -40,6 +40,15 @@ namespace SamsaraWest.Flow
         /// <summary>已安装的模块名，供启动自检与测试断言。</summary>
         private readonly List<string> _installedModules = new List<string>();
 
+        /// <summary>「探索遇敌 → 进战斗」的接线；它的订阅句柄在 <see cref="OnDestroy"/> 里统一释放。</summary>
+        private ExplorationBattleLink _explorationBattleLink;
+
+        /// <summary>「剧情状态变了 → 重建探索可行格」的接线；同样在 <see cref="OnDestroy"/> 里释放。</summary>
+        private NarrativeStateLink _narrativeStateLink;
+
+        /// <summary>「走到一扇门 → 换一张图」的接线；同样在 <see cref="OnDestroy"/> 里释放。</summary>
+        private MapChangeLink _mapChangeLink;
+
         /// <summary>已完成的引导次数。PlayMode 测试用它证明「第二次启动没有重复安装」。</summary>
         public static int BootstrapCount { get; private set; }
 
@@ -54,6 +63,15 @@ namespace SamsaraWest.Flow
         public DefinitionCatalog DefinitionCatalog => _definitionCatalog;
 
         public Battle.BattleConfig BattleConfig => _battleConfig;
+
+        /// <summary>「探索遇敌 → 进战斗」的接线。装在引导末尾，场景销毁时一并释放。</summary>
+        public ExplorationBattleLink ExplorationLink => _explorationBattleLink;
+
+        /// <summary>「剧情状态变了 → 重建探索可行格」的接线。同样装在引导末尾。</summary>
+        public NarrativeStateLink NarrativeLink => _narrativeStateLink;
+
+        /// <summary>「走到一扇门 → 换一张图」的接线。同样装在引导末尾。</summary>
+        public MapChangeLink MapChange => _mapChangeLink;
 
         /// <summary>其它模块安装自身服务的挂载点。</summary>
         public event Action<IServiceRegistry> ModuleInstalled;
@@ -82,6 +100,24 @@ namespace SamsaraWest.Flow
             }
 
             _instance = null;
+
+            if (_mapChangeLink != null)
+            {
+                _mapChangeLink.Dispose();
+                _mapChangeLink = null;
+            }
+
+            if (_narrativeStateLink != null)
+            {
+                _narrativeStateLink.Dispose();
+                _narrativeStateLink = null;
+            }
+
+            if (_explorationBattleLink != null)
+            {
+                _explorationBattleLink.Dispose();
+                _explorationBattleLink = null;
+            }
 
             if (IsReady)
             {
@@ -142,7 +178,40 @@ namespace SamsaraWest.Flow
                 Battle.BattleModule.Install(registry, _battleConfig);
                 Track("Battle");
 
+                // 剧情状态账就位：任务、对话、结局与探索的条件读的是同一本账。
+                // 它只依赖 Core（事件总线是软依赖），装在探索之前——探索要拿它当条件源。
+                Narrative.NarrativeModule.Install(registry);
+                Track("Narrative");
+
+                // 探索运行时就位：走格、交互、掷遭遇都要读地图与交互物表，所以排在 Data 之后。
+                // 条件源由组合根转述：账本在 Narrative，探索只认 IExplorationStateSource，
+                // 适配器在这里接上——两边因此都不必认识对方（见 NarrativeStateSourceAdapter）。
+                Exploration.ExplorationModule.Install(
+                    registry,
+                    new NarrativeStateSourceAdapter(registry.Resolve<Narrative.IStoryState>()));
+                Track("Exploration");
+
                 ModuleInstalled?.Invoke(registry);
+
+                // 接线最后装：它要同时拿到探索与战斗两个服务。
+                // 它不是一个模块（没有服务要注册），所以不计进 InstalledModules —— 那份清单只说「装上了哪些服务」。
+                _explorationBattleLink = new ExplorationBattleLink(
+                    registry.Resolve<Battle.IBattleService>(),
+                    registry.Resolve<IDefinitionRegistry>(),
+                    registry.Resolve<IEventBus>(),
+                    registry.Resolve<Exploration.IExplorationService>());
+
+                // 剧情状态接线：账本（flag 或心念）一变就重建探索的可行格，让条件交互物当场显隐。
+                _narrativeStateLink = new NarrativeStateLink(
+                    registry.Resolve<IEventBus>(),
+                    registry.Resolve<Exploration.IExplorationService>());
+
+                // 换图接线：探索只会说「这扇门通向 CH01_MAP02」，换不换、落在哪由这里定。
+                // 它要同时拿到探索服务与定义目录，所以同样排在模块之后。
+                _mapChangeLink = new MapChangeLink(
+                    registry.Resolve<IEventBus>(),
+                    registry.Resolve<IDefinitionRegistry>(),
+                    registry.Resolve<Exploration.IExplorationService>());
             }
             catch (Exception exception)
             {

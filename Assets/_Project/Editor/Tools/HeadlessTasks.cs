@@ -43,6 +43,28 @@ namespace SamsaraWest.Editor
             Finish(failed ? ExitValidationFailed : ExitOk);
         }
 
+        /// <summary>
+        /// 只跑本地化管线：重生成 key 常量类与文本表资产，<b>不动</b> Data/Tables 与定义资产。
+        /// 改了 <c>localization-zh-Hans.csv</c> 的文案就来跑这个——用
+        /// <see cref="ImportAndValidate"/> 会顺带全量重导入数据表，把明明没改的定义资产也标脏。
+        /// </summary>
+        public static void ImportLocalization()
+        {
+            var localization = LocalizationImporter.ImportAll();
+            foreach (var line in localization.Log)
+            {
+                Debug.Log($"[SamsaraWest] {line}");
+            }
+
+            Debug.Log($"[SamsaraWest] {localization.Report.Summary()}");
+            Debug.Log(
+                $"[CI] loc_errors={CountErrors(localization.Report)} loc_keys={localization.KeyCount} " +
+                $"constants_rewritten={localization.ConstantsRewritten} missing_used_by_data={localization.MissingKeysUsedByData}");
+            ValidationLog.Write("本地化导入", localization.Report);
+
+            Finish(localization.Report.HasErrors || localization.MissingKeysUsedByData > 0 ? ExitValidationFailed : ExitOk);
+        }
+
         /// <summary>不重导入，直接校验现有资产。用于「只想确认当前工程是干净的」。</summary>
         public static void ValidateOnly()
         {

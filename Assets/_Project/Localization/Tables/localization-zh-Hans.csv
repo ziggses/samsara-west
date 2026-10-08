@@ -129,6 +129,10 @@ int.ch01.002.name,指路木牌,可交互物名
 int.ch01.002.desc,字迹模糊的旧木牌。,可交互物说明
 int.ch01.003.name,寨中木箱,可交互物名
 int.ch01.003.desc,上了锁的木箱，需要先走完前面的路。,可交互物说明
+int.ch01.004.name,古道山门,可交互物名
+int.ch01.004.desc,山道尽头的石门，穿过去便是山下小镇。,可交互物说明
+int.ch01.005.name,镇口牌坊,可交互物名
+int.ch01.005.desc,回望山道的镇口，出去就上后山。,可交互物说明
 loot.enm.bandit.name,山贼掉落,掉落表名
 loot.enm.bandit.desc,喽啰身上的杂物。,掉落说明
 loot.enm.bandit_archer.name,弓手掉落,掉落表名
@@ -266,6 +270,7 @@ gallery.ending.true,已解锁：第八十二难,图鉴条目
 ui.prompt.talk,交谈,交互提示
 ui.prompt.examine,查看,交互提示
 ui.prompt.open,打开,交互提示
+ui.prompt.enter,进入,交互提示
 ui.battle.command.attack,攻击,战斗指令
 ui.battle.command.skill,法术,战斗指令
 ui.battle.command.item,道具,战斗指令
@@ -327,3 +332,23 @@ ui.battle.move.prompt,选择落点,战斗界面：移动子选择提示
 ui.battle.move.slot,空位 {0},战斗界面：移动落点按钮，{0} 为阵型序号（从 1 起）
 ui.battle.swap.prompt,选择换位同伴,战斗界面：换位子选择提示
 ui.battle.view.hint,诊断用战斗面板：按 F2 开一场首章遭遇，F3 收起。,战斗界面诊断层提示
+ui.explore.title,探索,探索界面标题
+ui.explore.view.hint,诊断用探索面板：按 F4 进图或离图，方向键或 WASD 走格，E 交互，F3 收起。,探索界面诊断层提示
+ui.explore.no.map,尚未进图：按 F4 进入首章地图。,探索界面：没有会话时的提示
+ui.explore.status,地图 {0} | 位置 {1} | 面朝{2} | 步数 {3},探索界面状态行。{0} 地图 ID {1} 格坐标 {2} 朝向 {3} 步数
+ui.explore.facing.north,上,朝向
+ui.explore.facing.east,右,朝向
+ui.explore.facing.south,下,朝向
+ui.explore.facing.west,左,朝向
+ui.explore.facing.target,前方：{0}（{1}）,探索界面：面朝格上的交互物。{0} 名字 {1} 交互提示
+ui.explore.facing.empty,前方空着,探索界面：面朝格上没有东西
+ui.explore.facing.target.plain,前方：{0},探索界面：面朝格上的交互物没登记提示键时只报名字。{0} 名字
+ui.explore.encounter.pending,遭遇 {0} 还挂着：先把它了结。,探索界面：遭遇未了结。{0} 遭遇 ID
+ui.explore.move.out_of_bounds,那是地图边界。,移动被拒：目标越界
+ui.explore.move.blocked,去路被挡住了。,移动被拒：目标格被交互物占着
+ui.explore.interact.no_target,面前没有可以动的东西。,交互被拒：面朝格上没有交互物
+ui.explore.interact.requirement_not_met,现在还不能动它。,交互被拒：条件未满足
+ui.explore.interact.already_used,已经用过了。,交互被拒：一次性交互物已用过
+ui.explore.interact.triggered,触发了 {0}。,交互成功。{0} 交互物名字
+ui.explore.interact.map_change,前往 {0}。,交互要求换图。{0} 目标地图 ID
+ui.explore.grid.legend,@ 自己  * 面朝  # 交互物  . 空地,探索界面格子图例

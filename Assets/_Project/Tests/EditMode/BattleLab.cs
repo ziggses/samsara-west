@@ -213,6 +213,26 @@ namespace SamsaraWest.Tests.EditMode
         }
 
         /// <summary>
+        /// 造一场遭遇编排。只填敌方名单：探索侧的接线测试要验的是「遭遇 ID 能查出敌方名单」，
+        /// 阵型标签（本就不参与计算）、BGM、阶段这些在那里没有断言价值。
+        /// </summary>
+        internal EncounterDefinition Encounter(string id, params string[] enemyIds)
+        {
+            var encounter = New<EncounterDefinition>(id, "enc");
+            Set(encounter, "_chapterIndex", 1);
+            Set(encounter, "_enemyIds", enemyIds ?? Array.Empty<string>());
+            Set(encounter, "_formation", null);
+            Set(encounter, "_isElite", false);
+            Set(encounter, "_isBoss", false);
+            Set(encounter, "_bossPhaseIds", Array.Empty<string>());
+            Set(encounter, "_backgroundKey", null);
+            Set(encounter, "_bgmKey", null);
+            Set(encounter, "_allowFlee", true);
+            Set(encounter, "_defeatGameOver", false);
+            return encounter;
+        }
+
+        /// <summary>
         /// 造一件战斗内可用的消耗品。
         /// </summary>
         /// <remarks>

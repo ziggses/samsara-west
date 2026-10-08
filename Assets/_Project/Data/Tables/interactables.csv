@@ -5,3 +5,5 @@ id,displayNameKey,descriptionKey,tags,version,mapId,gridX,gridY,interactionTypeK
 INT_CH01_001_VILLAGER,int.ch01.001.name,int.ch01.001.desc,ch01;npc,1,CH01_MAP01,3,4,interact.dialogue,DLG_CH01_001,,Equal,0,false,false,ui.prompt.talk,sprite.int.villager
 INT_CH01_002_SIGNPOST,int.ch01.002.name,int.ch01.002.desc,ch01;prop,1,CH01_MAP01,6,4,interact.examine,DLG_CH01_002,,Equal,0,false,false,ui.prompt.examine,sprite.int.signpost
 INT_CH01_003_CHEST,int.ch01.003.name,int.ch01.003.desc,ch01;chest,1,CH01_MAP02,8,5,interact.chest,LUT_ENM_BANDIT,flag.ch01.prologue_done,Equal,1,true,true,ui.prompt.open,sprite.int.chest
+INT_CH01_004_ROAD_GATE,int.ch01.004.name,int.ch01.004.desc,ch01;door,1,CH01_MAP01,18,6,interact.door,CH01_MAP02,,Equal,0,false,false,ui.prompt.enter,sprite.int.gate
+INT_CH01_005_TOWN_GATE,int.ch01.005.name,int.ch01.005.desc,ch01;door,1,CH01_MAP02,15,5,interact.door,CH01_MAP01,,Equal,0,false,false,ui.prompt.enter,sprite.int.gate
