@@ -12,7 +12,7 @@ using UnityEngine;
 namespace SamsaraWest.Tests.EditMode
 {
     /// <summary>
-    /// 数据管线的验收测试：17 张表能导、能增量跳过、就地更新不断引用、
+    /// 数据管线的验收测试：18 张表能导、能增量跳过、就地更新不断引用、
     /// 校验零错误零重复 ID，本地化键被数据资产完整覆盖，界面无硬编码中文。
     /// 这些断言直接跑真实工程数据，坏数据会让它们立刻变红。
     /// </summary>
@@ -21,10 +21,10 @@ namespace SamsaraWest.Tests.EditMode
         private const string ItemsTable = "items";
 
         [Test]
-        public void ImportMap_CoversSeventeenTablesAndEveryTableFileExists()
+        public void ImportMap_CoversEighteenTablesAndEveryTableFileExists()
         {
             var bindings = DefinitionImportMap.Bindings;
-            Assert.AreEqual(17, bindings.Count, "定义类型数量变了就要同步改这里，避免漏登记的表在导入时被静默跳过。");
+            Assert.AreEqual(18, bindings.Count, "定义类型数量变了就要同步改这里，避免漏登记的表在导入时被静默跳过。");
 
             var tableNames = new HashSet<string>();
             for (var i = 0; i < bindings.Count; i++)

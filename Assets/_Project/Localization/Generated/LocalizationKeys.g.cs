@@ -163,6 +163,10 @@ namespace SamsaraWest.Localization
         public const string MAP_CH01_MAP01_NAME = "map.ch01.map01.name";
         public const string MAP_CH01_MAP02_DESC = "map.ch01.map02.desc";
         public const string MAP_CH01_MAP02_NAME = "map.ch01.map02.name";
+        public const string PASSIVE_STAFF_FORCE_DESC = "passive.staff_force.desc";
+        public const string PASSIVE_STAFF_FORCE_NAME = "passive.staff_force.name";
+        public const string PASSIVE_STILLNESS_BREATH_DESC = "passive.stillness_breath.desc";
+        public const string PASSIVE_STILLNESS_BREATH_NAME = "passive.stillness_breath.name";
         public const string PHASE_CH01_BOSS_P1_DESC = "phase.ch01.boss.p1.desc";
         public const string PHASE_CH01_BOSS_P1_NAME = "phase.ch01.boss.p1.name";
         public const string PHASE_CH01_BOSS_P1_TAUNT = "phase.ch01.boss.p1.taunt";
@@ -250,6 +254,10 @@ namespace SamsaraWest.Localization
         public const string STATUS_HASTE_NAME = "status.haste.name";
         public const string STATUS_SHIELD_DESC = "status.shield.desc";
         public const string STATUS_SHIELD_NAME = "status.shield.name";
+        public const string STATUS_STAFF_FORCE_DESC = "status.staff_force.desc";
+        public const string STATUS_STAFF_FORCE_NAME = "status.staff_force.name";
+        public const string STATUS_STILLNESS_BREATH_DESC = "status.stillness_breath.desc";
+        public const string STATUS_STILLNESS_BREATH_NAME = "status.stillness_breath.name";
         public const string STATUS_STUN_DESC = "status.stun.desc";
         public const string STATUS_STUN_NAME = "status.stun.name";
         public const string STATUS_SWEET_ROT_DESC = "status.sweet_rot.desc";

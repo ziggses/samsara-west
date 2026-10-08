@@ -115,16 +115,23 @@ namespace SamsaraWest.UI
             $"{Id}:{LabelKey}({Rejection}{(ItemId == null ? string.Empty : $",{ItemId}×{ItemCount}")})";
     }
 
-    /// <summary>状态图标的一枚。堆叠数与剩余回合一起给，界面不再回头找定义。</summary>
+    /// <summary>状态图标的一枚。堆叠数、剩余回合与是否常驻一起给，界面不再回头找定义。</summary>
     public readonly struct BattleStatusChip
     {
-        public BattleStatusChip(string statusId, string nameKey, int stacks, int remainingTurns, bool isDebuff)
+        public BattleStatusChip(
+            string statusId,
+            string nameKey,
+            int stacks,
+            int remainingTurns,
+            bool isDebuff,
+            bool isPermanent = false)
         {
             StatusId = statusId;
             NameKey = nameKey;
             Stacks = stacks;
             RemainingTurns = remainingTurns;
             IsDebuff = isDebuff;
+            IsPermanent = isPermanent;
         }
 
         public string StatusId { get; }
@@ -133,12 +140,24 @@ namespace SamsaraWest.UI
 
         public int Stacks { get; }
 
+        /// <summary>
+        /// 剩余回合。<see cref="IsPermanent"/> 为真时这个数没有意义——常驻状态不会被递减，
+        /// 界面该显示的是「常驻」而不是一个到期日。
+        /// </summary>
         public int RemainingTurns { get; }
 
         /// <summary>减益还是增益，界面据此决定配色。</summary>
         public bool IsDebuff { get; }
 
-        public override string ToString() => $"{StatusId}x{Stacks}({RemainingTurns})";
+        /// <summary>常驻：被动挂上来的那类状态，不会自行到期，界面不画剩余回合数。</summary>
+        public bool IsPermanent { get; }
+
+        /// <summary>
+        /// 常驻状态在诊断串里用一个标记代替剩余回合数：界面脚本禁止中文字面量，
+        /// 而「不画到期日」这件事需要一个稳定的、可断言的写法。
+        /// </summary>
+        public override string ToString() =>
+            IsPermanent ? $"{StatusId}x{Stacks}(permanent)" : $"{StatusId}x{Stacks}({RemainingTurns})";
     }
 
     /// <summary>
@@ -380,7 +399,8 @@ namespace SamsaraWest.UI
                         status.DisplayNameKey,
                         status.Stacks,
                         status.RemainingTurns,
-                        status.IsDebuff));
+                        status.IsDebuff,
+                        status.IsPermanent));
                 }
 
                 if (unit.Side == BattleSide.Player)

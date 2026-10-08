@@ -19,8 +19,11 @@ namespace SamsaraWest.Data
         [CsvColumn("spiritRegenPerTurn")] [SerializeField] private int _spiritRegenPerTurn;
 
         [CsvColumn("element")] [SerializeField] private FiveElement _element = FiveElement.None;
-        [Tooltip("装备后带进战斗的技能 ID，可为空。挂载即「多一手可用技能」，skills.csv 里得真实存在。")]
+        [Tooltip("装备后带进战斗的技能 ID，可为空。挂载即「多一手可用技能」，skills.csv 里得真实存在。名字里的 passive 是历史遗留，它与被动（passiveId）不是一回事。")]
         [CsvColumn("passiveSkillId")] [SerializeField] private string _passiveSkillId;
+
+        [Tooltip("装备后挂上身的被动 ID，可为空。挂载即「进场时多一条常驻状态」，效果写在该被动指向的状态里（ADR-020）。")]
+        [CsvColumn("passiveId")] [SerializeField] private string _passiveId;
         [CsvColumn("requiredLevel")] [SerializeField] private int _requiredLevel = 1;
         [CsvColumn("price")] [SerializeField] private int _price;
 
@@ -50,6 +53,9 @@ namespace SamsaraWest.Data
         public FiveElement Element => _element;
 
         public string PassiveSkillId => _passiveSkillId;
+
+        /// <summary>装备后挂上身的被动 ID，可为空。与 <see cref="PassiveSkillId"/> 互不相干，可以只填一个。</summary>
+        public string PassiveId => _passiveId;
 
         public int RequiredLevel => _requiredLevel;
 
@@ -85,6 +91,11 @@ namespace SamsaraWest.Data
             if (!string.IsNullOrWhiteSpace(_passiveSkillId) && !IdRules.IsValidId(DefinitionKind.Skill, _passiveSkillId))
             {
                 report.Error("SUT_SKILL_ID_PATTERN", $"被动技能 ID '{_passiveSkillId}' 不符合技能命名规则。", Id, fieldName: "passiveSkillId");
+            }
+
+            if (!string.IsNullOrWhiteSpace(_passiveId) && !IdRules.IsValidId(DefinitionKind.Passive, _passiveId))
+            {
+                report.Error("SUT_PASSIVE_ID_PATTERN", $"被动 ID '{_passiveId}' 不符合被动命名规则。", Id, fieldName: "passiveId");
             }
 
             if (_healthCostPerTurn > 0 && _healthBonus <= 0)

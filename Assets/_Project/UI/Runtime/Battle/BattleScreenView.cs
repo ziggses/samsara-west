@@ -577,7 +577,8 @@ namespace SamsaraWest.UI
                     builder.Append(" x").Append(chip.Stacks);
                 }
 
-                if (chip.RemainingTurns > 0)
+                // 常驻状态不画回合数：写个数出来只会让人以为它要到期（被动挂上来的状态就是这一类）。
+                if (!chip.IsPermanent && chip.RemainingTurns > 0)
                 {
                     builder.Append(" (").Append(chip.RemainingTurns).Append(')');
                 }

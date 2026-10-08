@@ -21,8 +21,11 @@ namespace SamsaraWest.Data
         [CsvColumn("resistElement")] [SerializeField] private FiveElement _resistElement = FiveElement.None;
         [CsvColumn("breakDamageBonus")] [SerializeField] private int _breakDamageBonus;
 
-        [Tooltip("装备后带进战斗的技能 ID，可为空。挂载即「多一手可用技能」，skills.csv 里得真实存在。")]
+        [Tooltip("装备后带进战斗的技能 ID，可为空。挂载即「多一手可用技能」，skills.csv 里得真实存在。名字里的 passive 是历史遗留，它与被动（passiveId）不是一回事。")]
         [CsvColumn("passiveSkillId")] [SerializeField] private string _passiveSkillId;
+
+        [Tooltip("装备后挂上身的被动 ID，可为空。挂载即「进场时多一条常驻状态」，效果写在该被动指向的状态里（ADR-020）。")]
+        [CsvColumn("passiveId")] [SerializeField] private string _passiveId;
 
         [CsvColumn("requiredLevel")] [SerializeField] private int _requiredLevel = 1;
         [CsvColumn("price")] [SerializeField] private int _price;
@@ -55,6 +58,9 @@ namespace SamsaraWest.Data
 
         public string PassiveSkillId => _passiveSkillId;
 
+        /// <summary>装备后挂上身的被动 ID，可为空。与 <see cref="PassiveSkillId"/> 互不相干，可以只填一个。</summary>
+        public string PassiveId => _passiveId;
+
         public int RequiredLevel => _requiredLevel;
 
         public int Price => _price;
@@ -86,14 +92,20 @@ namespace SamsaraWest.Data
             }
 
             if (_attackBonus == 0 && _defenseBonus == 0 && _speedBonus == 0
-                && _healthBonus == 0 && _spiritBonus == 0 && string.IsNullOrWhiteSpace(_passiveSkillId))
+                && _healthBonus == 0 && _spiritBonus == 0
+                && string.IsNullOrWhiteSpace(_passiveSkillId) && string.IsNullOrWhiteSpace(_passiveId))
             {
-                report.Warn("EQP_NO_EFFECT", "装备没有任何数值加成也没有被动技能，可能只是占位数据。", Id, fieldName: "attackBonus");
+                report.Warn("EQP_NO_EFFECT", "装备没有任何数值加成也没有挂技能或被动，可能只是占位数据。", Id, fieldName: "attackBonus");
             }
 
             if (!string.IsNullOrWhiteSpace(_passiveSkillId) && !IdRules.IsValidId(DefinitionKind.Skill, _passiveSkillId))
             {
                 report.Error("EQP_SKILL_ID_PATTERN", $"被动技能 ID '{_passiveSkillId}' 不符合技能命名规则。", Id, fieldName: "passiveSkillId");
+            }
+
+            if (!string.IsNullOrWhiteSpace(_passiveId) && !IdRules.IsValidId(DefinitionKind.Passive, _passiveId))
+            {
+                report.Error("EQP_PASSIVE_ID_PATTERN", $"被动 ID '{_passiveId}' 不符合被动命名规则。", Id, fieldName: "passiveId");
             }
 
             if (!string.IsNullOrWhiteSpace(_forgeRecipeId) && !IdRules.IsValidId(DefinitionKind.Recipe, _forgeRecipeId))

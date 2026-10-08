@@ -263,7 +263,8 @@ namespace SamsaraWest.Battle
         /// </summary>
         /// <param name="loadout">
         /// 我方成员的在身装备与经文，省略表示裸装。只对角色生效——敌人不穿装备，
-        /// 因此敌方阵容传不传它都一样。
+        /// 因此敌方阵容传不传它都一样。在身清单不只带数值：它带的技能并进单位技能清单（ADR-019），
+        /// 带的被动在这一刻施加成常驻状态（ADR-020）。
         /// </param>
         public static BattleUnit CreateUnit(
             IDefinitionRegistry registry,
@@ -291,10 +292,10 @@ namespace SamsaraWest.Battle
             {
                 case CharacterDefinition character:
 
-                    // 装备与经文的加成、连同它们带来的技能，都在建单位这一刻并进单位（进场快照），
-                    // 之后战斗只看单位自身的数与技能清单。
+                    // 装备与经文的加成、连同它们带来的技能与被动，都在建单位这一刻并进单位（进场快照），
+                    // 之后战斗只看单位自身的数、技能清单与身上的状态。
                     var stats = ResolveCharacterStats(registry, character, loadout);
-                    return new BattleUnit(
+                    var unit = new BattleUnit(
                         runtimeId,
                         side,
                         formationIndex,
@@ -315,8 +316,16 @@ namespace SamsaraWest.Battle
                         stats.SpiritRegenPerTurn,
                         stats.HealthCostPerTurn);
 
+                    // 归位在挂被动<b>之前</b>：归位会清空状态清单，反过来写就等于把刚挂上的被动抹掉。
+                    // 于是「建单位那一刻」是全套的——数值、技能清单、开战归位、再接被动，一次做完。
+                    unit.PrepareForBattle();
+
+                    // 被动只在这一刻施加一次：此后它就是身上的一条普通状态，与别的状态同权（见 ADR-020）。
+                    ApplyPassives(registry, unit, stats.PassiveIds, character.Id);
+                    return unit;
+
                 case EnemyDefinition enemy:
-                    return new BattleUnit(
+                    var enemyUnit = new BattleUnit(
                         runtimeId,
                         side,
                         formationIndex,
@@ -336,6 +345,10 @@ namespace SamsaraWest.Battle
                         // 敌人不穿经文：每回合的回灵与苦修都只有我方成员可能非零。
                         spiritRegenPerTurn: 0,
                         healthCostPerTurn: 0);
+
+                    // 敌人没有被动可挂，归位之后就是最终形态。
+                    enemyUnit.PrepareForBattle();
+                    return enemyUnit;
 
                 default:
                     GameLog.Error(
@@ -382,6 +395,71 @@ namespace SamsaraWest.Battle
             }
 
             return stats;
+        }
+
+        /// <summary>
+        /// 把进场画像里那几条被动逐条施加成<b>常驻状态</b>。
+        /// </summary>
+        /// <remarks>
+        /// <para>
+        /// 被动的身份在 <c>passives.csv</c>，效果数值在它指向的那条状态上（口径见 ADR-020）：
+        /// 因此这里要做两跳查表——被动 → 状态。施加之后就结束：这条状态与场上任何一条状态完全同权，
+        /// 参与修正聚合、参与每回合结算、写进单位的状态清单，也照旧进得了将来任何按清单挑选的移除机制；
+        /// 唯一的区别是它常驻不到期。
+        /// </para>
+        /// <para>
+        /// 只作用携带者本人——不广播给队友，也不碰敌人。坏引用（被动查不到、承载状态查不到）
+        /// 只跳过那一条并记错误日志，不让一处数据错误变成打不开的战斗。
+        /// </para>
+        /// </remarks>
+        private static void ApplyPassives(
+            IDefinitionRegistry registry,
+            BattleUnit unit,
+            string[] passiveIds,
+            string characterId)
+        {
+            if (unit == null || passiveIds == null || passiveIds.Length == 0)
+            {
+                return;
+            }
+
+            for (var i = 0; i < passiveIds.Length; i++)
+            {
+                var passiveId = passiveIds[i];
+                if (string.IsNullOrWhiteSpace(passiveId))
+                {
+                    continue;
+                }
+
+                if (!registry.TryGet(passiveId, out var mounted) || mounted == null)
+                {
+                    GameLog.Error(
+                        LogChannel.Battle,
+                        $"成员 {characterId} 的被动 '{passiveId}' 在数据表里找不到，已跳过。",
+                        passiveId);
+                    continue;
+                }
+
+                if (!(mounted is PassiveDefinition passive))
+                {
+                    GameLog.Error(
+                        LogChannel.Battle,
+                        $"成员 {characterId} 的 '{passiveId}' 是 {mounted.Kind}，被动栏只接受被动，已跳过。",
+                        passiveId);
+                    continue;
+                }
+
+                if (!registry.TryGet(passive.StatusId, out var carried) || !(carried is StatusDefinition status))
+                {
+                    GameLog.Error(
+                        LogChannel.Battle,
+                        $"被动 '{passiveId}' 指向的状态 '{passive.StatusId}' 在数据表里找不到或不是状态，已跳过。",
+                        passiveId);
+                    continue;
+                }
+
+                unit.ApplyStatus(status);
+            }
         }
     }
 }

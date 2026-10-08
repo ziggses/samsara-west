@@ -10,26 +10,26 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: afa080f24149f5647bfa27ca26e0ef09, type: 3}
-  m_Name: STS_STUN
+  m_Name: STS_STAFF_FORCE
   m_EditorClassIdentifier: 
-  _id: STS_STUN
-  _displayNameKey: status.stun.name
-  _descriptionKey: status.stun.desc
+  _id: STS_STAFF_FORCE
+  _displayNameKey: status.staff_force.name
+  _descriptionKey: status.staff_force.desc
   _tags:
-  - debuff
-  - control
+  - buff
+  - passive
   _version: 1
   _icon: {fileID: 0}
   _durationTurns: 1
   _maxStacks: 1
-  _stackRule: 2
+  _stackRule: 0
   _healthDeltaPerTurn: 0
-  _attackModifier: 0
+  _attackModifier: 0.12
   _defenseModifier: 0
   _speedModifier: 0
   _incomingDamageModifier: 1
   _breakDamageModifier: 1
-  _preventsAction: 1
-  _isDebuff: 1
-  _vfxKey: vfx.status.stun
-  _permanent: 0
+  _preventsAction: 0
+  _isDebuff: 0
+  _vfxKey: vfx.status.staff_force
+  _permanent: 1

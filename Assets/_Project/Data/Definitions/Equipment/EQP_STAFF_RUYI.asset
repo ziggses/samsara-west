@@ -32,6 +32,7 @@ MonoBehaviour:
   _resistElement: 0
   _breakDamageBonus: 8
   _passiveSkillId: 
+  _passiveId: 
   _requiredLevel: 5
   _price: 1200
   _forgeRecipeId: RCP_STAFF_RUYI

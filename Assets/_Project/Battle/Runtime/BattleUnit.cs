@@ -263,7 +263,14 @@ namespace SamsaraWest.Battle
         public override string ToString() =>
             $"#{RuntimeId} {DefinitionId} {Health}/{MaxHealth} 护体 {BreakValue}/{BreakThreshold} {Slot}";
 
-        /// <summary>开战前的归位：满血满灵、护体满、无状态、无冷却。</summary>
+        /// <summary>
+        /// 建单位那一刻的归位：满血满灵、护体满、无状态、无冷却。
+        /// </summary>
+        /// <remarks>
+        /// 由 <c>BattleFactory.CreateUnit</c> 在构造之后、挂被动之前调用，因此<b>调用顺序有契约</b>：
+        /// 它清空状态清单，所以必须在被动施加之前跑（被动挂上来就是一条常驻状态，见 ADR-020）。
+        /// 反过来说，战斗开始之后再调用它等于把身上所有状态——包括被动——一起抹掉。
+        /// </remarks>
         internal void PrepareForBattle()
         {
             Health = MaxHealth;
@@ -473,6 +480,11 @@ namespace SamsaraWest.Battle
         /// 生命增减<b>不</b>走伤害公式：灼烧是「持续掉血」，不该再被防御力吃一遍。
         /// 先结算再递减时长，于是「1 回合的眩晕」还能正好控住一个完整回合。
         /// </summary>
+        /// <remarks>
+        /// 常驻状态（<see cref="BattleStatusInstance.IsPermanent"/>）只走前半段：它的每回合量照旧结算，
+        /// 但<b>不</b>递减时长、也不会进 <paramref name="expiredSink"/>。被动的效果正是靠这一条常驻到底——
+        /// 「每回合回血」这类被动要求它继续结算，而不是要求它提前结束。
+        /// </remarks>
         internal int TickStatuses(List<BattleStatusInstance> expiredSink)
         {
             var delta = 0;
@@ -493,6 +505,11 @@ namespace SamsaraWest.Battle
             for (var i = _statuses.Count - 1; i >= 0; i--)
             {
                 var status = _statuses[i];
+                if (status.IsPermanent)
+                {
+                    continue;
+                }
+
                 status.RemainingTurns--;
                 if (status.RemainingTurns <= 0)
                 {

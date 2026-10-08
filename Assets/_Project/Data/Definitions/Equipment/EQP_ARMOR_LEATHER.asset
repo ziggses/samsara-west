@@ -31,6 +31,7 @@ MonoBehaviour:
   _resistElement: 0
   _breakDamageBonus: 0
   _passiveSkillId: 
+  _passiveId: 
   _requiredLevel: 1
   _price: 80
   _forgeRecipeId: 

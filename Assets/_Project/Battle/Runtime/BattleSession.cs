@@ -82,11 +82,8 @@ namespace SamsaraWest.Battle
                     nameof(setup));
             }
 
-            for (var i = 0; i < _units.Count; i++)
-            {
-                _units[i].PrepareForBattle();
-            }
-
+            // 开战归位（满血满灵、无状态、无冷却）已经在建单位那一刻做完了，这里不能再做第二遍：
+            // 归位会清空状态清单，而此时身上可能已经挂着被动挂上来的常驻状态（见 ADR-020）。
             _queue = new ActionQueue(_config);
             _queue.Reset(_units);
 

@@ -438,6 +438,124 @@ namespace SamsaraWest.Tests.EditMode
             AssertHasCode(report, "LOADOUT_SKILL_KIND_UNSUPPORTED");
         }
 
+        [Test]
+        public void 装备与经文带来的被动并进清单_按在身顺序()
+        {
+            using var lab = new BattleLab();
+            var character = lab.Character("CHR_TEST_A", 100, 10, 5, 8);
+            lab.Status("STS_TEST_FORCE", isDebuff: false, permanent: true);
+            lab.Passive("PSV_TEST_FORCE", "STS_TEST_FORCE");
+            lab.Passive("PSV_TEST_BREATH", "STS_TEST_FORCE");
+            lab.Equipment("EQP_TEST_STAFF", EquipmentSlot.Weapon, passiveId: "PSV_TEST_FORCE");
+            lab.Sutra("SUT_TEST_MIND", passiveId: "PSV_TEST_BREATH");
+
+            var report = new ValidationReport();
+            var snapshot = CharacterStatsResolver.Resolve(
+                character,
+                new[]
+                {
+                    new LoadoutEntry("Weapon", "EQP_TEST_STAFF"),
+                    new LoadoutEntry("Sutra", "SUT_TEST_MIND"),
+                },
+                lab.Registry(),
+                report);
+
+            Assert.IsTrue(report.IsClean, "两条各来自一处、互不重复，不该留结论。");
+            CollectionAssert.AreEqual(
+                new[] { "PSV_TEST_FORCE", "PSV_TEST_BREATH" },
+                snapshot.PassiveIds,
+                "按在身清单顺序排：先武器后经文。顺序在这里没有玩法含义，只为日志与排查读起来稳定。");
+            CollectionAssert.IsEmpty(snapshot.SkillIds, "被动与技能各走各的清单：带了被动不等于多了一手技能。");
+        }
+
+        [Test]
+        public void 两处授予同一条被动_只算一条()
+        {
+            using var lab = new BattleLab();
+            var character = lab.Character("CHR_TEST_A", 100, 10, 5, 8);
+            lab.Status("STS_TEST_FORCE", isDebuff: false, permanent: true);
+            lab.Passive("PSV_TEST_FORCE", "STS_TEST_FORCE");
+            lab.Equipment("EQP_TEST_STAFF", EquipmentSlot.Weapon, passiveId: "PSV_TEST_FORCE");
+            lab.Sutra("SUT_TEST_MIND", passiveId: "PSV_TEST_FORCE");
+
+            var report = new ValidationReport();
+            var snapshot = CharacterStatsResolver.Resolve(
+                character,
+                new[]
+                {
+                    new LoadoutEntry("Weapon", "EQP_TEST_STAFF"),
+                    new LoadoutEntry("Sutra", "SUT_TEST_MIND"),
+                },
+                lab.Registry(),
+                report);
+
+            Assert.IsTrue(report.IsClean, "重复不是坏数据：它不改变任何行为，因此不报。");
+            CollectionAssert.AreEqual(
+                new[] { "PSV_TEST_FORCE" },
+                snapshot.PassiveIds,
+                "被动清单是集合语义：会就是会，两处给同一条只算一条。");
+        }
+
+        [Test]
+        public void 没穿东西时_被动清单是空的()
+        {
+            using var lab = new BattleLab();
+            var character = lab.Character("CHR_TEST_A", 100, 10, 5, 8);
+
+            var report = new ValidationReport();
+            var bare = CharacterStatsResolver.Resolve(character, null, lab.Registry(), report);
+            var withEmpty = CharacterStatsResolver.Resolve(
+                character,
+                System.Array.Empty<LoadoutEntry>(),
+                lab.Registry(),
+                report);
+
+            CollectionAssert.IsEmpty(bare.PassiveIds, "角色没有「自带被动」这一列：裸装就是一条都没有。");
+            CollectionAssert.IsEmpty(withEmpty.PassiveIds, "传空清单与不传，被动清单必须一样。");
+        }
+
+        [Test]
+        public void 挂载的被动查不到_跳过那一条_并留下错误码()
+        {
+            using var lab = new BattleLab();
+            var character = lab.Character("CHR_TEST_A", 100, 10, 5, 8);
+            lab.Equipment(
+                "EQP_TEST_STAFF",
+                EquipmentSlot.Weapon,
+                attackBonus: 5,
+                passiveId: "PSV_NOT_IN_TABLE");
+
+            var report = new ValidationReport();
+            var snapshot = CharacterStatsResolver.Resolve(
+                character,
+                new[] { new LoadoutEntry("Weapon", "EQP_TEST_STAFF") },
+                lab.Registry(),
+                report);
+
+            Assert.AreEqual(15, snapshot.Attack, "被动引用坏掉不影响这件装备的数值加成：坏的是那一栏指向，不是整件装备。");
+            CollectionAssert.IsEmpty(snapshot.PassiveIds, "查不到的被动不进来。");
+            AssertHasCode(report, "LOADOUT_PASSIVE_MISSING");
+        }
+
+        [Test]
+        public void 挂载指向的不是被动_跳过那一条_并留下错误码()
+        {
+            using var lab = new BattleLab();
+            var character = lab.Character("CHR_TEST_A", 100, 10, 5, 8);
+            lab.Status("STS_TEST_FORCE", isDebuff: false, permanent: true);
+            lab.Equipment("EQP_TEST_STAFF", EquipmentSlot.Weapon, passiveId: "STS_TEST_FORCE");
+
+            var report = new ValidationReport();
+            var snapshot = CharacterStatsResolver.Resolve(
+                character,
+                new[] { new LoadoutEntry("Weapon", "EQP_TEST_STAFF") },
+                lab.Registry(),
+                report);
+
+            CollectionAssert.IsEmpty(snapshot.PassiveIds, "被动栏只接受被动：指向状态的 ID 进不了清单。");
+            AssertHasCode(report, "LOADOUT_PASSIVE_KIND_UNSUPPORTED");
+        }
+
         private static void AssertHasCode(ValidationReport report, string code)
         {
             var codes = new List<string>(report.Issues.Count);

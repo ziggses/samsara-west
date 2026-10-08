@@ -31,3 +31,4 @@ MonoBehaviour:
   _preventsAction: 0
   _isDebuff: 1
   _vfxKey: vfx.status.weaken
+  _permanent: 0

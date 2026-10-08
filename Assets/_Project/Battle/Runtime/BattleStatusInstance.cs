@@ -30,8 +30,18 @@ namespace SamsaraWest.Battle
 
         public bool IsDebuff => Definition.IsDebuff;
 
+        /// <summary>
+        /// 常驻：只认定义上的那一列，实例层面没有「这一次算永久」这种例外——
+        /// 常驻与否是<b>数据</b>说的事，不是某一次施加说的事。
+        /// </summary>
+        public bool IsPermanent => Definition.IsPermanent;
+
         public int Stacks { get; internal set; }
 
+        /// <summary>
+        /// 剩余回合。常驻状态（<see cref="IsPermanent"/>）上这个数<b>不</b>代表终点：
+        /// 它不会被递减，也就不会归零。
+        /// </summary>
         public int RemainingTurns { get; internal set; }
 
         /// <summary>每回合按层数结算的生命增减。<b>不</b>走伤害公式，见 <c>BattleSession</c> 的回合结算。</summary>
@@ -77,7 +87,9 @@ namespace SamsaraWest.Battle
                 (Mathf.Abs(definition.HealthDeltaPerTurn) * 0.01f);
         }
 
-        public override string ToString() => $"{StatusId}×{Stacks}({RemainingTurns})";
+        /// <summary>日志用的一行。常驻状态不写剩余回合数——写个数出来只会让人以为它会到期。</summary>
+        public override string ToString() =>
+            IsPermanent ? $"{StatusId}×{Stacks}(常驻)" : $"{StatusId}×{Stacks}({RemainingTurns})";
 
         /// <summary>
         /// 倍率型修正按层数放大：1 层 1.25、2 层 1.5，而不是 1.25²。

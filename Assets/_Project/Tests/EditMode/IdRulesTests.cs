@@ -22,6 +22,7 @@ namespace SamsaraWest.Tests.EditMode
         [TestCase(DefinitionKind.Item, "ITM_HEAL_PILL")]
         [TestCase(DefinitionKind.Equipment, "EQP_SWORD_001")]
         [TestCase(DefinitionKind.Sutra, "SUT_HEART")]
+        [TestCase(DefinitionKind.Passive, "PSV_STAFF_FORCE")]
         [TestCase(DefinitionKind.Quest, "QST_CH01_MAIN")]
         [TestCase(DefinitionKind.Dialogue, "DLG_CH01_004")]
         [TestCase(DefinitionKind.Map, "CH01_MAP01")]
@@ -44,6 +45,8 @@ namespace SamsaraWest.Tests.EditMode
         [TestCase(DefinitionKind.Map, "MAP_CH01_01")]
         [TestCase(DefinitionKind.Interactable, "INT_CH1_BOX")]
         [TestCase(DefinitionKind.Dialogue, "对话一")]
+        [TestCase(DefinitionKind.Passive, "PASSIVE_X")]
+        [TestCase(DefinitionKind.Passive, "SKL_STAFF_FORCE")]
         public void IsValidId_RejectsMalformedIds(DefinitionKind kind, string id)
         {
             Assert.IsFalse(IdRules.IsValidId(kind, id), $"{kind} 应拒绝 {id}");

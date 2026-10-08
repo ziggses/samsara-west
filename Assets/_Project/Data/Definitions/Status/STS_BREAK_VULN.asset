@@ -32,3 +32,4 @@ MonoBehaviour:
   _preventsAction: 0
   _isDebuff: 1
   _vfxKey: vfx.status.break
+  _permanent: 0

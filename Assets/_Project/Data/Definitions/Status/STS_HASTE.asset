@@ -31,3 +31,4 @@ MonoBehaviour:
   _preventsAction: 0
   _isDebuff: 0
   _vfxKey: vfx.status.haste
+  _permanent: 0

@@ -101,6 +101,10 @@ sutra.stillness.name,静心禅,经文名
 sutra.stillness.desc,每回合回复灵力，适合久战。,经文说明
 sutra.rage.name,怒目金刚,经文名
 sutra.rage.desc,以血气换攻势，攻击与护体同时提升。,经文说明
+passive.staff_force.name,铁禅杖之力,被动名
+passive.staff_force.desc,握着铁禅杖时出手更狠，攻击提升一成二。,被动说明
+passive.stillness_breath.name,静心调息,被动名
+passive.stillness_breath.desc,修静心禅时气息自匀，每回合回一点血。,被动说明
 quest.ch01.main01.name,问路,任务名
 quest.ch01.main01.desc,向樵夫打听黑风岭的路径。,任务说明
 quest.ch01.main02.name,黑风岭,任务名
@@ -135,6 +139,10 @@ loot.enm.bandit_leader.name,寨主掉落,掉落表名
 loot.enm.bandit_leader.desc,必掉腰牌，另有两次抽取。,掉落说明
 status.sweet_rot.name,甜腐,状态名
 status.sweet_rot.desc,甜腐入体：每回合回复少量生命，防御却下降四分之一。,状态说明
+status.staff_force.name,杖力,状态名
+status.staff_force.desc,铁禅杖压手：攻击提升一成二。,状态说明
+status.stillness_breath.name,调息,状态名
+status.stillness_breath.desc,气机渐匀：每回合回复少量生命。,状态说明
 enemy.drunk_monkey.name,醉猴妖,敌人名
 enemy.drunk_monkey.desc,抱着酒坛的猴妖，挥拳时脚步虚浮，五行属土。,敌人图鉴
 enemy.stone_thrower.name,石猴投手,敌人名

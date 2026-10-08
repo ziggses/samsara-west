@@ -131,7 +131,8 @@ namespace SamsaraWest.Tests.EditMode
             float defenseModifier = 0f,
             float speedModifier = 0f,
             float incomingDamageModifier = 1f,
-            float breakDamageModifier = 1f)
+            float breakDamageModifier = 1f,
+            bool permanent = false)
         {
             var status = New<StatusDefinition>(id, "sts");
             Set(status, "_durationTurns", durationTurns);
@@ -145,7 +146,22 @@ namespace SamsaraWest.Tests.EditMode
             Set(status, "_speedModifier", speedModifier);
             Set(status, "_incomingDamageModifier", incomingDamageModifier);
             Set(status, "_breakDamageModifier", breakDamageModifier);
+            Set(status, "_permanent", permanent);
             return status;
+        }
+
+        /// <summary>
+        /// 造一条被动。
+        /// </summary>
+        /// <remarks>
+        /// 被动只登记身份与来源，效果落在 <paramref name="statusId"/> 指向的状态上（见 ADR-020）。
+        /// 因此造被动之前得先把那条状态造出来并登记进同一个建场器。
+        /// </remarks>
+        internal PassiveDefinition Passive(string id, string statusId)
+        {
+            var passive = New<PassiveDefinition>(id, "psv");
+            Set(passive, "_statusId", statusId);
+            return passive;
         }
 
         internal CharacterDefinition Character(
@@ -251,6 +267,7 @@ namespace SamsaraWest.Tests.EditMode
             int breakDamageBonus = 0,
             int requiredLevel = 1,
             string passiveSkillId = null,
+            string passiveId = null,
             params string[] allowedCharacterIds)
         {
             var equipment = New<EquipmentDefinition>(id, "eqp");
@@ -265,6 +282,7 @@ namespace SamsaraWest.Tests.EditMode
             Set(equipment, "_resistElement", FiveElement.None);
             Set(equipment, "_breakDamageBonus", breakDamageBonus);
             Set(equipment, "_passiveSkillId", passiveSkillId);
+            Set(equipment, "_passiveId", passiveId);
             Set(equipment, "_requiredLevel", requiredLevel);
             Set(equipment, "_price", 0);
             Set(equipment, "_forgeRecipeId", null);
@@ -283,7 +301,8 @@ namespace SamsaraWest.Tests.EditMode
             int breakThresholdBonus = 0,
             int spiritRegenPerTurn = 0,
             int healthCostPerTurn = 0,
-            string passiveSkillId = null)
+            string passiveSkillId = null,
+            string passiveId = null)
         {
             var sutra = New<SutraDefinition>(id, "sut");
             Set(sutra, "_tier", RarityTier.Common);
@@ -296,6 +315,7 @@ namespace SamsaraWest.Tests.EditMode
             Set(sutra, "_spiritRegenPerTurn", spiritRegenPerTurn);
             Set(sutra, "_element", FiveElement.None);
             Set(sutra, "_passiveSkillId", passiveSkillId);
+            Set(sutra, "_passiveId", passiveId);
             Set(sutra, "_requiredLevel", 1);
             Set(sutra, "_price", 0);
             Set(sutra, "_healthCostPerTurn", healthCostPerTurn);

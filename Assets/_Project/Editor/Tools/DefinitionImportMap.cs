@@ -56,6 +56,7 @@ namespace SamsaraWest.Editor
             new DefinitionImportBinding("shops", typeof(ShopDefinition), "Shop", "商店"),
             new DefinitionImportBinding("recipes", typeof(RecipeDefinition), "Recipe", "配方"),
             new DefinitionImportBinding("endingconditions", typeof(EndingConditionDefinition), "EndingCondition", "结局条件"),
+            new DefinitionImportBinding("passives", typeof(PassiveDefinition), "Passive", "被动"),
         };
 
         public static IReadOnlyList<DefinitionImportBinding> Bindings => All;

@@ -1,0 +1,7 @@
+# 《西游：第八十二难》被动定义表 v1
+# 被动只回答「这是谁给的」：效果不写在这张表里，而是落在 statusId 指向的那条状态上（见 ADR-020）。
+# 建单位那一刻由 BattleFactory 把在身装备与经文带来的被动逐条施加成常驻状态，此后被动不再参与运行期。
+# 被动自己的 displayNameKey 供说明与图鉴读；小字状态条上显示的是承载状态的名（两条各写各的，口径见 ADR-020）。
+id,displayNameKey,descriptionKey,tags,version,statusId
+PSV_STAFF_FORCE,passive.staff_force.name,passive.staff_force.desc,ch01;passive;gear,1,STS_STAFF_FORCE
+PSV_STILLNESS_BREATH,passive.stillness_breath.name,passive.stillness_breath.desc,ch01;passive;sutra,1,STS_STILLNESS_BREATH

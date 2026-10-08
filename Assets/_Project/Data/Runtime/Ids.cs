@@ -4,7 +4,7 @@ using System.Text.RegularExpressions;
 
 namespace SamsaraWest.Data
 {
-    /// <summary>数据种类。与 17 个定义类一一对应。</summary>
+    /// <summary>数据种类。与 18 个定义类一一对应。</summary>
     public enum DefinitionKind
     {
         Unknown = 0,
@@ -25,6 +25,7 @@ namespace SamsaraWest.Data
         Shop = 15,
         Recipe = 16,
         EndingCondition = 17,
+        Passive = 18,
     }
 
     /// <summary>
@@ -50,6 +51,9 @@ namespace SamsaraWest.Data
             { DefinitionKind.Item, @"^ITM_[A-Z0-9_]{2,40}$" },
             { DefinitionKind.Equipment, @"^EQP_[A-Z0-9_]{2,40}$" },
             { DefinitionKind.Sutra, @"^SUT_[A-Z0-9_]{2,40}$" },
+
+            // 被动：PSV_。被动只登记身份与来源，效果落在它指向的那条状态上（见 ADR-020）。
+            { DefinitionKind.Passive, @"^PSV_[A-Z0-9_]{2,40}$" },
             { DefinitionKind.Quest, @"^QST_[A-Z0-9_]{2,40}$" },
             { DefinitionKind.Dialogue, @"^DLG_(CH\d{2}_\d{3}|[A-Z0-9_]{2,40})$" },
 
