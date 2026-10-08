@@ -263,6 +263,20 @@ ui.battle.command.defend,防御,战斗指令
 ui.battle.command.flee,逃跑,战斗指令
 ui.battle.status.break,护体已破,战斗提示
 ui.battle.intent.preview,敌人意图：{0},战斗提示，{0} 为意图文本
+ui.battle.title,战斗,战斗界面标题
+ui.battle.round,第 {0} 回合,战斗界面，{0} 为回合数
+ui.battle.actor.current,行动中,战斗界面：当前行动者标记
+ui.battle.hp,生命 {0}/{1},战斗界面气血，{0} 当前、{1} 上限
+ui.battle.break,护体 {0}/{1},战斗界面护体，{0} 剩余、{1} 上限
+ui.battle.target.prompt,选择目标,战斗界面选目标提示
+ui.battle.command.endturn,结束回合,战斗指令
+ui.battle.escape,逃跑成功率 {0},战斗界面，{0} 为百分比
+ui.battle.result.victory,战斗胜利,战斗结算
+ui.battle.result.defeat,战斗失败,战斗结算
+ui.battle.result.escaped,脱离战斗,战斗结算
+ui.battle.result.forced_retreat,剧情撤退,战斗结算
+ui.battle.rejection.skill_on_cooldown,冷却中,指令被拒原因
+ui.battle.rejection.not_enough_spirit,灵力不足,指令被拒原因
 ui.common.confirm,确定,通用按钮
 ui.common.cancel,取消,通用按钮
 ui.hud.chapter,第 {0} 章,主界面，{0} 为章号

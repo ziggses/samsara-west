@@ -514,20 +514,48 @@ MonoBehaviour:
     _text: "\u6BCF\u56DE\u5408\u56DE\u590D\u7075\u529B\uFF0C\u9002\u5408\u4E45\u6218\u3002"
   - _key: sutra.stillness.name
     _text: "\u9759\u5FC3\u7985"
+  - _key: ui.battle.actor.current
+    _text: "\u884C\u52A8\u4E2D"
+  - _key: ui.battle.break
+    _text: "\u62A4\u4F53 {0}/{1}"
   - _key: ui.battle.command.attack
     _text: "\u653B\u51FB"
   - _key: ui.battle.command.defend
     _text: "\u9632\u5FA1"
+  - _key: ui.battle.command.endturn
+    _text: "\u7ED3\u675F\u56DE\u5408"
   - _key: ui.battle.command.flee
     _text: "\u9003\u8DD1"
   - _key: ui.battle.command.item
     _text: "\u9053\u5177"
   - _key: ui.battle.command.skill
     _text: "\u6CD5\u672F"
+  - _key: ui.battle.escape
+    _text: "\u9003\u8DD1\u6210\u529F\u7387 {0}"
+  - _key: ui.battle.hp
+    _text: "\u751F\u547D {0}/{1}"
   - _key: ui.battle.intent.preview
     _text: "\u654C\u4EBA\u610F\u56FE\uFF1A{0}"
+  - _key: ui.battle.rejection.not_enough_spirit
+    _text: "\u7075\u529B\u4E0D\u8DB3"
+  - _key: ui.battle.rejection.skill_on_cooldown
+    _text: "\u51B7\u5374\u4E2D"
+  - _key: ui.battle.result.defeat
+    _text: "\u6218\u6597\u5931\u8D25"
+  - _key: ui.battle.result.escaped
+    _text: "\u8131\u79BB\u6218\u6597"
+  - _key: ui.battle.result.forced_retreat
+    _text: "\u5267\u60C5\u64A4\u9000"
+  - _key: ui.battle.result.victory
+    _text: "\u6218\u6597\u80DC\u5229"
+  - _key: ui.battle.round
+    _text: "\u7B2C {0} \u56DE\u5408"
   - _key: ui.battle.status.break
     _text: "\u62A4\u4F53\u5DF2\u7834"
+  - _key: ui.battle.target.prompt
+    _text: "\u9009\u62E9\u76EE\u6807"
+  - _key: ui.battle.title
+    _text: "\u6218\u6597"
   - _key: ui.common.cancel
     _text: "\u53D6\u6D88"
   - _key: ui.common.confirm
