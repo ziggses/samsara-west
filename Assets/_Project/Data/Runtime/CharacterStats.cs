@@ -30,11 +30,19 @@ namespace SamsaraWest.Data
     }
 
     /// <summary>
-    /// 一个成员的<b>有效数值</b>：角色基础值 + 在身装备 + 经文，合成一次的结果。
+    /// 一个成员的<b>进场画像</b>：角色基础值 + 在身装备 + 经文，合成一次的结果。
     /// </summary>
     /// <remarks>
+    /// <para>
     /// 这是<b>进场快照</b>而不是活对象：战斗只读它一次，之后的增减一律走状态与伤害公式，
     /// 不回头改这份数值。于是换装只影响<b>下一场</b>战斗，不会把进行中的战斗算乱。
+    /// </para>
+    /// <para>
+    /// 画像里不止数值，还有两样同样「进场那一刻定型」的东西：<b>每回合效果</b>
+    /// （<see cref="SpiritRegenPerTurn"/> 与 <see cref="HealthCostPerTurn"/>）与<b>技能清单</b>
+    /// （<see cref="SkillIds"/>）。它们都不是上限类的数，因此不参与夹下限，各自由消费方解释——
+    /// 数值归伤害公式，每回合效果归回合收尾，技能清单归选招。
+    /// </para>
     /// </remarks>
     public readonly struct CharacterStatsSnapshot
     {
@@ -46,7 +54,8 @@ namespace SamsaraWest.Data
             int speed,
             int breakThreshold,
             int spiritRegenPerTurn,
-            int healthCostPerTurn)
+            int healthCostPerTurn,
+            string[] skillIds)
         {
             MaxHealth = maxHealth;
             MaxSpirit = maxSpirit;
@@ -56,6 +65,7 @@ namespace SamsaraWest.Data
             BreakThreshold = breakThreshold;
             SpiritRegenPerTurn = spiritRegenPerTurn;
             HealthCostPerTurn = healthCostPerTurn;
+            SkillIds = skillIds ?? Array.Empty<string>();
         }
 
         public int MaxHealth { get; }
@@ -83,6 +93,18 @@ namespace SamsaraWest.Data
 
         /// <summary>每个「自己的回合」结束时流失的生命（苦修）。0 表示这本经文不要代价。</summary>
         public int HealthCostPerTurn { get; }
+
+        /// <summary>
+        /// 这名成员进场后<b>会哪几手</b>：角色自带技能在前，在身装备与经文带来的（<c>passiveSkillId</c>）按清单顺序在后。
+        /// </summary>
+        /// <remarks>
+        /// 「会哪几手」是<b>集合语义</b>：同一手由两处授予只算一手，因此这一串里没有重复项。
+        /// 顺序<b>不是随便排的</b>——规划器的平局判据「技能靠前者胜」与界面的按钮顺序都照着它来，
+        /// 于是自带技能在势均力敌时优先被选中。与画像里其余部分一样，它只读一次、不再改写；
+        /// 调用方按只读用，别就地改这一串。它<b>不进</b> <see cref="ToString"/>：清单不是数值，
+        /// 日志行里列一串 ID 只会把真正要看的那几个数淹没。
+        /// </remarks>
+        public string[] SkillIds { get; }
 
         /// <summary>把每回合效果附在数值末尾——只在非零时出现，免得裸装单位的日志被两个零拖长。</summary>
         public override string ToString()
@@ -116,17 +138,23 @@ namespace SamsaraWest.Data
     /// 单位构造再兜一次，避免别的入口绕过聚合层时造出「速度为 0」的单位。
     /// </para>
     /// <para>
+    /// <b>技能挂载</b>：装备与经文的 <c>passiveSkillId</c> 是「这件东西让我多会哪一手」，
+    /// 挂载结果并进 <see cref="CharacterStatsSnapshot.SkillIds"/>——自带技能在前，挂载的按清单顺序在后，
+    /// 重复的只留第一次出现。挂载<b>不带任何特权</b>：挂上来的技能与自带技能完全同权，
+    /// 照样占主行动、吃灵力、进冷却（口径见 ADR-019）。
+    /// </para>
+    /// <para>
     /// <b>每回合效果</b>：经文的 <c>spiritRegenPerTurn</c>（每回合回灵）与 <c>healthCostPerTurn</c>（苦修扣血）
     /// 不是上限类的数，而是「走完自己一手就发生一次」的量，所以它们<b>照旧加算进快照、但不参与夹下限</b>
     /// （只保证非负）；真正结算的时机在战斗侧的回合收尾，由 <c>BattleSession</c> 统一处理。
-    ///
+    /// </para>
     /// <para>
     /// <b>暂不生效的字段</b>（本层不假装算过，留待各自接进伤害公式或回合回路）：
     /// <c>EquipmentDefinition.breakDamageBonus</c>（破防伤害加成）与 <c>resistElement</c>（五行承伤减免）——
     /// 这两个都要先拍板「加成是百分点还是倍率、抗性减伤多少」，口径定下来再接；
-    /// <c>passiveSkillId</c>（被动技能）需要先有技能挂载机制；两者的 <c>requiredLevel</c>——
-    /// 角色目前没有等级来源，因此等级校验无处可施，不臆造一套等级系统。
-    /// </para>
+    /// 「被动技能」里<b>被动</b>那一层语义（不占行动、常驻生效）也还没有承载物，
+    /// 需要先给技能表加「主动／被动」这一列、再定下被动效果的表达方式（登记见 ADR-019）；
+    /// 两者的 <c>requiredLevel</c>——角色目前没有等级来源，因此等级校验无处可施，不臆造一套等级系统。
     /// </para>
     /// <para>
     /// <b>坏数据不毁战斗</b>：栏位对不上、限定角色不符、定义缺失的件一律跳过并记进报告，
@@ -151,7 +179,8 @@ namespace SamsaraWest.Data
                 character.Speed,
                 character.BreakThreshold,
                 spiritRegenPerTurn: 0,
-                healthCostPerTurn: 0);
+                healthCostPerTurn: 0,
+                character.StartingSkillIds);
         }
 
         /// <summary>
@@ -202,6 +231,56 @@ namespace SamsaraWest.Data
 
             // 一个栏位只算一件：谁先占上算谁的，重复的那件按警告跳过（存档侧同样禁止重复栏位）。
             var usedSlots = new HashSet<EquipmentSlot>();
+
+            // 技能清单：角色自带技能打底，在身装备与经文带来的按清单顺序追加。
+            var skills = new List<string>(baseStats.SkillIds);
+            var ownedSkills = new HashSet<string>(StringComparer.Ordinal);
+            for (var i = 0; i < baseStats.SkillIds.Length; i++)
+            {
+                var owned = baseStats.SkillIds[i];
+                if (!string.IsNullOrWhiteSpace(owned))
+                {
+                    ownedSkills.Add(owned);
+                }
+            }
+
+            // 挂载一件东西带来的技能。坏引用只跳过它自己——一件写错的东西不该让人开不了战，
+            // 也不该被悄悄吞掉，于是跳过与留码同时发生。
+            void Mount(string skillId, string sourceItemId)
+            {
+                if (string.IsNullOrWhiteSpace(skillId))
+                {
+                    return;
+                }
+
+                if (!registry.TryGet(skillId, out var mounted) || mounted == null)
+                {
+                    report.Error(
+                        "LOADOUT_SKILL_MISSING",
+                        $"{sourceItemId} 挂载的技能 '{skillId}' 在数据表里找不到，已跳过。",
+                        character.Id,
+                        fieldName: "passiveSkillId");
+                    return;
+                }
+
+                if (!(mounted is SkillDefinition))
+                {
+                    report.Error(
+                        "LOADOUT_SKILL_KIND_UNSUPPORTED",
+                        $"{sourceItemId} 挂载的 '{skillId}' 是 {mounted.Kind}，挂载位置只接受技能，已跳过。",
+                        character.Id,
+                        fieldName: "passiveSkillId");
+                    return;
+                }
+
+                if (!ownedSkills.Add(skillId))
+                {
+                    // 重复不是坏数据：技能清单是集合语义，会就是会，两处给同一手不改变任何行为，因此不报。
+                    return;
+                }
+
+                skills.Add(skillId);
+            }
 
             for (var i = 0; i < loadout.Count; i++)
             {
@@ -306,6 +385,7 @@ namespace SamsaraWest.Data
                         attack += equipment.AttackBonus;
                         defense += equipment.DefenseBonus;
                         speed += equipment.SpeedBonus;
+                        Mount(equipment.PassiveSkillId, entry.ItemId);
                         break;
 
                     case SutraDefinition sutra:
@@ -316,6 +396,7 @@ namespace SamsaraWest.Data
                         breakThreshold += sutra.BreakThresholdBonus;
                         spiritRegenPerTurn += sutra.SpiritRegenPerTurn;
                         healthCostPerTurn += sutra.HealthCostPerTurn;
+                        Mount(sutra.PassiveSkillId, entry.ItemId);
                         break;
                 }
             }
@@ -328,7 +409,9 @@ namespace SamsaraWest.Data
                 Math.Max(1, speed),
                 Math.Max(1, breakThreshold),
                 Math.Max(0, spiritRegenPerTurn),
-                Math.Max(0, healthCostPerTurn));
+                Math.Max(0, healthCostPerTurn),
+                // 一手都没挂上时把角色自带的清单原样交出去：省一次拷贝，也少一份可能与角色表读写不同步的副本。
+                skills.Count == baseStats.SkillIds.Length ? baseStats.SkillIds : skills.ToArray());
         }
 
         /// <summary>

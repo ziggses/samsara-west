@@ -250,6 +250,7 @@ namespace SamsaraWest.Tests.EditMode
             int spiritBonus = 0,
             int breakDamageBonus = 0,
             int requiredLevel = 1,
+            string passiveSkillId = null,
             params string[] allowedCharacterIds)
         {
             var equipment = New<EquipmentDefinition>(id, "eqp");
@@ -263,7 +264,7 @@ namespace SamsaraWest.Tests.EditMode
             Set(equipment, "_element", FiveElement.None);
             Set(equipment, "_resistElement", FiveElement.None);
             Set(equipment, "_breakDamageBonus", breakDamageBonus);
-            Set(equipment, "_passiveSkillId", null);
+            Set(equipment, "_passiveSkillId", passiveSkillId);
             Set(equipment, "_requiredLevel", requiredLevel);
             Set(equipment, "_price", 0);
             Set(equipment, "_forgeRecipeId", null);
@@ -281,7 +282,8 @@ namespace SamsaraWest.Tests.EditMode
             int spiritBonus = 0,
             int breakThresholdBonus = 0,
             int spiritRegenPerTurn = 0,
-            int healthCostPerTurn = 0)
+            int healthCostPerTurn = 0,
+            string passiveSkillId = null)
         {
             var sutra = New<SutraDefinition>(id, "sut");
             Set(sutra, "_tier", RarityTier.Common);
@@ -293,7 +295,7 @@ namespace SamsaraWest.Tests.EditMode
             Set(sutra, "_breakThresholdBonus", breakThresholdBonus);
             Set(sutra, "_spiritRegenPerTurn", spiritRegenPerTurn);
             Set(sutra, "_element", FiveElement.None);
-            Set(sutra, "_passiveSkillId", null);
+            Set(sutra, "_passiveSkillId", passiveSkillId);
             Set(sutra, "_requiredLevel", 1);
             Set(sutra, "_price", 0);
             Set(sutra, "_healthCostPerTurn", healthCostPerTurn);

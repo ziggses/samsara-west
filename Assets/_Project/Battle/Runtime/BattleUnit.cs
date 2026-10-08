@@ -93,6 +93,13 @@ namespace SamsaraWest.Battle
 
         public bool IsBoss { get; }
 
+        /// <summary>
+        /// 这个单位会哪几手：角色自带技能 + 在身装备与经文带来的（见 ADR-019）。
+        /// </summary>
+        /// <remarks>
+        /// 顺序<b>就是优先级</b>：自带技能在前、挂载的在后，规划器的平局判据与界面的按钮顺序都读它。
+        /// 挂载来的技能与自带技能在运行期<b>没有区别</b>——同一份清单、同一个选招入口、同一套消耗与冷却。
+        /// </remarks>
         public IReadOnlyList<string> SkillIds => _skillIds;
 
         public int MaxHealth { get; }

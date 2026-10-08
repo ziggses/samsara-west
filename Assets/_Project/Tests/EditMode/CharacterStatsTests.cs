@@ -8,8 +8,9 @@ namespace SamsaraWest.Tests.EditMode
     /// 属性聚合（角色基础值 + 在身装备 + 经文）的口径用例。
     /// </summary>
     /// <remarks>
-    /// 钉两件事：一是<b>加算</b>与<b>夹下限</b>这两个口径本身；二是每一件被跳过的装备都必须留下错误码——
-    /// 「坏数据不毁战斗」不等于「坏数据静默生效」。断言只认错误码，不认日志文案，改文案不会误伤用例。
+    /// 钉三件事：一是<b>加算</b>与<b>夹下限</b>这两个口径本身；二是每一件被跳过的装备都必须留下错误码——
+    /// 「坏数据不毁战斗」不等于「坏数据静默生效」；三是装备与经文带来的技能怎么并进清单
+    /// （自带在前、挂载在后、重复只留一手，坏引用同样留码）。断言只认错误码，不认日志文案，改文案不会误伤用例。
     /// </remarks>
     [TestFixture]
     public sealed class CharacterStatsTests
@@ -362,6 +363,79 @@ namespace SamsaraWest.Tests.EditMode
             Assert.IsTrue(report.IsClean);
             Assert.AreEqual(0, snapshot.SpiritRegenPerTurn, "装备没有「每回合效果」这一说，只有经文有。");
             Assert.AreEqual(0, snapshot.HealthCostPerTurn);
+        }
+
+        [Test]
+        public void 装备与经文带来的技能并进清单_自带在前挂载在后()
+        {
+            using var lab = new BattleLab();
+            var character = lab.Character("CHR_TEST_A", 100, 10, 5, 8, skillIds: "SKL_TEST_HIT");
+            lab.AttackSkill("SKL_TEST_MOUNTED");
+            lab.Equipment("EQP_TEST_STAFF", EquipmentSlot.Weapon, passiveSkillId: "SKL_TEST_MOUNTED");
+            lab.Sutra("SUT_TEST_MIND", passiveSkillId: "SKL_TEST_MOUNTED");
+
+            var report = new ValidationReport();
+            var snapshot = CharacterStatsResolver.Resolve(
+                character,
+                new[]
+                {
+                    new LoadoutEntry("Weapon", "EQP_TEST_STAFF"),
+                    new LoadoutEntry("Sutra", "SUT_TEST_MIND"),
+                },
+                lab.Registry(),
+                report);
+
+            Assert.IsTrue(report.IsClean, "两处授予同一手是集合语义上的重复，不是坏数据，不该留结论。");
+            CollectionAssert.AreEqual(
+                new[] { "SKL_TEST_HIT", "SKL_TEST_MOUNTED" },
+                snapshot.SkillIds,
+                "自带技能在前、挂载的在后；重复的只留第一次出现。");
+        }
+
+        [Test]
+        public void 挂载的技能查不到_跳过那一手_并留下错误码()
+        {
+            using var lab = new BattleLab();
+            var character = lab.Character("CHR_TEST_A", 100, 10, 5, 8, skillIds: "SKL_TEST_HIT");
+            lab.AttackSkill("SKL_TEST_HIT");
+            lab.Equipment(
+                "EQP_TEST_STAFF",
+                EquipmentSlot.Weapon,
+                attackBonus: 5,
+                passiveSkillId: "SKL_NOT_IN_TABLE");
+
+            var report = new ValidationReport();
+            var snapshot = CharacterStatsResolver.Resolve(
+                character,
+                new[] { new LoadoutEntry("Weapon", "EQP_TEST_STAFF") },
+                lab.Registry(),
+                report);
+
+            Assert.AreEqual(15, snapshot.Attack, "挂载引用坏掉不影响这件装备的数值加成：坏的是那一手指向，不是整件装备。");
+            CollectionAssert.AreEqual(
+                new[] { "SKL_TEST_HIT" },
+                snapshot.SkillIds,
+                "查不到的那一手不进来，自带技能照旧。");
+            AssertHasCode(report, "LOADOUT_SKILL_MISSING");
+        }
+
+        [Test]
+        public void 挂载指向的不是技能_跳过那一手_并留下错误码()
+        {
+            using var lab = new BattleLab();
+            var character = lab.Character("CHR_TEST_A", 100, 10, 5, 8);
+            lab.Enemy("ENM_TEST_A", 200, 10, 0, 10);
+            lab.Equipment("EQP_TEST_STAFF", EquipmentSlot.Weapon, passiveSkillId: "ENM_TEST_A");
+
+            var report = new ValidationReport();
+            var snapshot = CharacterStatsResolver.Resolve(
+                character,
+                new[] { new LoadoutEntry("Weapon", "EQP_TEST_STAFF") },
+                lab.Registry(),
+                report);
+
+            CollectionAssert.IsEmpty(snapshot.SkillIds, "指向敌人的 ID 不是技能，进不了清单。");
+            AssertHasCode(report, "LOADOUT_SKILL_KIND_UNSUPPORTED");
         }
 
         private static void AssertHasCode(ValidationReport report, string code)

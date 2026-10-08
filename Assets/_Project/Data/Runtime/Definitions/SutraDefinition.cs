@@ -19,6 +19,7 @@ namespace SamsaraWest.Data
         [CsvColumn("spiritRegenPerTurn")] [SerializeField] private int _spiritRegenPerTurn;
 
         [CsvColumn("element")] [SerializeField] private FiveElement _element = FiveElement.None;
+        [Tooltip("装备后带进战斗的技能 ID，可为空。挂载即「多一手可用技能」，skills.csv 里得真实存在。")]
         [CsvColumn("passiveSkillId")] [SerializeField] private string _passiveSkillId;
         [CsvColumn("requiredLevel")] [SerializeField] private int _requiredLevel = 1;
         [CsvColumn("price")] [SerializeField] private int _price;

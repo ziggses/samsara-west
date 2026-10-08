@@ -21,7 +21,7 @@ namespace SamsaraWest.Data
         [CsvColumn("resistElement")] [SerializeField] private FiveElement _resistElement = FiveElement.None;
         [CsvColumn("breakDamageBonus")] [SerializeField] private int _breakDamageBonus;
 
-        [Tooltip("装备后被动生效的技能 ID，可为空。")]
+        [Tooltip("装备后带进战斗的技能 ID，可为空。挂载即「多一手可用技能」，skills.csv 里得真实存在。")]
         [CsvColumn("passiveSkillId")] [SerializeField] private string _passiveSkillId;
 
         [CsvColumn("requiredLevel")] [SerializeField] private int _requiredLevel = 1;

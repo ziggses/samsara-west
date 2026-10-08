@@ -291,7 +291,8 @@ namespace SamsaraWest.Battle
             {
                 case CharacterDefinition character:
 
-                    // 装备与经文的加成在建单位这一刻并进数值（进场快照），之后战斗只看单位自身的数。
+                    // 装备与经文的加成、连同它们带来的技能，都在建单位这一刻并进单位（进场快照），
+                    // 之后战斗只看单位自身的数与技能清单。
                     var stats = ResolveCharacterStats(registry, character, loadout);
                     return new BattleUnit(
                         runtimeId,
@@ -308,7 +309,8 @@ namespace SamsaraWest.Battle
                         stats.Speed,
                         character.Element,
                         stats.BreakThreshold,
-                        character.StartingSkillIds,
+                        // 清单里已经含「自带 + 在身带来的」，战斗侧不再自己拼一份（口径见 ADR-019）。
+                        stats.SkillIds,
                         isBoss: false,
                         stats.SpiritRegenPerTurn,
                         stats.HealthCostPerTurn);

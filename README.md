@@ -14,7 +14,7 @@
 # 1. 挂载外部素材 + 初始化工程（新机器、新克隆跑一次；幂等，可反复执行）
 powershell -NoProfile -ExecutionPolicy Bypass -File E:\tx2\samsara-west\Tools\setup-project.ps1
 
-# 2. 跑全套测试（当前基线：EditMode 441 + PlayMode 22）
+# 2. 跑全套测试（当前基线：EditMode 454 + PlayMode 22）
 powershell -NoProfile -ExecutionPolicy Bypass -File E:\tx2\samsara-west\Tools\run-tests.ps1 -Platform All
 ```
 
@@ -173,7 +173,7 @@ Unity.exe -batchmode -quit -projectPath E:\tx2\samsara-west ^
 
 工程自身的文档在 `Docs/`（随仓库分发）：
 
-- `Docs/架构决策.md`：17 条架构决策（模块与依赖、服务定位、事件总线、随机、日志、存档迁移、生成物不白写盘、UI 框架、装备 8 槽与存档 v3、战斗数学契约、装备/经文加成的进场快照口径等）与未决事项。
+- `Docs/架构决策.md`：19 条架构决策（模块与依赖、服务定位、事件总线、随机、日志、存档迁移、生成物不白写盘、UI 框架、装备 8 槽与存档 v3、战斗数学契约、装备/经文加成的进场快照口径、经文的每回合效果、装备/经文带来的技能挂载等）与未决事项。
 - `Docs/数据管线.md`：17 张表 → 资产的映射、解析与列映射规则、增量导入的跳过条件、校验码表、常用操作与故障排查。
 - `Docs/战斗数值-v1.md`：伤害公式与运算顺序、五行倍率（相克 + 相生）、暴击、护体/破防、行动速度、首章数值快照、输出与回合数校算，以及待人工拍板的遗留（第 7.4 节）。
 - `Docs/战斗内核-v1.md`：一场战斗的推进顺序（`BeginNextTurn` / `FinishTurn`）、行动队列与平局判据、意图预告与 AI 选招、目标结算、破防与状态的计时口径、冷却、随机与可复现、13 个战斗事件、装配现状，以及遗留清单（11.1 待拍板 / 11.2 已定口径的取舍）。
