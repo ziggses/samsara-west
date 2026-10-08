@@ -63,6 +63,7 @@ namespace SamsaraWest.Tests.EditMode
                 BattleTextKeys.Health,
                 BattleTextKeys.Break,
                 BattleTextKeys.Flee,
+                BattleTextKeys.Defend,
                 BattleTextKeys.EndTurn,
                 BattleTextKeys.EscapeChance,
             };
@@ -143,6 +144,9 @@ namespace SamsaraWest.Tests.EditMode
                     BattleCommandRejection.SlotOccupied,
                     BattleCommandRejection.SlotOutOfRange,
                     BattleCommandRejection.MoveAlreadyUsed,
+
+                    // 数据错误：配置指的定义没登记，属于「该去修数据」而不是「该去劝玩家」。
+                    BattleCommandRejection.DefinitionMissing,
                 },
                 silent,
                 "拒绝原因的显隐名单变了：要么给新原因补文本键，要么把它写进这份名单。");

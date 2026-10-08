@@ -114,14 +114,20 @@ namespace SamsaraWest.Battle
 
         /// <summary>这一次的移动／换位已经用过了。</summary>
         MoveAlreadyUsed = 15,
+
+        /// <summary>
+        /// 配置指向的定义在数据表里找不到（例如 <c>BattleConfig.DefendStatusId</c>
+        /// 指的状态没登记）。这是<b>数据错误</b>而不是玩家操作错误，界面不必给文案。
+        /// </summary>
+        DefinitionMissing = 16,
     }
 
     /// <summary>
     /// 一次行动的种类。
     /// </summary>
     /// <remarks>
-    /// 任务书里列出的道具、防御、联合技仍然没有口径，因此<b>不</b>为它们预留占位枚举值，
-    /// 避免出现一个永远走不通的分支。逃跑已经拍板，见 <see cref="Escape"/>。
+    /// 任务书里列出的道具与联合技仍然没有口径，因此<b>不</b>为它们预留占位枚举值，
+    /// 避免出现一个永远走不通的分支。逃跑见 <see cref="Escape"/>，防御见 <see cref="Defend"/>。
     /// </remarks>
     public enum BattleActionKind
     {
@@ -139,6 +145,13 @@ namespace SamsaraWest.Battle
         /// 一次掷骰决定整场走人还是失败；失败只是白费这一手，敌人照常行动。
         /// </summary>
         Escape = 3,
+
+        /// <summary>
+        /// 防御（主行动）：给自己挂上配置指定的减伤状态（默认「守势」，
+        /// 减伤 50%、持续 2 回合，数值全在 <c>statuses.csv</c> 里）。
+        /// 它<b>不</b>走技能表：防御是每个单位都有的通用指令，不该在 12 个角色的技能表里各写一份。
+        /// </summary>
+        Defend = 4,
     }
 
     /// <summary>状态发生变化的方式，用于事件与战斗日志。</summary>

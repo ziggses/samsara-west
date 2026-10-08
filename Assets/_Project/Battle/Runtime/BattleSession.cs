@@ -513,6 +513,94 @@ namespace SamsaraWest.Battle
         }
 
         /// <summary>
+        /// 防御（主行动）：给自己挂上配置指定的减伤状态。
+        /// </summary>
+        /// <remarks>
+        /// <para>口径（已拍板，批次 4）：减伤 <b>50%</b>、持续 <b>2 回合</b>、<b>占主行动</b>。
+        /// 减伤幅度与持续回合<b>不在</b>这里——它们跟着状态表走
+        /// （<c>statuses.csv</c> 的 <c>STS_DEFEND</c>：承伤乘区 ×0.5、时长 2），
+        /// 本方法只负责「把它挂上去」，于是调数值不用改代码，改挂哪个状态也不用改代码
+        /// （见 <see cref="BattleConfig.DefendStatusId"/>）。</para>
+        ///
+        /// <para><b>与破防怎么互算</b>：破防的 ×1.5 是伤害公式第 5 步的独立乘区，
+        /// 防御的 ×0.5 走第 7 步的承伤修正，两者按顺序<b>相乘</b>，净效果 <c>1.5 × 0.5 = 0.75</c>——
+        /// 破防中的人举架仍然比平常更疼，但不会白举。</para>
+        ///
+        /// <para>防御是<b>通用指令</b>，不在技能表里：不吃灵力、不进冷却、不掷任何随机数。
+        /// 代价与回报都由「占掉主行动」这一条承担，所以自动战斗的规划器不会主动防御
+        /// （规划器只从技能表里选招，见 <see cref="BattleActionPlanner"/>）。</para>
+        /// </remarks>
+        public BattleActionResult TryDefend()
+        {
+            var actor = CurrentActor;
+            if (Outcome != BattleOutcome.Ongoing)
+            {
+                return BattleActionResult.Rejected(
+                    BattleCommandRejection.BattleFinished, actor, BattleActionKind.Defend);
+            }
+
+            if (actor == null || Phase == TurnPhase.Idle)
+            {
+                return BattleActionResult.Rejected(
+                    BattleCommandRejection.NoActiveTurn, actor, BattleActionKind.Defend);
+            }
+
+            if (_mainActionUsed || Phase != TurnPhase.MainAction)
+            {
+                return BattleActionResult.Rejected(
+                    BattleCommandRejection.WrongPhase, actor, BattleActionKind.Defend);
+            }
+
+            if (!_registry.TryGet(_config.DefendStatusId, out StatusDefinition status) || status == null)
+            {
+                GameLog.Warn(
+                    LogChannel.Battle,
+                    $"防御指令引用的状态 '{_config.DefendStatusId}' 不在数据表里，本手被拒。",
+                    _config.DefendStatusId);
+                return BattleActionResult.Rejected(
+                    BattleCommandRejection.DefinitionMissing, actor, BattleActionKind.Defend);
+            }
+
+            var result = BattleActionResult.Succeeded(actor, BattleActionKind.Defend, null);
+
+            // 结果与技能路径同构：防御也是「对某个目标施加了一次状态」，
+            // 只是目标是自己、且没有伤害与掷骰。复用 BattleUnitEffect 让日志与界面
+            // 不必为防御再写一套读取方式。
+            var effect = result.AddEffect(actor, null);
+            effect.TargetWasBroken = actor.IsBroken;
+
+            var change = actor.ApplyStatus(status);
+            var applied = actor.FindStatus(status.Id);
+            effect.AppliedStatusId = status.Id;
+            effect.StatusChange = change;
+
+            Publish(new BattleStatusAppliedEvent(
+                actor.RuntimeId,
+                status.Id,
+                change,
+                applied?.Stacks ?? 1,
+                applied?.RemainingTurns ?? status.DurationTurns));
+
+            GameLog.Info(
+                LogChannel.Battle,
+                $"#{actor.RuntimeId} {actor.DefinitionId} 防御，挂上 {status.Id}"
+                + $"（{change}，剩余 {applied?.RemainingTurns ?? status.DurationTurns} 回合）。",
+                actor.DefinitionId);
+
+            _mainActionUsed = true;
+            _plansDirty = true;
+
+            // 与 UseSkill 同一条：主行动用掉之后只剩一次移动／换位；
+            // 战斗已经结算完毕时不再改阶段，避免「已结束」与「还剩一次移动」同时成立。
+            if (Outcome == BattleOutcome.Ongoing)
+            {
+                Phase = TurnPhase.MoveOrSwap;
+            }
+
+            return result;
+        }
+
+        /// <summary>
         /// 剧情强制结束这场战斗（撤退）。
         /// </summary>
         /// <remarks>

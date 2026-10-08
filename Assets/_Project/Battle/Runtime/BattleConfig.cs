@@ -88,6 +88,11 @@ namespace SamsaraWest.Battle
         [SerializeField] private float _powerWeightSpeed = 1f;
         [SerializeField] private float _powerWeightHealth = 0.1f;
 
+        [Header("防御（主行动）")]
+        [Tooltip("防御指令挂上的状态 ID。减伤幅度、持续时间、叠层规则都在状态表里"
+            + "（statuses.csv 的 STS_DEFEND：承伤 ×0.5、持续 2 回合），调数值不用改代码。")]
+        [SerializeField] private string _defendStatusId = "STS_DEFEND";
+
         [Header("威胁评估（规划器选招与选目标）：威胁 = 伤害期望 × 权重 + 治疗量 × 权重 + 御敌速度 × 权重")]
         [Tooltip("伤害期望在威胁值里的权重。")]
         [SerializeField] private float _threatWeightDamage = 1f;
@@ -140,6 +145,12 @@ namespace SamsaraWest.Battle
         public float EscapeMinChance => _escapeMinChance;
 
         public float EscapeMaxChance => _escapeMaxChance;
+
+        /// <summary>
+        /// 防御指令挂上的状态 ID（默认「守势」）。
+        /// 减伤幅度与持续回合<b>不在</b>这里：它们跟着状态表走，见 <see cref="BattleSession.TryDefend"/>。
+        /// </summary>
+        public string DefendStatusId => _defendStatusId;
 
         public float PowerWeightAttack => _powerWeightAttack;
 

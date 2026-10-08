@@ -37,6 +37,7 @@ MonoBehaviour:
   _powerWeightDefense: 1
   _powerWeightSpeed: 1
   _powerWeightHealth: 0.1
+  _defendStatusId: STS_DEFEND
   _threatWeightDamage: 1
   _threatWeightHeal: 1
   _threatWeightSpeed: 0

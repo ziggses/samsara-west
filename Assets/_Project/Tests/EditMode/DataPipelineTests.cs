@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using NUnit.Framework;
+using SamsaraWest.Battle;
 using SamsaraWest.Data;
 using SamsaraWest.Editor;
 using SamsaraWest.Localization;
@@ -194,6 +195,31 @@ namespace SamsaraWest.Tests.EditMode
 
             Assert.Greater(report.ScannedFiles, 0, "扫描范围至少要覆盖到 UI 脚本，否则这个测试是空的。");
             Assert.AreEqual(0, report.Hits.Count, DescribeHits(report));
+        }
+
+        [Test]
+        public void DefendStatus_InRealTable_IsHalfDamageForTwoTurnsAndConfigPointsAtIt()
+        {
+            // 防御的减伤幅度与持续回合不住在代码里，只住在 statuses.csv 里。
+            // 因此这里直接对真实数据表对账：改了 CSV 却忘了改口径，这条会红。
+            CsvImporter.ImportAll(force: true);
+
+            var catalog = AssetDatabase.LoadAssetAtPath<DefinitionCatalog>(SamsaraWestPaths.DefinitionCatalogAsset);
+            Assert.IsNotNull(catalog, "导入后必须存在定义目录资产。");
+
+            var config = AssetDatabase.LoadAssetAtPath<BattleConfig>(SamsaraWestPaths.BattleConfigAsset);
+            Assert.IsNotNull(config, "少了战斗数值资产就无从知道防御挂的是哪个状态。");
+            Assert.IsTrue(
+                catalog.TryGet(config.DefendStatusId, out StatusDefinition defend),
+                $"配置里的防御状态 {config.DefendStatusId} 在状态表里查不到："
+                + "防御会变成「点了没反应」，而且只有跑到那一手才看得出来。");
+
+            Assert.AreEqual(0.5f, defend.IncomingDamageModifier, 0.0001f, "已拍板：减伤 50%。");
+            Assert.AreEqual(2, defend.DurationTurns, "已拍板：持续 2 回合。");
+            Assert.AreEqual(StackRule.Refresh, defend.StackRule, "同一手再举一次是刷新时长，不是叠加。");
+            Assert.AreEqual(1, defend.MaxStacks);
+            Assert.IsFalse(defend.IsDebuff, "防御是增益，配色与图标按增益画。");
+            Assert.AreEqual("vfx.status.defend", defend.VfxKey, "特效键沿用 vfx.status.<id> 的既有命名。");
         }
 
         private static string Describe(CsvImportSummary summary) => Describe(summary.Report, summary.Log);

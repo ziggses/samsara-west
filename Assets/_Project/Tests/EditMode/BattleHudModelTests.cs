@@ -65,7 +65,7 @@ namespace SamsaraWest.Tests.EditMode
         }
 
         [Test]
-        public void 轮到我方时_指令里带着技能_逃跑与结束回合()
+        public void 轮到我方时_指令里带着技能_防御_逃跑与结束回合()
         {
             using var lab = new BattleLab();
             BuildBasic(lab);
@@ -87,6 +87,14 @@ namespace SamsaraWest.Tests.EditMode
 
             Assert.IsNotNull(Find(hud, BattleCommandId.Flee, null), "逃跑是主行动，得有按钮。");
             Assert.IsNotNull(Find(hud, BattleCommandId.EndTurn, null), "放弃剩余行动也得有按钮。");
+
+            var defend = Find(hud, BattleCommandId.Defend, null);
+            Assert.IsNotNull(defend, "防御是主行动，得有按钮。");
+            Assert.IsTrue(defend.Enabled, "防御不吃灵力也不进冷却，轮到我方就该是可点的。");
+            Assert.AreEqual(
+                LocalizationKeys.UI_BATTLE_COMMAND_DEFEND,
+                defend.LabelKey,
+                "防御按钮的文案键是数据表里的那一条，不是现编的中文。");
 
             Assert.IsTrue(hud.PlayerRows[0].IsCurrentActor, "轮到的单位必须被标出来。");
         }
@@ -227,6 +235,29 @@ namespace SamsaraWest.Tests.EditMode
             Assert.LessOrEqual(hud.EscapeChance, 1f);
         }
 
+        [Test]
+        public void 守势以增益色挂到状态行上_并写清还剩几回合()
+        {
+            using var lab = new BattleLab();
+            BuildBasic(lab);
+            RegisterDefend(lab);
+
+            var session = NewSession(lab, Setup(Line("CHR_A"), Line("ENM_A")));
+            var hud = new BattleHudModel(session, lab.Registry());
+            session.BeginNextTurn();
+            Assert.IsTrue(session.TryDefend().Success);
+            hud.Refresh();
+
+            var chip = hud.PlayerRows[0].Statuses[0];
+            Assert.AreEqual(1, hud.PlayerRows[0].Statuses.Count, "状态行只该多出一枚守势。");
+            Assert.AreEqual(lab.Config.DefendStatusId, chip.StatusId);
+            Assert.AreEqual("test.battle.sts.name", chip.NameKey);
+            Assert.IsFalse(chip.IsDebuff, "守势是增益，配色与图标按增益画。");
+            Assert.AreEqual(1, chip.Stacks);
+            Assert.AreEqual(2, chip.RemainingTurns, "剩余回合数直接给界面，界面不回头找定义。");
+            Assert.IsEmpty(hud.EnemyRows[0].Statuses, "守势只挂在自己身上。");
+        }
+
         private static BattleCommandOption Find(BattleHudModel hud, BattleCommandId id, string skillId)
         {
             for (var i = 0; i < hud.Commands.Count; i++)
@@ -254,6 +285,16 @@ namespace SamsaraWest.Tests.EditMode
             lab.Character("CHR_B", 300, 10, 5, 20, FiveElement.None, 30, 50, "SKL_HIT");
             lab.Enemy("ENM_A", 3000, 1, 0, 10, FiveElement.None, 900, false, "SKL_HIT");
         }
+
+        /// <summary>按数据表里的口径登记守势：减伤 50%、持续 2 回合、增益。</summary>
+        private static void RegisterDefend(BattleLab lab) =>
+            lab.Status(
+                lab.Config.DefendStatusId,
+                durationTurns: 2,
+                stackRule: StackRule.Refresh,
+                maxStacks: 1,
+                isDebuff: false,
+                incomingDamageModifier: 0.5f);
 
         private static BattleSetup Setup(List<BattleUnitBlueprint> party, List<BattleUnitBlueprint> enemies) =>
             new BattleSetup(Encounter, party, enemies);

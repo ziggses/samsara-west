@@ -407,6 +407,12 @@ namespace SamsaraWest.Tests.EditMode
                 AssertSame(nameof(code.MinSpeed), code.MinSpeed, asset.MinSpeed);
                 AssertSame(nameof(code.MaxSpeed), code.MaxSpeed, asset.MaxSpeed);
                 AssertSame(nameof(code.IntentPreviewLead), code.IntentPreviewLead, asset.IntentPreviewLead);
+
+                Assert.AreEqual(
+                    code.DefendStatusId,
+                    asset.DefendStatusId,
+                    $"{nameof(code.DefendStatusId)} 在资产与代码默认值之间不一致："
+                    + "防御挂哪个状态是资产说了算，改了代码不等于改了资产。");
             }
             finally
             {

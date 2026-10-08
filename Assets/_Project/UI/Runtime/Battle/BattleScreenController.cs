@@ -202,6 +202,36 @@ namespace SamsaraWest.UI
             return true;
         }
 
+        /// <summary>
+        /// 防御（给自己挂减伤状态），占一次主行动。
+        /// </summary>
+        /// <remarks>
+        /// 与 <see cref="ChooseFlee"/> 同形：一次结算、不选目标。
+        /// 它与技能一样会消耗主行动，因此结算之后走同一条 <see cref="AdvanceAfterMainAction"/>。
+        /// </remarks>
+        public bool ChooseDefend()
+        {
+            if (Prompt != BattlePrompt.PlayerCommand)
+            {
+                return false;
+            }
+
+            LastResult = _session.TryDefend();
+            PendingSkillId = null;
+            _candidateIds.Clear();
+
+            if (!_session.IsFinished && _session.Phase == TurnPhase.MainAction)
+            {
+                // 被拒（主行动还在，例如配置指的状态没登记）：原地等我方重新下令。
+                _hud.Refresh();
+                Prompt = BattlePrompt.PlayerCommand;
+                return true;
+            }
+
+            AdvanceAfterMainAction();
+            return true;
+        }
+
         /// <summary>放弃剩余行动，直接结束当前单位的回合。</summary>
         public bool ChooseEndTurn()
         {

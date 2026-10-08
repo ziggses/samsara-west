@@ -31,6 +31,30 @@ namespace SamsaraWest.Tests.EditMode
             Assert.IsFalse(screen.ChooseTarget(1));
             Assert.IsFalse(screen.ChooseFlee());
             Assert.IsFalse(screen.ChooseEndTurn());
+            Assert.IsFalse(screen.ChooseDefend());
+        }
+
+        [Test]
+        public void 防御走通一手_主行动用掉并留下守势()
+        {
+            using var lab = new BattleLab();
+            BuildDuel(lab);
+
+            var screen = NewScreen(lab, out var session);
+            screen.Start();
+
+            Assert.IsTrue(screen.ChooseDefend());
+            Assert.IsTrue(screen.LastResult.Success);
+            Assert.AreEqual(BattleActionKind.Defend, screen.LastResult.Kind);
+
+            Assert.IsNotNull(
+                session.PlayerUnits[0].FindStatus(lab.Config.DefendStatusId),
+                "防御必须落进内核，界面上不能只是个装饰按钮。");
+            Assert.AreEqual(1, screen.Hud.PlayerRows[0].Statuses.Count, "快照里也该多出一枚守势。");
+            Assert.IsFalse(screen.Hud.PlayerRows[0].Statuses[0].IsDebuff);
+
+            Assert.AreEqual(BattlePrompt.PlayerCommand, screen.Prompt, "敌方走完之后再轮回我方。");
+            Assert.AreEqual(session.PlayerUnits[0].RuntimeId, screen.Hud.CurrentActorRuntimeId);
         }
 
         [Test]
@@ -254,6 +278,15 @@ namespace SamsaraWest.Tests.EditMode
             lab.AttackSkill("SKL_HIT", power: 20, breakDamage: 0);
             lab.Character("CHR_A", 300, 10, 5, 30, FiveElement.None, 30, 50, "SKL_HIT");
             lab.Enemy("ENM_A", 3000, 1, 0, 20, FiveElement.None, 900, false, "SKL_HIT");
+
+            // 按数据表里的口径登记守势：防御指令挂的就是它（减伤 50%、持续 2 回合、增益）。
+            lab.Status(
+                lab.Config.DefendStatusId,
+                durationTurns: 2,
+                stackRule: StackRule.Refresh,
+                maxStacks: 1,
+                isDebuff: false,
+                incomingDamageModifier: 0.5f);
         }
 
         private static List<BattleUnitBlueprint> Line(params string[] definitionIds)

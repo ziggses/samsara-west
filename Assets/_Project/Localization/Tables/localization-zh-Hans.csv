@@ -49,6 +49,8 @@ status.blessed.name,净心,状态名
 status.blessed.desc,每回合恢复少量生命。,状态说明
 status.haste.name,疾行,状态名
 status.haste.desc,速度提升三成。,状态说明
+status.defend.name,守势,状态名
+status.defend.desc,架住来招：受到的伤害减半。,状态说明
 enemy.bandit.name,山贼喽啰,敌人名
 enemy.bandit.desc,拦路讨钱的小卒，五行属木。,敌人图鉴
 enemy.bandit_archer.name,山贼弓手,敌人名

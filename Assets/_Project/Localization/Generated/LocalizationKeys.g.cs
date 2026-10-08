@@ -244,6 +244,8 @@ namespace SamsaraWest.Localization
         public const string STATUS_BREAK_VULN_NAME = "status.break_vuln.name";
         public const string STATUS_BURN_DESC = "status.burn.desc";
         public const string STATUS_BURN_NAME = "status.burn.name";
+        public const string STATUS_DEFEND_DESC = "status.defend.desc";
+        public const string STATUS_DEFEND_NAME = "status.defend.name";
         public const string STATUS_HASTE_DESC = "status.haste.desc";
         public const string STATUS_HASTE_NAME = "status.haste.name";
         public const string STATUS_SHIELD_DESC = "status.shield.desc";

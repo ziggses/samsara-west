@@ -12,7 +12,7 @@ namespace SamsaraWest.UI
     /// <remarks>
     /// 数值只增不改：它会进入界面状态机与录屏脚本。
     /// 任务书里的道具与联合技还没有口径，因此不占位（同 <see cref="BattleActionKind"/> 的注释）；
-    /// 防御同样没有内核指令，界面上也就不给按钮——宁可少一个按钮，也不做一个点了没反应的。
+    /// 防御已经拍板并落进内核（<see cref="BattleSession.TryDefend"/>），因此有按钮。
     /// </remarks>
     public enum BattleCommandId
     {
@@ -24,6 +24,9 @@ namespace SamsaraWest.UI
 
         /// <summary>主动结束回合，放弃剩余行动。</summary>
         EndTurn = 2,
+
+        /// <summary>防御，给自己挂上减伤状态（主行动）。</summary>
+        Defend = 3,
     }
 
     /// <summary>
@@ -424,6 +427,17 @@ namespace SamsaraWest.UI
             _commands.Add(new BattleCommandOption(
                 BattleCommandId.Flee,
                 SamsaraWest.Localization.LocalizationKeys.UI_BATTLE_COMMAND_FLEE,
+                string.Empty,
+                0,
+                true,
+                BattleCommandRejection.None));
+
+            // 防御摆在技能与逃跑之间：它也是一手「打出去」的主行动，
+            // 而逃跑与结束回合是「不打」的那两个，排在后面。
+            // 它永远可用（不吃灵力、不进冷却），内核只在相位不对时才拒。
+            _commands.Add(new BattleCommandOption(
+                BattleCommandId.Defend,
+                SamsaraWest.Localization.LocalizationKeys.UI_BATTLE_COMMAND_DEFEND,
                 string.Empty,
                 0,
                 true,

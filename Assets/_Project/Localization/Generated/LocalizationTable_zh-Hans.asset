@@ -486,6 +486,10 @@ MonoBehaviour:
     _text: "\u6BCF\u56DE\u5408\u635F\u5931\u751F\u547D\uFF0C\u53EF\u53E0\u52A0\u5C42\u6570\u3002"
   - _key: status.burn.name
     _text: "\u707C\u70E7"
+  - _key: status.defend.desc
+    _text: "\u67B6\u4F4F\u6765\u62DB\uFF1A\u53D7\u5230\u7684\u4F24\u5BB3\u51CF\u534A\u3002"
+  - _key: status.defend.name
+    _text: "\u5B88\u52BF"
   - _key: status.haste.desc
     _text: "\u901F\u5EA6\u63D0\u5347\u4E09\u6210\u3002"
   - _key: status.haste.name
