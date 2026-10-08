@@ -232,6 +232,75 @@ namespace SamsaraWest.Tests.EditMode
             return item;
         }
 
+        /// <summary>
+        /// 造一件装备。
+        /// </summary>
+        /// <remarks>
+        /// <c>requiredLevel</c> 默认给 1 而不是数据表里常见的 5：角色目前没有等级来源，
+        /// 等级校验无处可施（见 <c>CharacterStatsResolver</c> 的口径说明）。想钉住「等级暂不参与校验」的用例，
+        /// 显式传一个大数，让它在等级系统落地那天立刻变红。
+        /// </remarks>
+        internal EquipmentDefinition Equipment(
+            string id,
+            EquipmentSlot slot = EquipmentSlot.Weapon,
+            int attackBonus = 0,
+            int defenseBonus = 0,
+            int speedBonus = 0,
+            int healthBonus = 0,
+            int spiritBonus = 0,
+            int breakDamageBonus = 0,
+            int requiredLevel = 1,
+            params string[] allowedCharacterIds)
+        {
+            var equipment = New<EquipmentDefinition>(id, "eqp");
+            Set(equipment, "_slot", slot);
+            Set(equipment, "_tier", RarityTier.Common);
+            Set(equipment, "_attackBonus", attackBonus);
+            Set(equipment, "_defenseBonus", defenseBonus);
+            Set(equipment, "_speedBonus", speedBonus);
+            Set(equipment, "_healthBonus", healthBonus);
+            Set(equipment, "_spiritBonus", spiritBonus);
+            Set(equipment, "_element", FiveElement.None);
+            Set(equipment, "_resistElement", FiveElement.None);
+            Set(equipment, "_breakDamageBonus", breakDamageBonus);
+            Set(equipment, "_passiveSkillId", null);
+            Set(equipment, "_requiredLevel", requiredLevel);
+            Set(equipment, "_price", 0);
+            Set(equipment, "_forgeRecipeId", null);
+            Set(equipment, "_spriteKey", null);
+            Set(equipment, "_allowedCharacterIds", allowedCharacterIds ?? Array.Empty<string>());
+            return equipment;
+        }
+
+        /// <summary>造一本经文。占用「经文」栏位，数值同样按加算进有效属性。</summary>
+        internal SutraDefinition Sutra(
+            string id,
+            int attackBonus = 0,
+            int defenseBonus = 0,
+            int healthBonus = 0,
+            int spiritBonus = 0,
+            int breakThresholdBonus = 0,
+            int spiritRegenPerTurn = 0,
+            int healthCostPerTurn = 0)
+        {
+            var sutra = New<SutraDefinition>(id, "sut");
+            Set(sutra, "_tier", RarityTier.Common);
+            Set(sutra, "_mantraTypeKey", KeyPrefix + "sut.mind");
+            Set(sutra, "_attackBonus", attackBonus);
+            Set(sutra, "_defenseBonus", defenseBonus);
+            Set(sutra, "_healthBonus", healthBonus);
+            Set(sutra, "_spiritBonus", spiritBonus);
+            Set(sutra, "_breakThresholdBonus", breakThresholdBonus);
+            Set(sutra, "_spiritRegenPerTurn", spiritRegenPerTurn);
+            Set(sutra, "_element", FiveElement.None);
+            Set(sutra, "_passiveSkillId", null);
+            Set(sutra, "_requiredLevel", 1);
+            Set(sutra, "_price", 0);
+            Set(sutra, "_healthCostPerTurn", healthCostPerTurn);
+            Set(sutra, "_spriteKey", null);
+            return sutra;
+        }
+
         /// <summary>把已登记的定义装进数据目录，返回运行期查询入口。</summary>
         internal IDefinitionRegistry Registry()
         {

@@ -41,7 +41,8 @@ namespace SamsaraWest.Battle
             bool isBoss = false,
             string backgroundKey = null,
             string bgmKey = null,
-            IBattleInventory inventory = null)
+            IBattleInventory inventory = null,
+            IBattleLoadout loadout = null)
         {
             EncounterId = encounterId;
             Party = party ?? Array.Empty<BattleUnitBlueprint>();
@@ -50,6 +51,7 @@ namespace SamsaraWest.Battle
             BackgroundKey = backgroundKey;
             BgmKey = bgmKey;
             Inventory = inventory;
+            Loadout = loadout;
         }
 
         /// <summary>遭遇 ID，来自 <c>ENC_CH01_001</c> 这类既有约定。手工构造时可以为空。</summary>
@@ -76,6 +78,16 @@ namespace SamsaraWest.Battle
         /// 所以这里持的是 <see cref="IBattleInventory"/> 本身，不是一份拷贝。
         /// </remarks>
         public IBattleInventory Inventory { get; }
+
+        /// <summary>
+        /// 开战时每个成员身上带了什么装备与经文。为 null 表示「这一战按裸装打」——
+        /// 所有成员的数值都取 <see cref="CharacterDefinition"/> 的基础值。
+        /// </summary>
+        /// <remarks>
+        /// 装备加成在<b>建单位那一刻</b>就并进 <see cref="BattleUnit"/> 的生命／灵力／攻／防／速／护体
+        /// （口径见 <see cref="CharacterStatsResolver"/>），之后换装不会回头改动进行中的战斗。
+        /// </remarks>
+        public IBattleLoadout Loadout { get; }
 
         /// <summary>
         /// 入场清单自检。不合法时返回 false 并把原因写进 <paramref name="error"/>，
@@ -165,10 +177,15 @@ namespace SamsaraWest.Battle
         /// 这一战能吃到哪些道具。省略表示「这场没有道具可用」。
         /// 正式流程会传存档背包；诊断层传一个现搭的 <see cref="BattleInventory"/>。
         /// </param>
+        /// <param name="loadout">
+        /// 我方成员的在身装备与经文。省略表示「按裸装打」。
+        /// 正式流程会传存档的 <c>EquipmentAssignment</c>；诊断层传一个现搭的 <see cref="BattleLoadout"/>。
+        /// </param>
         public static BattleSetup FromEncounter(
             EncounterDefinition encounter,
             IReadOnlyList<string> partyCharacterIds,
-            IBattleInventory inventory = null)
+            IBattleInventory inventory = null,
+            IBattleLoadout loadout = null)
         {
             if (encounter == null)
             {
@@ -210,7 +227,8 @@ namespace SamsaraWest.Battle
                 encounter.IsBoss,
                 encounter.BackgroundKey,
                 encounter.BgmKey,
-                inventory);
+                inventory,
+                loadout);
         }
 
         /// <summary>
@@ -243,12 +261,17 @@ namespace SamsaraWest.Battle
         /// <summary>
         /// 按定义造一个运行期单位。定义缺失或类型对不上时返回 null 并记错误日志。
         /// </summary>
+        /// <param name="loadout">
+        /// 我方成员的在身装备与经文，省略表示裸装。只对角色生效——敌人不穿装备，
+        /// 因此敌方阵容传不传它都一样。
+        /// </param>
         public static BattleUnit CreateUnit(
             IDefinitionRegistry registry,
             BattleSide side,
             int runtimeId,
             int formationIndex,
-            in BattleUnitBlueprint blueprint)
+            in BattleUnitBlueprint blueprint,
+            IBattleLoadout loadout = null)
         {
             if (registry == null)
             {
@@ -267,6 +290,9 @@ namespace SamsaraWest.Battle
             switch (definition)
             {
                 case CharacterDefinition character:
+
+                    // 装备与经文的加成在建单位这一刻并进数值（进场快照），之后战斗只看单位自身的数。
+                    var stats = ResolveCharacterStats(registry, character, loadout);
                     return new BattleUnit(
                         runtimeId,
                         side,
@@ -275,13 +301,13 @@ namespace SamsaraWest.Battle
                         character.Id,
                         character.DisplayNameKey,
                         character.Kind,
-                        character.MaxHealth,
-                        character.MaxSpirit,
-                        character.Attack,
-                        character.Defense,
-                        character.Speed,
+                        stats.MaxHealth,
+                        stats.MaxSpirit,
+                        stats.Attack,
+                        stats.Defense,
+                        stats.Speed,
                         character.Element,
-                        character.BreakThreshold,
+                        stats.BreakThreshold,
                         character.StartingSkillIds,
                         isBoss: false);
 
@@ -311,6 +337,44 @@ namespace SamsaraWest.Battle
                         blueprint.DefinitionId);
                     return null;
             }
+        }
+
+        /// <summary>
+        /// 按在身清单算这名成员的有效数值；没穿东西时直接返回基础值，连报告都不建。
+        /// </summary>
+        /// <remarks>
+        /// 聚合结论在开战这一刻就定型，所以每一条都记进日志：装备配错、限定角色不符、定义缺失
+        /// 都是<b>数据问题</b>，应该在开战时暴露出来，而不是让玩家看到一个少了几点攻击的隐身数值。
+        /// 单件坏数据只跳过那一件，战斗照样打得下去——不让一处配置错误变成打不开的战斗。
+        /// </remarks>
+        private static CharacterStatsSnapshot ResolveCharacterStats(
+            IDefinitionRegistry registry,
+            CharacterDefinition character,
+            IBattleLoadout loadout)
+        {
+            var entries = loadout?.LoadoutOf(character.Id);
+            if (entries == null || entries.Count == 0)
+            {
+                return CharacterStatsResolver.BaseOf(character);
+            }
+
+            var report = new ValidationReport();
+            var stats = CharacterStatsResolver.Resolve(character, entries, registry, report);
+            for (var i = 0; i < report.Issues.Count; i++)
+            {
+                var issue = report.Issues[i];
+                var message = $"成员 {character.Id} 的在身装备：{issue.Message}";
+                if (issue.Severity == ValidationSeverity.Error)
+                {
+                    GameLog.Error(LogChannel.Battle, message, character.Id);
+                }
+                else
+                {
+                    GameLog.Warn(LogChannel.Battle, message, character.Id);
+                }
+            }
+
+            return stats;
         }
     }
 }

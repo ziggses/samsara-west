@@ -1026,7 +1026,8 @@ namespace SamsaraWest.Battle
                 // 行动值同值时靠布阵序号破平局，于是同速时我方先动，
                 // 与 Docs/战斗数值-v1.md 里那一串校算顺序一致。
                 var runtimeId = _units.Count;
-                var unit = BattleFactory.CreateUnit(_registry, side, runtimeId, runtimeId, blueprints[i]);
+                // 在身装备只作用于我方成员；敌方没穿装备，传进去也无件可查。
+                var unit = BattleFactory.CreateUnit(_registry, side, runtimeId, runtimeId, blueprints[i], _setup.Loadout);
                 if (unit == null)
                 {
                     continue;
