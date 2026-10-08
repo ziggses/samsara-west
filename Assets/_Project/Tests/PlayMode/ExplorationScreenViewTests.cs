@@ -346,7 +346,12 @@ namespace SamsaraWest.Tests.PlayMode
             var pending = session.PendingEncounterId;
             StringAssert.Contains(pending, screen.StatusLine, "遭遇挂着了就得报出来，藏着一个未了结的遭遇最让人困惑。");
 
-            Assert.IsFalse(screen.Step(MoveDirection.South), "遭遇没了结之前不该还能走。");
+            // 往回走一步：那一格刚刚站过，必定是能走的空地。
+            // 方向不能写死——遭遇在哪一步掷中取决于运行期种子（引导场景的 _masterSeed 是 0），
+            // 走到 (0,0) 时朝南的一步落在图外，拒绝理由就变成了越界，这条用例会时红时绿。
+            var back = session.Position.Y == 0 ? MoveDirection.North : MoveDirection.South;
+
+            Assert.IsFalse(screen.Step(back), "遭遇没了结之前不该还能走。");
             Assert.AreEqual(MoveRejection.EncounterPending, screen.LastMove.Value.Rejection);
             Assert.AreEqual(
                 localization.Format(LocalizationKeys.UI_EXPLORE_ENCOUNTER_PENDING, pending),
@@ -357,7 +362,7 @@ namespace SamsaraWest.Tests.PlayMode
 
             session.ResolveEncounter();
 
-            Assert.IsTrue(screen.Step(MoveDirection.South), "了结之后必须能立刻继续走。");
+            Assert.IsTrue(screen.Step(back), "了结之后必须能立刻继续走。");
             Assert.AreEqual(MoveRejection.None, screen.LastMove.Value.Rejection);
             Assert.AreEqual(0, localization.MissingKeys.Count);
         }

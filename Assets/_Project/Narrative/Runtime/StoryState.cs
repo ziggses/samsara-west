@@ -33,12 +33,26 @@ namespace SamsaraWest.Narrative
 
         /// <summary>给心念某一轴累加一个增量（可正可负）。增量为 0 时什么都不做。</summary>
         void AdjustKarma(KarmaAxis axis, int delta);
+
+        /// <summary>已写下的状态键快照（值为 0 的键不在其中）。存档接线读它。</summary>
+        IReadOnlyDictionary<string, int> Values { get; }
+
+        /// <summary>
+        /// 用一份快照整体替换账本（读档用）：清空既有键、按快照重建、心念三轴按传入值设定。
+        /// </summary>
+        /// <remarks>
+        /// 为什么是「整本替换」而不是逐个 <see cref="SetValue"/>：读档要的是「换成另一份状态」，
+        /// 在当前状态上叠加会把上一局的残留键留下——那种残留只有在玩家读档后才会被发现。
+        /// 来自快照的坏键与 <c>karma.*</c> 键照旧进不来（记日志并跳过），心念只从三个参数来。
+        /// 整本换掉发一条 <see cref="StoryStateRestoredEvent"/>，订阅方据此重建一次。
+        /// </remarks>
+        void Restore(IReadOnlyDictionary<string, int> values, int compassion, int truth, int freedom);
     }
 
     /// <inheritdoc cref="IStoryState" />
     /// <remarks>
-    /// 全部状态都在内存里，<b>本轮不进存档</b>：与 <c>Battle</c> 的服务同一种期别——
-    /// 骨架期先把「谁能写、谁能读、变了怎么通知」这套机制钉住，存档接线是下一步。
+    /// 全部状态都在内存里，进出存档靠 <c>Flow/SaveCoordinator</c> 搬运（ADR-025）：
+    /// 组合根采集 <see cref="Values"/> 与心念，读档时用 <see cref="Restore"/> 整本换回来。
     /// 键的取值不做上下界夹取（心念可正可负，数据层也没有上下界），这是有意的：
     /// 先如实记录，等结局判定的口径拍板后再决定要不要夹。
     /// </remarks>
@@ -151,6 +165,51 @@ namespace SamsaraWest.Narrative
             _karma[index] = current;
 
             Publish(new StoryKarmaChangedEvent(axis.ChannelKey(), previous, current));
+        }
+
+        public void Restore(IReadOnlyDictionary<string, int> values, int compassion, int truth, int freedom)
+        {
+            _values.Clear();
+
+            var restored = 0;
+            if (values != null)
+            {
+                foreach (var pair in values)
+                {
+                    if (!IdRules.IsValidStateKey(pair.Key))
+                    {
+                        GameLog.Error(
+                            LogChannel.Narrative,
+                            $"存档里的剧情状态键 '{pair.Key}' 不符合命名规则，已跳过。",
+                            pair.Key);
+                        continue;
+                    }
+
+                    if (KarmaAxes.TryParseChannel(pair.Key, out _))
+                    {
+                        GameLog.Warn(
+                            LogChannel.Narrative,
+                            $"存档里的 '{pair.Key}' 是心念轴，已跳过；心念从存档的三个轴字段恢复。",
+                            pair.Key);
+                        continue;
+                    }
+
+                    if (pair.Value == 0)
+                    {
+                        // 与快照口径一致：值为 0 的键等于没写过，不在账本里留空记录。
+                        continue;
+                    }
+
+                    _values[pair.Key] = pair.Value;
+                    restored++;
+                }
+            }
+
+            _karma[(int)KarmaAxis.Compassion] = compassion;
+            _karma[(int)KarmaAxis.Truth] = truth;
+            _karma[(int)KarmaAxis.Freedom] = freedom;
+
+            Publish(new StoryStateRestoredEvent(restored, compassion, truth, freedom));
         }
 
         private void Publish<T>(T gameEvent) where T : IGameEvent =>

@@ -52,4 +52,33 @@ namespace SamsaraWest.Narrative
 
         public int CurrentValue { get; }
     }
+
+    /// <summary>
+    /// 整本账被换掉了（读档，见 <see cref="IStoryState.Restore"/>）。
+    /// </summary>
+    /// <remarks>
+    /// <see cref="StoryStateChangedEvent"/> 说的是「一个键变了」，这条说的是「整本换了一份」。
+    /// 为什么不逐键发：读档会一次换掉几百个键，逐键发会让每个订阅方各跑几百遍，
+    /// 而它们要做的其实是同一件事——按新账重建一次。载荷只够报出「换成了什么规模」，
+    /// 想细看就该去读账本，而不是从事件里拼一份影子账。
+    /// </remarks>
+    public readonly struct StoryStateRestoredEvent : IGameEvent
+    {
+        public StoryStateRestoredEvent(int flagCount, int compassion, int truth, int freedom)
+        {
+            FlagCount = flagCount;
+            Compassion = compassion;
+            Truth = truth;
+            Freedom = freedom;
+        }
+
+        /// <summary>换进来多少个非 0 的状态键。单看它就能区分「读了一份空档」与「读了一份真档」。</summary>
+        public int FlagCount { get; }
+
+        public int Compassion { get; }
+
+        public int Truth { get; }
+
+        public int Freedom { get; }
+    }
 }

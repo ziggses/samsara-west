@@ -14,8 +14,9 @@ namespace SamsaraWest.Flow
     /// 账本换了值，探索自己<b>收不到</b>那条事件——它不许认识 <c>Narrative</c>。
     /// 于是这条订阅落在组合根：Flow 两边都认识，像 <c>ExplorationBattleLink</c> 一样做那条唯一同时看得见两端的线。
     ///
-    /// 两条事件都要听：交互物的条件键平时是 <c>flag.*</c>，但键的格式规则允许 <c>karma.*</c>
-    /// （「慈悲 ≥ 30 才开的门」），所以心念变化同样要重建。
+    /// 三条事件都要听：交互物的条件键平时是 <c>flag.*</c>，但键的格式规则允许 <c>karma.*</c>
+    /// （「慈悲 ≥ 30 才开的门」），所以心念变化同样要重建；读档那一下是<b>整本换掉</b>，
+    /// 逐键发不现实（一次几百条），所以账本另发一条「整本换掉了」。
     ///
     /// 不在图上时什么都不做：账本可以在进图前就被改（对话发生在哪都行），
     /// 而进图那一刻 <c>ExplorationService.EnterMap</c> 本来就会按当前账本建格，不必在这里补。
@@ -49,6 +50,9 @@ namespace SamsaraWest.Flow
             _subscriptions.Add(bus.Subscribe<StoryKarmaChangedEvent>(
                 NarrativeEventChannel.Channel,
                 OnKarmaChanged));
+            _subscriptions.Add(bus.Subscribe<StoryStateRestoredEvent>(
+                NarrativeEventChannel.Channel,
+                OnStateRestored));
         }
 
         /// <summary>因状态变化而重建过几次可行格。诊断与测试用。</summary>
@@ -65,9 +69,12 @@ namespace SamsaraWest.Flow
             _subscriptions.Dispose();
         }
 
-        private void OnStateChanged(StoryStateChangedEvent gameEvent) => Refresh(gameEvent.StateKey);
+        private void OnStateChanged(StoryStateChangedEvent gameEvent) => Refresh($"{gameEvent.StateKey} 变化");
 
-        private void OnKarmaChanged(StoryKarmaChangedEvent gameEvent) => Refresh(gameEvent.KarmaChannel);
+        private void OnKarmaChanged(StoryKarmaChangedEvent gameEvent) => Refresh($"{gameEvent.KarmaChannel} 变化");
+
+        private void OnStateRestored(StoryStateRestoredEvent gameEvent) =>
+            Refresh($"整本换掉（{gameEvent.FlagCount} 个键）");
 
         private void Refresh(string cause)
         {
@@ -83,7 +90,7 @@ namespace SamsaraWest.Flow
 
             GameLog.Info(
                 LogChannel.Flow,
-                $"剧情状态 {cause} 变化，已重建地图 {session.MapId} 的可行格（可见交互物 {session.Grid.VisibleInteractables.Count} 个）。",
+                $"剧情状态 {cause}，已重建地图 {session.MapId} 的可行格（可见交互物 {session.Grid.VisibleInteractables.Count} 个）。",
                 session.MapId);
         }
     }

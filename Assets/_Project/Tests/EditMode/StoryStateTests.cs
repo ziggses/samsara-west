@@ -21,12 +21,14 @@ namespace SamsaraWest.Tests.EditMode
         private StoryState _state;
         private readonly List<StoryStateChangedEvent> _changes = new List<StoryStateChangedEvent>();
         private readonly List<StoryKarmaChangedEvent> _karmaChanges = new List<StoryKarmaChangedEvent>();
+        private readonly List<StoryStateRestoredEvent> _restores = new List<StoryStateRestoredEvent>();
 
         [SetUp]
         public void SetUp()
         {
             _changes.Clear();
             _karmaChanges.Clear();
+            _restores.Clear();
 
             _bus = new EventBus();
             _registry = new ServiceRegistry();
@@ -38,6 +40,7 @@ namespace SamsaraWest.Tests.EditMode
 
             _bus.Subscribe<StoryStateChangedEvent>(NarrativeEventChannel.Channel, _changes.Add);
             _bus.Subscribe<StoryKarmaChangedEvent>(NarrativeEventChannel.Channel, _karmaChanges.Add);
+            _bus.Subscribe<StoryStateRestoredEvent>(NarrativeEventChannel.Channel, _restores.Add);
         }
 
         [Test]
@@ -156,6 +159,95 @@ namespace SamsaraWest.Tests.EditMode
 
             Assert.AreEqual(2, _state.Values.Count);
             Assert.AreEqual(1, _state.Values[FlagKey]);
+        }
+
+        [Test]
+        public void Restore_ReplacesWholeLedger()
+        {
+            _state.SetValue(FlagKey, 1);
+            _state.SetValue("flag.ch01.stale", 1);
+
+            _state.Restore(new Dictionary<string, int> { { "flag.ch01.fresh", 2 } }, 1, 2, 3);
+
+            Assert.AreEqual(1, _state.Count, "整本替换：上一局的键不该跟着过来。");
+            Assert.AreEqual(0, _state.GetValue(FlagKey), "上一局写过的键必须没了，否则读档会留下没人查得出的残留。");
+            Assert.AreEqual(2, _state.GetValue("flag.ch01.fresh"));
+        }
+
+        [Test]
+        public void Restore_SetsKarmaFromArguments()
+        {
+            _state.AdjustKarma(KarmaAxis.Compassion, 7);
+
+            _state.Restore(null, 3, -1, 0);
+
+            Assert.AreEqual(3, _state.GetKarma(KarmaAxis.Compassion), "读档是恢复一份值，不是在当前值上累加。");
+            Assert.AreEqual(-1, _state.GetKarma(KarmaAxis.Truth), "心念可正可负，负数也要如实恢复。");
+            Assert.AreEqual(0, _state.GetKarma(KarmaAxis.Freedom));
+        }
+
+        [Test]
+        public void Restore_SkipsInvalidAndKarmaKeys()
+        {
+            _state.Restore(
+                new Dictionary<string, int>
+                {
+                    { "not_a_key", 5 },
+                    { KarmaAxes.TruthChannel, 9 },
+                    { "flag.ch01.ok", 1 },
+                },
+                0,
+                0,
+                0);
+
+            Assert.AreEqual(1, _state.Count, "只有合法、且不是心念轴的键进得来。");
+            Assert.AreEqual(1, _state.GetValue("flag.ch01.ok"));
+            Assert.AreEqual(0, _state.GetKarma(KarmaAxis.Truth), "存档里的 karma.* 键不该盖过三个轴字段。");
+        }
+
+        [Test]
+        public void Restore_SkipsZeroValues()
+        {
+            _state.Restore(new Dictionary<string, int> { { FlagKey, 0 } }, 0, 0, 0);
+
+            Assert.AreEqual(0, _state.Count, "值为 0 等于没写过，与快照口径一致。");
+        }
+
+        [Test]
+        public void Restore_NullValues_EmptiesLedger()
+        {
+            _state.SetValue(FlagKey, 1);
+
+            _state.Restore(null, 0, 0, 0);
+
+            Assert.AreEqual(0, _state.Count, "空快照也是一份快照：把账清空，而不是什么都不做。");
+            Assert.AreEqual(1, _restores.Count);
+            Assert.AreEqual(0, _restores[0].FlagCount);
+        }
+
+        [Test]
+        public void Restore_AnnouncesOnceWithCount()
+        {
+            _state.SetValue("flag.ch01.previous", 1);
+
+            // 铺场那一笔自己会发一条 changed 事件，基线先把它排除：
+            // 这条用例要证的是「Restore 不逐键发」，不是「铺场不发」。
+            var changesFromSeeding = _changes.Count;
+
+            _state.Restore(
+                new Dictionary<string, int> { { FlagKey, 1 }, { "flag.ch01.second", 2 } },
+                4,
+                5,
+                6);
+
+            Assert.AreEqual(1, _restores.Count, "整本换掉该只发一条事件，而不是每个键一条。");
+            Assert.AreEqual(2, _restores[0].FlagCount);
+            Assert.AreEqual(4, _restores[0].Compassion);
+            Assert.AreEqual(5, _restores[0].Truth);
+            Assert.AreEqual(6, _restores[0].Freedom);
+
+            Assert.AreEqual(changesFromSeeding, _changes.Count, "整本替换不逐键发 StoryStateChangedEvent。");
+            Assert.AreEqual(0, _karmaChanges.Count, "心念也不逐轴发：订阅方看这一条就够了。");
         }
     }
 }

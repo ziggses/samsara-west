@@ -49,6 +49,12 @@ namespace SamsaraWest.Flow
         /// <summary>「走到一扇门 → 换一张图」的接线；同样在 <see cref="OnDestroy"/> 里释放。</summary>
         private MapChangeLink _mapChangeLink;
 
+        /// <summary>「一次性交互物用过了 → 记进剧情账本」的接线；同样在 <see cref="OnDestroy"/> 里释放。</summary>
+        private InteractionFlagLink _interactionFlagLink;
+
+        /// <summary>「战斗结局 → 记进剧情账本」的接线；同样在 <see cref="OnDestroy"/> 里释放。</summary>
+        private BattleStoryLink _battleStoryLink;
+
         /// <summary>已完成的引导次数。PlayMode 测试用它证明「第二次启动没有重复安装」。</summary>
         public static int BootstrapCount { get; private set; }
 
@@ -72,6 +78,12 @@ namespace SamsaraWest.Flow
 
         /// <summary>「走到一扇门 → 换一张图」的接线。同样装在引导末尾。</summary>
         public MapChangeLink MapChange => _mapChangeLink;
+
+        /// <summary>「一次性交互物用过了 → 记进剧情账本」的接线。同样装在引导末尾。</summary>
+        public InteractionFlagLink InteractionFlags => _interactionFlagLink;
+
+        /// <summary>「战斗结局 → 记进剧情账本」的接线。同样装在引导末尾。</summary>
+        public BattleStoryLink BattleStory => _battleStoryLink;
 
         /// <summary>其它模块安装自身服务的挂载点。</summary>
         public event Action<IServiceRegistry> ModuleInstalled;
@@ -111,6 +123,18 @@ namespace SamsaraWest.Flow
             {
                 _narrativeStateLink.Dispose();
                 _narrativeStateLink = null;
+            }
+
+            if (_interactionFlagLink != null)
+            {
+                _interactionFlagLink.Dispose();
+                _interactionFlagLink = null;
+            }
+
+            if (_battleStoryLink != null)
+            {
+                _battleStoryLink.Dispose();
+                _battleStoryLink = null;
             }
 
             if (_explorationBattleLink != null)
@@ -193,6 +217,16 @@ namespace SamsaraWest.Flow
 
                 ModuleInstalled?.Invoke(registry);
 
+                // 存档搬运的实现在这里，接口在 Save（ISaveCoordinator）：搬运要同时认识探索（位置）、
+                // 剧情（账本）与随机（母种子），而 Save 只依赖 Core，装不下这段逻辑（ADR-025）。
+                // 界面按接口从注册表拿它，所以它必须注册；但它不是模块——注册它的不是模块安装器。
+                registry.Register<ISaveCoordinator>(new SaveCoordinator(
+                    registry.Resolve<ISaveService>(),
+                    registry.Resolve<Narrative.IStoryState>(),
+                    registry.Resolve<Exploration.IExplorationService>(),
+                    registry.Resolve<IDefinitionRegistry>(),
+                    registry.Resolve<IRandomService>()));
+
                 // 接线最后装：它要同时拿到探索与战斗两个服务。
                 // 它不是一个模块（没有服务要注册），所以不计进 InstalledModules —— 那份清单只说「装上了哪些服务」。
                 _explorationBattleLink = new ExplorationBattleLink(
@@ -212,6 +246,20 @@ namespace SamsaraWest.Flow
                     registry.Resolve<IEventBus>(),
                     registry.Resolve<IDefinitionRegistry>(),
                     registry.Resolve<Exploration.IExplorationService>());
+
+                // 交互记账线：一次性交互物用过了就记进账本，从此跨地图、进存档都认得它。
+                // 它只写不读（读那一侧是探索自己往账本上问），所以不需要拿探索服务。
+                _interactionFlagLink = new InteractionFlagLink(
+                    registry.Resolve<IEventBus>(),
+                    registry.Resolve<Narrative.IStoryState>());
+
+                // 战果回写线：打完一场就把结局记进账本（flag.battle.<遭遇>.won / lost / fled / retreated），
+                // 内容侧据此显隐交互物与分支剧情。它同样只写不读，所以不必拿战斗或探索服务；
+                // 归因靠事件自带的遭遇 ID（ADR-026 给 BattleEndedEvent 补了它）。
+                // 这里刻意不丢战斗会话：那要等「进入下一段剧情」，而它还不存在。
+                _battleStoryLink = new BattleStoryLink(
+                    registry.Resolve<IEventBus>(),
+                    registry.Resolve<Narrative.IStoryState>());
             }
             catch (Exception exception)
             {

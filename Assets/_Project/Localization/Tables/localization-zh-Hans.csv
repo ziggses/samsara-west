@@ -352,3 +352,11 @@ ui.explore.interact.already_used,已经用过了。,交互被拒：一次性交�
 ui.explore.interact.triggered,触发了 {0}。,交互成功。{0} 交互物名字
 ui.explore.interact.map_change,前往 {0}。,交互要求换图。{0} 目标地图 ID
 ui.explore.grid.legend,@ 自己  * 面朝  # 交互物  . 空地,探索界面格子图例
+ui.save.title,存档,存档界面标题
+ui.save.view.hint,诊断用存档面板：F5 保存到槽位 1，F9 从槽位 1 读取，F3 收起。,存档界面诊断层提示
+ui.save.status.empty,槽位 {0}：还没有存档。,存档界面：槽位空
+ui.save.status.present,槽位 {0}：有存档，按 F9 读取。,存档界面：槽位上有存档
+ui.save.status.saved,槽位 {0}：已保存。,存档界面：保存成功
+ui.save.status.loaded,槽位 {0}：已读档。,存档界面：读档成功
+ui.save.status.failed,槽位 {0}：失败，细节在日志里。,存档界面：存档或读档失败
+ui.save.status.unavailable,存档服务还没就绪。,存档界面：服务未就绪

@@ -199,6 +199,9 @@ namespace SamsaraWest.Tests.EditMode
                 "UI 不得依赖 Flow：组合根是装配者，界面反向指挥流程会把启动顺序焊死。");
             Assert.IsTrue(references.Contains("SamsaraWest.Battle"), "战斗界面要读战斗服务。");
             Assert.IsTrue(references.Contains("SamsaraWest.Exploration"), "探索界面要读探索会话（ADR-022）。");
+            Assert.IsTrue(
+                references.Contains("SamsaraWest.Save"),
+                "存档面板要读存档搬运接口（ADR-025）：界面能存能读，但认的是接口，不是组合根。");
         }
 
         [Test]

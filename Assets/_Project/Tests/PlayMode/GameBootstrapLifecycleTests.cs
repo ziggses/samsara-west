@@ -94,6 +94,12 @@ namespace SamsaraWest.Tests.PlayMode
             Assert.IsNotNull(
                 bootstrap.MapChange,
                 "换图接线也要装在引导末尾：探索只会发出换图请求，没人接的话首章走到门口也出不去。");
+            Assert.IsNotNull(
+                bootstrap.InteractionFlags,
+                "交互记账线也要装在引导末尾：一次性交互物只会发事件，没人接的话「开过的箱子」永远记不下来。");
+            Assert.IsNotNull(
+                registry.Resolve<ISaveCoordinator>(),
+                "存档搬运必须注册进注册表：界面按接口取它，取不到就没有任何东西能把一局收成一份档。");
 
             var storyState = registry.Resolve<Narrative.IStoryState>();
             Assert.IsNotNull(storyState, "剧情状态账必须在引导期就位，否则条件类交互物永远隐藏。");

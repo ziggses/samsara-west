@@ -1451,7 +1451,7 @@ namespace SamsaraWest.Battle
         private void EndBattle(BattleOutcome outcome)
         {
             Outcome = outcome;
-            Publish(new BattleEndedEvent(outcome, RoundNumber, ActionCount));
+            Publish(new BattleEndedEvent(_setup.EncounterId, outcome, RoundNumber, ActionCount));
             GameLog.Info(
                 LogChannel.Battle,
                 $"战斗结束：{outcome}，第 {RoundNumber} 回合、累计 {ActionCount} 手。",

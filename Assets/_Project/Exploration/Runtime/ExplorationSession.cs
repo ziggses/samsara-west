@@ -104,8 +104,35 @@ namespace SamsaraWest.Exploration
         public GridPosition FacingPosition => MoveDirections.Step(Position, Facing);
 
         /// <summary>这条一次性交互物是不是已经用过了。</summary>
-        public bool HasUsed(string interactableId) =>
-            !string.IsNullOrEmpty(interactableId) && _used.Contains(interactableId);
+        /// <remarks>
+        /// 两个来源：本次会话记下的（<c>_used</c>），与剧情账本里的
+        /// <see cref="InteractableFlags"/> 记录。账本那一份跨会话、跨地图、进存档——
+        /// 没有它，开过的箱子出镇再回来就会复活。
+        ///
+        /// 账本说用过就把 ID 并进 <c>_used</c>：同一条交互物在一次会话里只问账本一次，
+        /// 没有账本时（<see cref="MissingExplorationStateSource"/> 每个键只警告一次）也不会反复刷日志。
+        /// 没有账本时读回 0，行为与从前一致：一次性只在本次进图内有效。
+        /// </remarks>
+        public bool HasUsed(string interactableId)
+        {
+            if (string.IsNullOrEmpty(interactableId))
+            {
+                return false;
+            }
+
+            if (_used.Contains(interactableId))
+            {
+                return true;
+            }
+
+            if (_state == null || _state.GetValue(InteractableFlags.KeyOf(interactableId)) == 0)
+            {
+                return false;
+            }
+
+            _used.Add(interactableId);
+            return true;
+        }
 
         /// <summary>
         /// 朝某方向走一格。

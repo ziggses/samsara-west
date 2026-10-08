@@ -683,6 +683,23 @@ MonoBehaviour:
     _text: "\u5F53\u524D\u4EFB\u52A1"
   - _key: ui.save.slot
     _text: "\u5B58\u6863\u4F4D {0}"
+  - _key: ui.save.status.empty
+    _text: "\u69FD\u4F4D {0}\uFF1A\u8FD8\u6CA1\u6709\u5B58\u6863\u3002"
+  - _key: ui.save.status.failed
+    _text: "\u69FD\u4F4D {0}\uFF1A\u5931\u8D25\uFF0C\u7EC6\u8282\u5728\u65E5\u5FD7\u91CC\u3002"
+  - _key: ui.save.status.loaded
+    _text: "\u69FD\u4F4D {0}\uFF1A\u5DF2\u8BFB\u6863\u3002"
+  - _key: ui.save.status.present
+    _text: "\u69FD\u4F4D {0}\uFF1A\u6709\u5B58\u6863\uFF0C\u6309 F9 \u8BFB\u53D6\u3002"
+  - _key: ui.save.status.saved
+    _text: "\u69FD\u4F4D {0}\uFF1A\u5DF2\u4FDD\u5B58\u3002"
+  - _key: ui.save.status.unavailable
+    _text: "\u5B58\u6863\u670D\u52A1\u8FD8\u6CA1\u5C31\u7EEA\u3002"
+  - _key: ui.save.title
+    _text: "\u5B58\u6863"
+  - _key: ui.save.view.hint
+    _text: "\u8BCA\u65AD\u7528\u5B58\u6863\u9762\u677F\uFF1AF5 \u4FDD\u5B58\u5230\u69FD\u4F4D
+      1\uFF0CF9 \u4ECE\u69FD\u4F4D 1 \u8BFB\u53D6\uFF0CF3 \u6536\u8D77\u3002"
   - _key: ui.settings.audio
     _text: "\u97F3\u91CF"
   - _key: ui.shop.buy

@@ -341,6 +341,14 @@ namespace SamsaraWest.Localization
         public const string UI_PROMPT_TALK = "ui.prompt.talk";
         public const string UI_QUEST_TRACKER_TITLE = "ui.quest.tracker.title";
         public const string UI_SAVE_SLOT = "ui.save.slot";
+        public const string UI_SAVE_STATUS_EMPTY = "ui.save.status.empty";
+        public const string UI_SAVE_STATUS_FAILED = "ui.save.status.failed";
+        public const string UI_SAVE_STATUS_LOADED = "ui.save.status.loaded";
+        public const string UI_SAVE_STATUS_PRESENT = "ui.save.status.present";
+        public const string UI_SAVE_STATUS_SAVED = "ui.save.status.saved";
+        public const string UI_SAVE_STATUS_UNAVAILABLE = "ui.save.status.unavailable";
+        public const string UI_SAVE_TITLE = "ui.save.title";
+        public const string UI_SAVE_VIEW_HINT = "ui.save.view.hint";
         public const string UI_SETTINGS_AUDIO = "ui.settings.audio";
         public const string UI_SHOP_BUY = "ui.shop.buy";
         public const string UI_SHOP_SELL = "ui.shop.sell";

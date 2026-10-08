@@ -6,6 +6,7 @@
         "SamsaraWest.Data",
         "SamsaraWest.Battle",
         "SamsaraWest.Exploration",
+        "SamsaraWest.Save",
         "SamsaraWest.Localization",
         "Unity.TextMeshPro"
     ],

@@ -39,12 +39,24 @@ namespace SamsaraWest.Battle
     /// <summary>战斗结束。</summary>
     public readonly struct BattleEndedEvent : IGameEvent
     {
-        public BattleEndedEvent(BattleOutcome outcome, int rounds, int actionCount)
+        public BattleEndedEvent(string encounterId, BattleOutcome outcome, int rounds, int actionCount)
         {
+            EncounterId = encounterId;
             Outcome = outcome;
             Rounds = rounds;
             ActionCount = actionCount;
         }
+
+        /// <summary>
+        /// 是哪一场收的场。与 <see cref="BattleStartedEvent.EncounterId"/> 是同一个值。
+        /// </summary>
+        /// <remarks>
+        /// 开场事件带遭遇 ID、收场事件却不带，是没有道理的：流程侧的战后结算要按遭遇记账
+        /// （<c>flag.battle.&lt;遭遇&gt;.won</c> 这类，见 ADR-026），没有它就只能自己在组合根里
+        /// 记「刚才开的是哪一场」——把内核该搬的事实散出去，且手工构造的战斗（测试、将来的剧情战斗）
+        /// 会归错账。手工构造时它是空的，订阅方据此判断「这场没法归因」。
+        /// </remarks>
+        public string EncounterId { get; }
 
         public BattleOutcome Outcome { get; }
 
