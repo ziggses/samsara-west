@@ -27,6 +27,12 @@ namespace SamsaraWest.UI
 
         /// <summary>防御，给自己挂上减伤状态（主行动）。</summary>
         Defend = 3,
+
+        /// <summary>移动到本方的空格子（不占主行动，每回合一次）。</summary>
+        Move = 4,
+
+        /// <summary>与同阵营同伴换位（不占主行动，每回合一次）。</summary>
+        Swap = 5,
     }
 
     /// <summary>
@@ -210,6 +216,8 @@ namespace SamsaraWest.UI
         private readonly List<BattleUnitRow> _playerRows = new List<BattleUnitRow>(FormationSlot.Capacity);
         private readonly List<BattleUnitRow> _enemyRows = new List<BattleUnitRow>(FormationSlot.Capacity);
         private readonly List<BattleCommandOption> _commands = new List<BattleCommandOption>(8);
+        private readonly List<FormationSlot> _moveCandidates = new List<FormationSlot>(FormationSlot.Capacity);
+        private readonly List<int> _swapCandidates = new List<int>(FormationSlot.Capacity);
         private readonly List<BattleIntentRow> _intentRows = new List<BattleIntentRow>(FormationSlot.Capacity);
         private readonly Dictionary<int, BattleIntentRow> _intentPool = new Dictionary<int, BattleIntentRow>(FormationSlot.Capacity);
 
@@ -253,8 +261,17 @@ namespace SamsaraWest.UI
         /// <summary>场上全部单位行，我方在前。</summary>
         public IReadOnlyList<BattleUnitRow> Rows => _rows;
 
-        /// <summary>当前待行动的我方单位能发起的指令；轮不到我方时为空。</summary>
+        /// <summary>
+        /// 当前待行动的我方单位能发起的指令；轮不到我方时为空。
+        /// 主行动用掉之后仍然非空——那时给的是「移动／换位／结束回合」，不是空列表。
+        /// </summary>
         public IReadOnlyList<BattleCommandOption> Commands => _commands;
+
+        /// <summary>可落脚的格子（本方空格），按阵型序号升序；不能移动时为空。</summary>
+        public IReadOnlyList<FormationSlot> MoveCandidates => _moveCandidates;
+
+        /// <summary>可换位的同伴编号，升序；不能换位时为空。</summary>
+        public IReadOnlyList<int> SwapCandidates => _swapCandidates;
 
         /// <summary>场上敌人的意图预告，只含有意图的那些。</summary>
         public IReadOnlyList<BattleIntentRow> IntentRows => _intentRows;
@@ -282,6 +299,7 @@ namespace SamsaraWest.UI
         {
             RefreshUnits();
             RefreshIntents();
+            RefreshMoveOptions();
             RefreshCommands();
         }
 
@@ -374,6 +392,27 @@ namespace SamsaraWest.UI
             }
         }
 
+        /// <summary>
+        /// 算一遍「能挪到哪、能跟谁换」。
+        /// </summary>
+        /// <remarks>
+        /// 候选一律向内核要（<see cref="BattleSession.CollectMoveDestinations"/> 与
+        /// <see cref="BattleSession.CollectSwapPartners"/>），界面重算一遍就会出现两套判据。
+        /// </remarks>
+        private void RefreshMoveOptions()
+        {
+            _moveCandidates.Clear();
+            _swapCandidates.Clear();
+
+            if (_session.IsFinished || !_session.CanMoveOrSwap)
+            {
+                return;
+            }
+
+            _session.CollectMoveDestinations(_moveCandidates);
+            _session.CollectSwapPartners(_swapCandidates);
+        }
+
         private void RefreshCommands()
         {
             _commands.Clear();
@@ -384,12 +423,72 @@ namespace SamsaraWest.UI
                 return;
             }
 
-            // 主行动已经用掉：只剩一次移动／换位，界面这时不该再给指令按钮。
-            if (_session.Phase != TurnPhase.MainAction)
+            // 主行动还没用掉：技能、防御、逃跑都是「打出去」的那一手。
+            // 打完其中任何一手，内核就进 MoveOrSwap，这里随之换成下面那一批按钮。
+            if (_session.Phase == TurnPhase.MainAction)
             {
-                return;
+                AppendSkillCommands(actor);
+
+                // 防御与逃跑是「不打」的那两手，排在技能后面：代价都落在占掉主行动上。
+                // 防御永远可用（不吃灵力、不进冷却），内核只在相位不对时才拒。
+                _commands.Add(new BattleCommandOption(
+                    BattleCommandId.Defend,
+                    SamsaraWest.Localization.LocalizationKeys.UI_BATTLE_COMMAND_DEFEND,
+                    string.Empty,
+                    0,
+                    true,
+                    BattleCommandRejection.None));
+
+                _commands.Add(new BattleCommandOption(
+                    BattleCommandId.Flee,
+                    SamsaraWest.Localization.LocalizationKeys.UI_BATTLE_COMMAND_FLEE,
+                    string.Empty,
+                    0,
+                    true,
+                    BattleCommandRejection.None));
             }
 
+            // 移动与换位不占主行动，因此主行动前后都可能给：前面可以先挪一步再出招，
+            // 后面还剩那一次。候选为空就干脆不给按钮——没地方可去，点了也是白点。
+            if (_session.CanMoveOrSwap)
+            {
+                if (_moveCandidates.Count > 0)
+                {
+                    _commands.Add(new BattleCommandOption(
+                        BattleCommandId.Move,
+                        SamsaraWest.Localization.LocalizationKeys.UI_BATTLE_COMMAND_MOVE,
+                        string.Empty,
+                        0,
+                        true,
+                        BattleCommandRejection.None));
+                }
+
+                if (_swapCandidates.Count > 0)
+                {
+                    _commands.Add(new BattleCommandOption(
+                        BattleCommandId.Swap,
+                        SamsaraWest.Localization.LocalizationKeys.UI_BATTLE_COMMAND_SWAP,
+                        string.Empty,
+                        0,
+                        true,
+                        BattleCommandRejection.None));
+                }
+            }
+
+            // 结束回合两个相位都得给：主行动前是「这一手不打」，移动窗口里是「不挪了」。
+            // 少一个，玩家就会停在「有阶段、没按钮」的空转里。
+            _commands.Add(new BattleCommandOption(
+                BattleCommandId.EndTurn,
+                SamsaraWest.Localization.LocalizationKeys.UI_BATTLE_COMMAND_ENDTURN,
+                string.Empty,
+                0,
+                true,
+                BattleCommandRejection.None));
+        }
+
+        /// <summary>把当前单位会的技能逐个翻成按钮，置灰原因按内核的判定顺序写。</summary>
+        private void AppendSkillCommands(BattleUnit actor)
+        {
             var skillIds = actor.SkillIds;
             for (var i = 0; i < skillIds.Count; i++)
             {
@@ -423,33 +522,6 @@ namespace SamsaraWest.UI
                     rejection == BattleCommandRejection.None,
                     rejection));
             }
-
-            _commands.Add(new BattleCommandOption(
-                BattleCommandId.Flee,
-                SamsaraWest.Localization.LocalizationKeys.UI_BATTLE_COMMAND_FLEE,
-                string.Empty,
-                0,
-                true,
-                BattleCommandRejection.None));
-
-            // 防御摆在技能与逃跑之间：它也是一手「打出去」的主行动，
-            // 而逃跑与结束回合是「不打」的那两个，排在后面。
-            // 它永远可用（不吃灵力、不进冷却），内核只在相位不对时才拒。
-            _commands.Add(new BattleCommandOption(
-                BattleCommandId.Defend,
-                SamsaraWest.Localization.LocalizationKeys.UI_BATTLE_COMMAND_DEFEND,
-                string.Empty,
-                0,
-                true,
-                BattleCommandRejection.None));
-
-            _commands.Add(new BattleCommandOption(
-                BattleCommandId.EndTurn,
-                SamsaraWest.Localization.LocalizationKeys.UI_COMMON_CANCEL,
-                string.Empty,
-                0,
-                true,
-                BattleCommandRejection.None));
         }
     }
 }

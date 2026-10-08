@@ -96,11 +96,22 @@ namespace SamsaraWest.Tests.EditMode
                 defend.LabelKey,
                 "防御按钮的文案键是数据表里的那一条，不是现编的中文。");
 
+            // 移动不占主行动，所以主行动之前就能挪一步；单人队伍没有同伴，换位那颗按钮干脆不给。
+            var move = Find(hud, BattleCommandId.Move, null);
+            Assert.IsTrue(move.Enabled);
+            Assert.AreEqual(LocalizationKeys.UI_BATTLE_COMMAND_MOVE, move.LabelKey);
+            Assert.AreEqual(
+                FormationSlot.Capacity - 1,
+                hud.MoveCandidates.Count,
+                "本方只有一个单位时，余下的格子全是可落点。");
+            CollectionAssert.IsEmpty(hud.SwapCandidates, "没有同伴可换。");
+            Assert.IsNull(FindOrNull(hud, BattleCommandId.Swap, null), "没有可换的同伴就不给按钮，而不是给一颗点了被拒的。");
+
             Assert.IsTrue(hud.PlayerRows[0].IsCurrentActor, "轮到的单位必须被标出来。");
         }
 
         [Test]
-        public void 主行动用掉之后_不再给指令按钮()
+        public void 主行动用掉之后_只剩移动与结束回合()
         {
             using var lab = new BattleLab();
             BuildBasic(lab);
@@ -115,7 +126,52 @@ namespace SamsaraWest.Tests.EditMode
             hud.Refresh();
 
             Assert.AreEqual(TurnPhase.MoveOrSwap, hud.Phase);
-            CollectionAssert.IsEmpty(hud.Commands, "只剩移动／换位时不该再给主行动按钮。");
+            Assert.IsNull(FindOrNull(hud, BattleCommandId.Skill, null), "主行动已经用掉，技能按钮必须收起来。");
+            Assert.IsNull(FindOrNull(hud, BattleCommandId.Defend, null), "防御也是主行动，同样该收起。");
+            Assert.IsNull(FindOrNull(hud, BattleCommandId.Flee, null), "逃跑也是主行动，同样该收起。");
+
+            Assert.IsNotNull(FindOrNull(hud, BattleCommandId.Move, null), "还剩一次移动，得有按钮。");
+
+            var endTurn = Find(hud, BattleCommandId.EndTurn, null);
+            Assert.AreEqual(
+                LocalizationKeys.UI_BATTLE_COMMAND_ENDTURN,
+                endTurn.LabelKey,
+                "移动窗口里必须有「结束回合」（否则玩家卡在空转里），且用的是「结束回合」的文案键，不是通用的「取消」。");
+        }
+
+        [Test]
+        public void 移动与换位的候选_与内核一致()
+        {
+            using var lab = new BattleLab();
+            BuildBasic(lab);
+
+            var session = NewSession(lab, Setup(Line("CHR_A", "CHR_B"), Line("ENM_A")));
+            var hud = new BattleHudModel(session, lab.Registry());
+
+            session.BeginNextTurn();
+            hud.Refresh();
+
+            // 两人分坐 C0R0 与 C1R0，剩下的两格都空着。
+            var expectedSlots = new List<FormationSlot>();
+            session.CollectMoveDestinations(expectedSlots);
+            CollectionAssert.AreEqual(
+                expectedSlots,
+                hud.MoveCandidates,
+                "落点必须原样来自内核，界面不自己算格子。");
+            Assert.AreEqual(FormationSlot.Capacity - 2, hud.MoveCandidates.Count);
+            CollectionAssert.DoesNotContain(
+                hud.MoveCandidates,
+                session.PlayerUnits[0].Slot,
+                "自己站着的那一格不是落点。");
+
+            CollectionAssert.AreEqual(
+                new[] { session.PlayerUnits[1].RuntimeId },
+                hud.SwapCandidates,
+                "换位候选是同阵营的存活同伴，不含自己。");
+
+            var swap = Find(hud, BattleCommandId.Swap, null);
+            Assert.IsTrue(swap.Enabled);
+            Assert.AreEqual(LocalizationKeys.UI_BATTLE_COMMAND_SWAP, swap.LabelKey);
         }
 
         [Test]
@@ -256,6 +312,21 @@ namespace SamsaraWest.Tests.EditMode
             Assert.AreEqual(1, chip.Stacks);
             Assert.AreEqual(2, chip.RemainingTurns, "剩余回合数直接给界面，界面不回头找定义。");
             Assert.IsEmpty(hud.EnemyRows[0].Statuses, "守势只挂在自己身上。");
+        }
+
+        /// <summary>与 <see cref="Find"/> 同形，但找不到时返回 null 而不是判定失败。</summary>
+        private static BattleCommandOption? FindOrNull(BattleHudModel hud, BattleCommandId id, string skillId)
+        {
+            for (var i = 0; i < hud.Commands.Count; i++)
+            {
+                var option = hud.Commands[i];
+                if (option.Id == id && (skillId == null || option.SkillId == skillId))
+                {
+                    return option;
+                }
+            }
+
+            return null;
         }
 
         private static BattleCommandOption Find(BattleHudModel hud, BattleCommandId id, string skillId)

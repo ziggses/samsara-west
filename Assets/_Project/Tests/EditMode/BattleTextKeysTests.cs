@@ -64,6 +64,8 @@ namespace SamsaraWest.Tests.EditMode
                 BattleTextKeys.Break,
                 BattleTextKeys.Flee,
                 BattleTextKeys.Defend,
+                BattleTextKeys.Move,
+                BattleTextKeys.Swap,
                 BattleTextKeys.EndTurn,
                 BattleTextKeys.EscapeChance,
             };

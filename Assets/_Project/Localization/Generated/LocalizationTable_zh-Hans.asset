@@ -532,8 +532,12 @@ MonoBehaviour:
     _text: "\u9003\u8DD1"
   - _key: ui.battle.command.item
     _text: "\u9053\u5177"
+  - _key: ui.battle.command.move
+    _text: "\u79FB\u52A8"
   - _key: ui.battle.command.skill
     _text: "\u6CD5\u672F"
+  - _key: ui.battle.command.swap
+    _text: "\u6362\u4F4D"
   - _key: ui.battle.escape
     _text: "\u9003\u8DD1\u6210\u529F\u7387 {0}"
   - _key: ui.battle.hp

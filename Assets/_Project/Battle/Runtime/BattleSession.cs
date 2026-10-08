@@ -443,6 +443,88 @@ namespace SamsaraWest.Battle
         }
 
         /// <summary>
+        /// 此刻还能不能走一步（移动或换位）。界面据此决定给不给那两颗按钮。
+        /// </summary>
+        /// <remarks>
+        /// 判据就是 <see cref="MoveTo"/>／<see cref="SwapWith"/> 用的那一扇门
+        /// （<see cref="CheckMoveCommand"/>），借它一次，而不是在界面里重写「相位对不对、走没用过」——
+        /// 两份判据迟早会分家，然后出现「按钮能点、内核不让」。
+        /// </remarks>
+        public bool CanMoveOrSwap => CheckMoveCommand() == BattleCommandRejection.None;
+
+        /// <summary>
+        /// 收集当前行动者能落脚的格子（本方空格），按阵型序号升序。
+        /// </summary>
+        /// <remarks>
+        /// 「这格有没有人」用的是 <see cref="MoveTo"/> 同一个判据，因此界面照抄画出来的候选
+        /// 与内核会接受的候选是同一批，界面不需要、也不该自己算格子。
+        /// 还没轮到我方时收集结果为空。
+        /// </remarks>
+        public void CollectMoveDestinations(List<FormationSlot> sink)
+        {
+            if (sink == null)
+            {
+                throw new ArgumentNullException(nameof(sink));
+            }
+
+            sink.Clear();
+
+            var actor = CurrentActor;
+            if (actor == null || actor.Side != BattleSide.Player)
+            {
+                return;
+            }
+
+            for (var index = 0; index < FormationSlot.Capacity; index++)
+            {
+                var slot = FormationSlot.FromIndex(index);
+                if (slot == actor.Slot)
+                {
+                    continue;
+                }
+
+                if (FindUnitAtSlot(actor.Side, slot) == null)
+                {
+                    sink.Add(slot);
+                }
+            }
+        }
+
+        /// <summary>
+        /// 收集当前行动者能换位的同伴编号（同阵营存活、不含自己），升序。
+        /// </summary>
+        /// <remarks>
+        /// 单位列表本身就是「我方在前、编号升序」建的，直接沿用即可——
+        /// 两处各排一次，顺序口径就有了两个来源。
+        /// </remarks>
+        public void CollectSwapPartners(List<int> sink)
+        {
+            if (sink == null)
+            {
+                throw new ArgumentNullException(nameof(sink));
+            }
+
+            sink.Clear();
+
+            var actor = CurrentActor;
+            if (actor == null || actor.Side != BattleSide.Player)
+            {
+                return;
+            }
+
+            for (var i = 0; i < _players.Count; i++)
+            {
+                var ally = _players[i];
+                if (ally == actor || !ally.IsAlive)
+                {
+                    continue;
+                }
+
+                sink.Add(ally.RuntimeId);
+            }
+        }
+
+        /// <summary>
         /// 逃跑（主行动）：整队撤退。
         /// </summary>
         /// <remarks>

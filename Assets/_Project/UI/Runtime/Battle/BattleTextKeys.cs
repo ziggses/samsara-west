@@ -65,6 +65,12 @@ namespace SamsaraWest.UI
         /// <summary>防御按钮的文案键。</summary>
         public static string Defend => LocalizationKeys.UI_BATTLE_COMMAND_DEFEND;
 
+        /// <summary>移动按钮的文案键。</summary>
+        public static string Move => LocalizationKeys.UI_BATTLE_COMMAND_MOVE;
+
+        /// <summary>换位按钮的文案键。</summary>
+        public static string Swap => LocalizationKeys.UI_BATTLE_COMMAND_SWAP;
+
         /// <summary>结束回合按钮的文案键。</summary>
         public static string EndTurn => LocalizationKeys.UI_BATTLE_COMMAND_ENDTURN;
 

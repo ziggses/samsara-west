@@ -27,6 +27,11 @@ namespace SamsaraWest.UI
 
         /// <summary>循环没能推进（理论上不该发生）。这是一个必须被看见的缺陷信号，不是正常态。</summary>
         Stuck = 4,
+
+        /// <summary>
+        /// 主行动已经结算，还剩一次可选的移动／换位，等我方决定挪、换，还是就此交棒。
+        /// </summary>
+        PlayerMoveOrSwap = 5,
     }
 
     /// <summary>
@@ -36,10 +41,10 @@ namespace SamsaraWest.UI
     /// <remarks>
     /// <para>它<b>不</b>是 MonoBehaviour，也不碰 uGUI：界面只读 <see cref="Prompt"/> 决定画什么、
     /// 调 <c>Choose*</c> 提交输入。于是整条循环可以在 EditMode 里跑到底，不必先有场景。</para>
-    /// <para><b>关于移动／换位的取舍</b>：内核在主行动之后进入 <see cref="TurnPhase.MoveOrSwap"/>，
-    /// 那一步是可选的。最小回路里没有换位界面，于是主行动一结算就替玩家结束回合——
-    /// 否则会停在「有阶段、没按钮」的空转状态，玩家卡死。等换位界面做出来，
-    /// 把这一处替换成「等玩家决定移动或结束」即可，接口不必改。</para>
+    /// <para><b>移动／换位</b>：内核在主行动之后进入 <see cref="TurnPhase.MoveOrSwap"/>，
+    /// 那一步是可选的。这里就停在 <see cref="BattlePrompt.PlayerMoveOrSwap"/> 等玩家决定——
+    /// 曾经为了绕开「有阶段、没按钮」的空转而替玩家结束回合，现在 <c>Hud.Commands</c>
+    /// 在那个相位至少给得出「结束回合」，玩家不会卡住，权宜之计也就不必留了。</para>
     /// <para><b>敌方回合不出现在界面上</b>：这是内核的口径（见 <see cref="BattleSession.BeginNextTurn"/>
     /// 的注释），不是这里偷懒。</para>
     /// </remarks>
@@ -84,7 +89,9 @@ namespace SamsaraWest.UI
         /// </summary>
         public void Start()
         {
-            if (Prompt == BattlePrompt.PlayerCommand || Prompt == BattlePrompt.PlayerTarget)
+            if (Prompt == BattlePrompt.PlayerCommand
+                || Prompt == BattlePrompt.PlayerTarget
+                || Prompt == BattlePrompt.PlayerMoveOrSwap)
             {
                 return;
             }
@@ -232,10 +239,15 @@ namespace SamsaraWest.UI
             return true;
         }
 
-        /// <summary>放弃剩余行动，直接结束当前单位的回合。</summary>
+        /// <summary>
+        /// 放弃剩余行动，直接结束当前单位的回合。
+        /// </summary>
+        /// <remarks>
+        /// 两个相位都收：主行动之前是「这一手不打」，移动窗口里是「不挪了」。
+        /// </remarks>
         public bool ChooseEndTurn()
         {
-            if (Prompt != BattlePrompt.PlayerCommand)
+            if (!IsAwaitingPlayerInput)
             {
                 return false;
             }
@@ -248,30 +260,56 @@ namespace SamsaraWest.UI
         }
 
         /// <summary>移动到一个空格（不占主行动，每回合一次）。</summary>
+        /// <remarks>
+        /// 两个相位都收：主行动<b>之前</b>可以先挪一步再出招，主行动<b>之后</b>还有那一次。
+        /// 在主行动之后走成功时，这一回合已经没有别的可做，顺手结束回合——
+        /// 让玩家再点一次「结束回合」是纯噪音。被拒时不动相位，等玩家改点别的。
+        /// </remarks>
         public bool ChooseMove(FormationSlot destination)
         {
-            if (Prompt != BattlePrompt.PlayerCommand)
+            if (!IsAwaitingPlayerInput)
             {
                 return false;
             }
 
             LastResult = _session.MoveTo(destination);
+
+            if (LastResult.Success && !_session.IsFinished && _session.Phase == TurnPhase.MoveOrSwap)
+            {
+                _session.EndTurn();
+                Pump();
+                return true;
+            }
+
             _hud.Refresh();
             return true;
         }
 
         /// <summary>与同阵营同伴换位（不占主行动，每回合一次）。</summary>
+        /// <remarks>与 <see cref="ChooseMove"/> 同形，连「走成功就收尾」的取舍也一样。</remarks>
         public bool ChooseSwap(int allyRuntimeId)
         {
-            if (Prompt != BattlePrompt.PlayerCommand)
+            if (!IsAwaitingPlayerInput)
             {
                 return false;
             }
 
             LastResult = _session.SwapWith(allyRuntimeId);
+
+            if (LastResult.Success && !_session.IsFinished && _session.Phase == TurnPhase.MoveOrSwap)
+            {
+                _session.EndTurn();
+                Pump();
+                return true;
+            }
+
             _hud.Refresh();
             return true;
         }
+
+        /// <summary>此刻在等玩家下「不必选目标」的那类指令（技能、防御、逃跑、移动、换位、结束回合）。</summary>
+        private bool IsAwaitingPlayerInput =>
+            Prompt == BattlePrompt.PlayerCommand || Prompt == BattlePrompt.PlayerMoveOrSwap;
 
         private void ApplySkill(string skillId, int primaryTargetRuntimeId)
         {
@@ -291,13 +329,22 @@ namespace SamsaraWest.UI
         }
 
         /// <summary>
-        /// 主行动已结算：先替玩家收掉可选的移动阶段，再往下推进。
+        /// 主行动已结算：如果还剩一次可选的移动／换位，就把决定权交还玩家。
         /// </summary>
+        /// <remarks>
+        /// 这一处曾经是「替玩家结束回合」，为的是绕开「有阶段、没按钮」的空转。
+        /// 移动／换位接进界面之后不必再那样：<see cref="BattlePrompt.PlayerMoveOrSwap"/> 下
+        /// <c>Hud.Commands</c> 至少给得出「结束回合」，玩家永远有出路。
+        /// </remarks>
         private void AdvanceAfterMainAction()
         {
             if (!_session.IsFinished && _session.Phase == TurnPhase.MoveOrSwap)
             {
-                _session.EndTurn();
+                PendingSkillId = null;
+                _candidateIds.Clear();
+                Prompt = BattlePrompt.PlayerMoveOrSwap;
+                _hud.Refresh();
+                return;
             }
 
             Pump();

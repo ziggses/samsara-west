@@ -267,7 +267,9 @@ namespace SamsaraWest.Localization
         public const string UI_BATTLE_COMMAND_ENDTURN = "ui.battle.command.endturn";
         public const string UI_BATTLE_COMMAND_FLEE = "ui.battle.command.flee";
         public const string UI_BATTLE_COMMAND_ITEM = "ui.battle.command.item";
+        public const string UI_BATTLE_COMMAND_MOVE = "ui.battle.command.move";
         public const string UI_BATTLE_COMMAND_SKILL = "ui.battle.command.skill";
+        public const string UI_BATTLE_COMMAND_SWAP = "ui.battle.command.swap";
         public const string UI_BATTLE_ESCAPE = "ui.battle.escape";
         public const string UI_BATTLE_HP = "ui.battle.hp";
         public const string UI_BATTLE_INTENT_PREVIEW = "ui.battle.intent.preview";

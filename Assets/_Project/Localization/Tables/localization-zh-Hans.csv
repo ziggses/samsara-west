@@ -262,6 +262,8 @@ ui.battle.command.attack,攻击,战斗指令
 ui.battle.command.skill,法术,战斗指令
 ui.battle.command.item,道具,战斗指令
 ui.battle.command.defend,防御,战斗指令
+ui.battle.command.move,移动,战斗指令
+ui.battle.command.swap,换位,战斗指令
 ui.battle.command.flee,逃跑,战斗指令
 ui.battle.status.break,护体已破,战斗提示
 ui.battle.intent.preview,敌人意图：{0},战斗提示，{0} 为意图文本
