@@ -191,7 +191,13 @@ namespace SamsaraWest.Battle
             }
         }
 
-        /// <summary>生命比例，0–1。界面血条与 AI 的选人判据都用它。</summary>
+        /// <summary>
+        /// 生命比例，0–1，给界面血条用。
+        /// </summary>
+        /// <remarks>
+        /// 规划器<b>不再</b>用它选目标：威胁评估看的是伤害期望，与目标还剩多少血无关
+        /// （见 Docs/战斗内核-v1.md 第 4 节「不挑残血」一条）。
+        /// </remarks>
         public float HealthRatio => MaxHealth <= 0 ? 0f : (float)Health / MaxHealth;
 
         public bool HasSkill(string skillId) =>

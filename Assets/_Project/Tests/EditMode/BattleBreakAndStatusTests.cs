@@ -137,7 +137,9 @@ namespace SamsaraWest.Tests.EditMode
             lab.AttackSkill("SKL_HIT", power: 5, breakDamage: 0);
             lab.HealingSkill("SKL_MEND", healPower: 60);
             lab.Character("CHR_TANK", 200, 5, 20, 10, FiveElement.None, 30, 50, "SKL_HIT");
-            lab.Character("CHR_MEDIC", 120, 5, 5, 30, FiveElement.None, 30, 50, "SKL_HIT", "SKL_MEND");
+            // 治疗者的防御刻意高于坦克：规划器现在是按「能打出多少伤害」挑目标，
+            // 想让挨打的是坦克，就得让坦克成为<b>伤害期望</b>最高的那一个，而不是血条最长的那个。
+            lab.Character("CHR_MEDIC", 120, 5, 40, 30, FiveElement.None, 30, 50, "SKL_HIT", "SKL_MEND");
             lab.Enemy("ENM_A", 999, 40, 0, 5, FiveElement.None, 20, false, "SKL_HIT");
 
             var session = NewSession(lab, Setup(Line("CHR_TANK", "CHR_MEDIC"), Line("ENM_A")));

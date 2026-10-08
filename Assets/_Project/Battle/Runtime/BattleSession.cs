@@ -39,6 +39,7 @@ namespace SamsaraWest.Battle
         private readonly List<BattleUnit> _players;
         private readonly List<BattleUnit> _enemies;
         private readonly List<BattleUnit> _targetScratch = new List<BattleUnit>(FormationSlot.Capacity);
+        private readonly List<BattleUnit> _primaryScratch = new List<BattleUnit>(FormationSlot.Capacity);
         private readonly List<BattleStatusInstance> _expiredScratch = new List<BattleStatusInstance>(4);
         private readonly List<BattleIntent> _intentScratch = new List<BattleIntent>(FormationSlot.Capacity);
         private readonly Dictionary<int, BattlePlan> _plans = new Dictionary<int, BattlePlan>(12);
@@ -551,14 +552,18 @@ namespace SamsaraWest.Battle
         }
 
         /// <summary>
-        /// 把战斗一路推到底：敌方自动出手，我方由规划器代打。
+        /// 自动战斗：把这场仗一路推到底，双方都由规划器代打。
         /// </summary>
         /// <remarks>
-        /// 它是为测试与「不接界面也能看规则」的原型观察而存在的，
-        /// 不是玩法的一部分——真正的战斗必须由玩家的指令驱动。
+        /// 它<b>就是</b>自动战斗，不是测试专用的旁路：我方与敌方走的是<b>同一套</b>
+        /// <see cref="BattleActionPlanner"/>，输入是当前战局、输出是「推进到结局」，
+        /// 只产出 <see cref="Outcome"/>——不表演、不等待输入。
+        /// 「加速播放」（把规划器给出的手按时间轴一手手播出来）属于界面层，内核不提供「快进」概念，
+        /// 也不为此另立一套战斗循环。
+        /// 战斗已经有结局时立刻返回，不再推进。
         /// </remarks>
-        /// <param name="maxActions">安全上限，防止规则出 bug 时死循环。</param>
-        /// <returns>实际结算的行动手数。</returns>
+        /// <param name="maxActions">单次调用最多推进的手数，用尽即封顶（此时可能仍未分胜负）。</param>
+        /// <returns>结束时的 <see cref="ActionCount"/>（本场累计手数），不是本次推进的手数。</returns>
         public int RunToEnd(int maxActions = 512)
         {
             var guard = Mathf.Max(1, maxActions);
@@ -1088,7 +1093,7 @@ namespace SamsaraWest.Battle
                 }
 
                 _plans[unit.RuntimeId] = BattleActionPlanner.Plan(
-                    _config, _registry, unit, _units, _targetScratch);
+                    _config, _registry, unit, _units, _targetScratch, _primaryScratch);
             }
 
             _plansDirty = false;

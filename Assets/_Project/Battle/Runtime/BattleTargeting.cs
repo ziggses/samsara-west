@@ -131,29 +131,41 @@ namespace SamsaraWest.Battle
         }
 
         /// <summary>
-        /// 给 AI 挑一个主目标。规则刻意简单且确定：
-        /// 攻击类取<b>当前生命最高</b>的敌对单位（与 Docs/战斗数值-v1.md 里的回合数校算口径一致，
-        /// 也就是说校算出来的回合数在这场战斗里真的会发生），治疗类取生命比例最低的同伴。
+        /// 该规则的主目标是否需要在规划时<b>逐一试算</b>。
         /// </summary>
-        public static BattleUnit ChoosePrimaryForAi(BattleUnit actor, SkillDefinition skill, IReadOnlyList<BattleUnit> units)
+        /// <remarks>
+        /// 与 <see cref="NeedsCallerTarget"/> 的差别只在随机目标上：随机技能的落点由执行时抽签决定，
+        /// 但规划阶段仍要把每个可能的落点试算一遍才知道这一手值多少威胁
+        /// （<see cref="Resolve"/> 拿不到主目标就返回空集，那样任何随机技能都会被算成「打不出去」）。
+        /// 自身与全体目标不需要试算，用 <c>null</c> 主目标评估一次即可。
+        /// </remarks>
+        public static bool TriesPrimaryPerTarget(TargetRule rule) =>
+            NeedsCallerTarget(rule) || rule == TargetRule.RandomEnemy;
+
+        /// <summary>
+        /// 列出这个技能所有合法的主目标候选，按 <see cref="BattleUnit.RuntimeId"/> 升序。
+        /// </summary>
+        /// <remarks>
+        /// 顺序就是威胁评估的破平局顺序（口径：同值时取 <c>RuntimeId</c> 最小），
+        /// 所以调用方只要「严格优于才替换」，平局自然落到先出现的那一个。
+        /// </remarks>
+        /// <param name="actor">施法者。</param>
+        /// <param name="skill">技能定义。</param>
+        /// <param name="units">场上全部单位（含已倒下者，内部会过滤）。</param>
+        /// <param name="sink">结果容器，由调用方复用；进入时会被清空。</param>
+        public static void CollectCandidatePrimaries(
+            BattleUnit actor,
+            SkillDefinition skill,
+            IReadOnlyList<BattleUnit> units,
+            List<BattleUnit> sink)
         {
+            sink.Clear();
             if (actor == null || skill == null || units == null)
             {
-                return null;
-            }
-
-            if (skill.Target == TargetRule.Self)
-            {
-                return actor;
-            }
-
-            if (skill.Target == TargetRule.AllEnemies || skill.Target == TargetRule.AllAllies)
-            {
-                return null;
+                return;
             }
 
             var wantHostile = RequiresHostilePrimary(skill);
-            BattleUnit best = null;
             for (var i = 0; i < units.Count; i++)
             {
                 var unit = units[i];
@@ -162,36 +174,15 @@ namespace SamsaraWest.Battle
                     continue;
                 }
 
-                var isHostile = unit.Side != actor.Side;
-                if (isHostile != wantHostile)
+                if ((unit.Side != actor.Side) != wantHostile)
                 {
                     continue;
                 }
 
-                if (best == null || IsBetterPrimary(unit, best, preferWounded: !wantHostile))
-                {
-                    best = unit;
-                }
+                sink.Add(unit);
             }
 
-            return best;
-        }
-
-        private static bool IsBetterPrimary(BattleUnit candidate, BattleUnit current, bool preferWounded)
-        {
-            if (preferWounded)
-            {
-                if (candidate.HealthRatio != current.HealthRatio)
-                {
-                    return candidate.HealthRatio < current.HealthRatio;
-                }
-            }
-            else if (candidate.Health != current.Health)
-            {
-                return candidate.Health > current.Health;
-            }
-
-            return candidate.FormationIndex < current.FormationIndex;
+            sink.Sort(static (left, right) => left.RuntimeId.CompareTo(right.RuntimeId));
         }
 
         private static void CollectSide(BattleUnit actor, IReadOnlyList<BattleUnit> units, bool hostile, List<BattleUnit> sink)

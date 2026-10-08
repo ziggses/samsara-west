@@ -110,20 +110,27 @@ namespace SamsaraWest.Battle
     /// （玩家一动，敌人的最优解就可能变了），若重算顺手消耗随机数，
     /// 「同种子同结果」这条底线会被查询次数带偏。
     ///
-    /// 选招口径：先把每个可用技能的<b>确定伤害</b>（暴击掷骰取「必定不暴击」）算一遍，
-    /// 取总伤害最高者；伤害都为 0 时取治疗量最高者；仍然为 0 则取技能表里第一个能用的。
+    /// 选招口径是<b>威胁评估</b>：对每个「可用技能 × 合法主目标」的候选算一个威胁值，取最高的那一个。
+    /// 威胁 = 伤害期望 × 伤害权重 + 治疗量 × 治疗权重 + 命中集合里敌对单位的有效速度 × 速度权重，
+    /// 三项权重都在 <see cref="BattleConfig"/> 里（速度默认关）。伤害与治疗都是<b>确定性估算</b>
+    /// （暴击按「必定不暴击」算，理由与「不掷随机」是同一条）。威胁全为 0 时（纯增益、没人受伤的治疗）
+    /// 由破平局规则自然退回「技能表里第一个能用的」，不会让还有牌可打的单位呆站着。
     /// 这不追求聪明，只要求<b>可解释</b>——五个人的试玩要判断的是意图能不能被读懂，
     /// 不是敌人会不会最优解。
     /// </remarks>
     public static class BattleActionPlanner
     {
         /// <summary>为一个单位规划当前行动。</summary>
+        /// <param name="primaryScratch">
+        /// 枚举候选主目标用的容器，由调用方复用；不传就自己开一个（只在测试里会走到）。
+        /// </param>
         public static BattlePlan Plan(
             BattleConfig config,
             IDefinitionRegistry registry,
             BattleUnit actor,
             IReadOnlyList<BattleUnit> units,
-            List<BattleUnit> targetScratch)
+            List<BattleUnit> targetScratch,
+            List<BattleUnit> primaryScratch = null)
         {
             if (config == null || actor == null || !actor.IsAlive || units == null)
             {
@@ -136,13 +143,12 @@ namespace SamsaraWest.Battle
                 return BattlePlan.Empty(actor);
             }
 
+            var primaries = primaryScratch ?? new List<BattleUnit>(FormationSlot.Capacity);
+
             SkillDefinition bestSkill = null;
             BattleUnit bestPrimary = null;
-            var bestDamage = 0;
-            var bestHeal = 0;
-
-            SkillDefinition firstUsable = null;
-            BattleUnit firstUsablePrimary = null;
+            var bestThreat = 0f;
+            var hasBest = false;
 
             var skillIds = actor.SkillIds;
             for (var i = 0; i < skillIds.Count; i++)
@@ -164,71 +170,44 @@ namespace SamsaraWest.Battle
                     continue;
                 }
 
-                var primary = BattleTargeting.ChoosePrimaryForAi(actor, skill, units);
-                if (BattleTargeting.NeedsCallerTarget(skill.Target) && primary == null)
+                float threat;
+                if (BattleTargeting.TriesPrimaryPerTarget(skill.Target))
                 {
-                    continue;
-                }
-
-                var targets = BattleTargeting.Resolve(actor, skill, primary, units, targetScratch);
-                if (targets.Count == 0)
-                {
-                    continue;
-                }
-
-                if (firstUsable == null)
-                {
-                    firstUsable = skill;
-                    firstUsablePrimary = primary;
-                }
-
-                var damage = 0;
-                var heal = 0;
-                for (var t = 0; t < targets.Count; t++)
-                {
-                    var target = targets[t];
-                    if (skill.Power > 0)
+                    BattleTargeting.CollectCandidatePrimaries(actor, skill, units, primaries);
+                    for (var p = 0; p < primaries.Count; p++)
                     {
-                        damage += DamageCalculator.ComputeSkillTotal(
-                            config,
-                            skill.Power,
-                            actor.EffectiveAttack,
-                            target.EffectiveDefense,
-                            skill.HitCount,
-                            skill.Element,
-                            target.Element,
-                            target.IsBroken,
-                            target.MaxHealth,
-                            actor.AttackModifier,
-                            target.DefenseModifier);
-                    }
+                        if (!TryMeasureThreat(config, actor, skill, primaries[p], units, targetScratch, out threat))
+                        {
+                            continue;
+                        }
 
-                    if (skill.HealPower > 0)
-                    {
-                        heal += Math.Max(0, Math.Min(skill.HealPower, target.MaxHealth - target.Health));
+                        if (IsBetterCandidate(threat, primaries[p], bestThreat, bestPrimary, hasBest))
+                        {
+                            bestSkill = skill;
+                            bestPrimary = primaries[p];
+                            bestThreat = threat;
+                            hasBest = true;
+                        }
                     }
                 }
-
-                if (bestSkill == null || damage > bestDamage || (damage == bestDamage && heal > bestHeal))
+                else
                 {
-                    bestSkill = skill;
-                    bestPrimary = primary;
-                    bestDamage = damage;
-                    bestHeal = heal;
+                    // 自身技能的主目标就是自己；全体技能没有主目标。两者都只评估一次。
+                    var primary = skill.Target == TargetRule.Self ? actor : null;
+                    if (TryMeasureThreat(config, actor, skill, primary, units, targetScratch, out threat)
+                        && IsBetterCandidate(threat, primary, bestThreat, bestPrimary, hasBest))
+                    {
+                        bestSkill = skill;
+                        bestPrimary = primary;
+                        bestThreat = threat;
+                        hasBest = true;
+                    }
                 }
             }
 
             if (bestSkill == null)
             {
                 return BattlePlan.Empty(actor);
-            }
-
-            // 伤害与治疗都为 0 时（纯增益、或者没人受伤的治疗），退回「第一个能用的技能」，
-            // 至少不会让一个还有牌可打的单位呆站着。
-            if (bestDamage == 0 && bestHeal == 0 && firstUsable != null)
-            {
-                bestSkill = firstUsable;
-                bestPrimary = firstUsablePrimary;
             }
 
             var finalTargets = BattleTargeting.Resolve(actor, bestSkill, bestPrimary, units, targetScratch);
@@ -250,6 +229,101 @@ namespace SamsaraWest.Battle
 
             return new BattlePlan(new BattleIntent(actor, bestSkill, ids, isRandom), bestPrimary);
         }
+
+        /// <summary>
+        /// 算一个「技能 × 主目标」候选的威胁值。
+        /// </summary>
+        /// <remarks>
+        /// 公式：伤害期望 × <see cref="BattleConfig.ThreatWeightDamage"/>
+        /// + 治疗量 × <see cref="BattleConfig.ThreatWeightHeal"/>
+        /// + 命中集合里敌对单位的有效速度之和 × <see cref="BattleConfig.ThreatWeightSpeed"/>。
+        /// 速度那一项只算<b>敌对</b>单位：加速自己人不是「威胁」，去打一个跑得快的敌人才是。
+        /// 治疗量按「最多回满」计，所以给满血同伴加血算 0 威胁——这是有意的，
+        /// 界面上的意图读出来才符合直觉。
+        /// 返回 false 表示这一手打不出去（命中集合为空，例如对面已经全灭）。
+        /// </remarks>
+        private static bool TryMeasureThreat(
+            BattleConfig config,
+            BattleUnit actor,
+            SkillDefinition skill,
+            BattleUnit primary,
+            IReadOnlyList<BattleUnit> units,
+            List<BattleUnit> targetScratch,
+            out float threat)
+        {
+            threat = 0f;
+
+            var targets = BattleTargeting.Resolve(actor, skill, primary, units, targetScratch);
+            if (targets.Count == 0)
+            {
+                return false;
+            }
+
+            var damage = 0;
+            var heal = 0;
+            var hostileSpeed = 0;
+            for (var t = 0; t < targets.Count; t++)
+            {
+                var target = targets[t];
+                if (target.Side != actor.Side)
+                {
+                    hostileSpeed += target.EffectiveSpeed;
+                }
+
+                if (skill.Power > 0)
+                {
+                    damage += DamageCalculator.ComputeSkillTotal(
+                        config,
+                        skill.Power,
+                        actor.EffectiveAttack,
+                        target.EffectiveDefense,
+                        skill.HitCount,
+                        skill.Element,
+                        target.Element,
+                        target.IsBroken,
+                        target.MaxHealth,
+                        actor.AttackModifier,
+                        target.DefenseModifier);
+                }
+
+                if (skill.HealPower > 0)
+                {
+                    heal += Math.Max(0, Math.Min(skill.HealPower, target.MaxHealth - target.Health));
+                }
+            }
+
+            threat = (damage * config.ThreatWeightDamage)
+                     + (heal * config.ThreatWeightHeal)
+                     + (hostileSpeed * config.ThreatWeightSpeed);
+            return true;
+        }
+
+        /// <summary>
+        /// 新候选是否压过当前最优。
+        /// </summary>
+        /// <remarks>
+        /// 判据依次是：<b>威胁值更大</b> → <b>主目标 <c>RuntimeId</c> 更小</b> → <b>技能更靠前</b>。
+        /// 后两级由枚举顺序兜住：候选按 <c>RuntimeId</c> 升序（见
+        /// <see cref="BattleTargeting.CollectCandidatePrimaries"/>）、技能按 <c>SkillIds</c> 顺序，
+        /// 再加上「严格优于才替换」，平局就自然落到先枚举到的那一个。
+        /// 无主目标的技能（自身／全体）记 -1，平局时排在具体目标之前。
+        /// </remarks>
+        private static bool IsBetterCandidate(
+            float threat,
+            BattleUnit primary,
+            float bestThreat,
+            BattleUnit bestPrimary,
+            bool hasBest)
+        {
+            if (!hasBest || threat > bestThreat)
+            {
+                return true;
+            }
+
+            return threat >= bestThreat && PrimaryOrder(primary) < PrimaryOrder(bestPrimary);
+        }
+
+        private static int PrimaryOrder(BattleUnit unit) => unit == null ? -1 : unit.RuntimeId;
 
         /// <summary>只取意图（不关心执行用的单位引用）。</summary>
         public static BattleIntent PlanIntent(

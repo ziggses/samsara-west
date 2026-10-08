@@ -88,6 +88,17 @@ namespace SamsaraWest.Battle
         [SerializeField] private float _powerWeightSpeed = 1f;
         [SerializeField] private float _powerWeightHealth = 0.1f;
 
+        [Header("威胁评估（规划器选招与选目标）：威胁 = 伤害期望 × 权重 + 治疗量 × 权重 + 御敌速度 × 权重")]
+        [Tooltip("伤害期望在威胁值里的权重。")]
+        [SerializeField] private float _threatWeightDamage = 1f;
+
+        [Tooltip("治疗量在威胁值里的权重。与伤害同权，所以「奶 100」会压过「打 10」。")]
+        [SerializeField] private float _threatWeightHeal = 1f;
+
+        [Tooltip("命中集合里敌对单位的有效速度之和在威胁值里的权重。默认 0（关着）："
+            + "打开它，敌人就会优先去打断跑得快的那个。")]
+        [SerializeField] private float _threatWeightSpeed = 0f;
+
         public float AttackScale => _attackScale;
 
         public float DefenseScale => _defenseScale;
@@ -137,6 +148,12 @@ namespace SamsaraWest.Battle
         public float PowerWeightSpeed => _powerWeightSpeed;
 
         public float PowerWeightHealth => _powerWeightHealth;
+
+        public float ThreatWeightDamage => _threatWeightDamage;
+
+        public float ThreatWeightHeal => _threatWeightHeal;
+
+        public float ThreatWeightSpeed => _threatWeightSpeed;
 
         /// <summary>
         /// 五行倍率。这是数值表里唯一「规则性」的一段，其余都是可调参数。
