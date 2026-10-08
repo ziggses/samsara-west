@@ -61,7 +61,7 @@ namespace SamsaraWest.Tests.PlayMode
         }
 
         [UnityTest]
-        public IEnumerator Bootstrap_InstallsCoreDataLocalizationSaveBattleNarrativeAndExplorationModules()
+        public IEnumerator Bootstrap_InstallsCoreDataEconomyLocalizationSaveBattleNarrativeAndExplorationModules()
         {
             yield return null;
 
@@ -69,7 +69,7 @@ namespace SamsaraWest.Tests.PlayMode
             Assert.IsNotNull(bootstrap, "创建启动器后应当存在实例。");
             Assert.IsTrue(bootstrap.IsReady);
             CollectionAssert.AreEqual(
-                new[] { "Core", "Data", "Localization", "Save", "Battle", "Narrative", "Exploration" },
+                new[] { "Core", "Data", "Economy", "Localization", "Save", "Battle", "Narrative", "Exploration" },
                 bootstrap.InstalledModules,
                 "模块安装顺序即依赖顺序，改动顺序要同步改这里。");
 
@@ -100,6 +100,12 @@ namespace SamsaraWest.Tests.PlayMode
             Assert.IsNotNull(
                 registry.Resolve<ISaveCoordinator>(),
                 "存档搬运必须注册进注册表：界面按接口取它，取不到就没有任何东西能把一局收成一份档。");
+            Assert.IsNotNull(
+                registry.Resolve<Economy.IEconomyService>(),
+                "经济模块必须在引导期就位：存档里的钱与背包要有一个运行期真源可搬。");
+            Assert.IsNotNull(
+                bootstrap.LootLink,
+                "战利品结算线要装在引导末尾：打赢一场之后，钱与物得有人收。");
 
             var storyState = registry.Resolve<Narrative.IStoryState>();
             Assert.IsNotNull(storyState, "剧情状态账必须在引导期就位，否则条件类交互物永远隐藏。");
@@ -159,7 +165,7 @@ namespace SamsaraWest.Tests.PlayMode
             bootstrap.Bootstrap();
 
             Assert.AreEqual(before, GameBootstrap.BootstrapCount, "重复引导不得再装一遍服务。");
-            Assert.AreEqual(7, bootstrap.InstalledModules.Count);
+            Assert.AreEqual(8, bootstrap.InstalledModules.Count);
         }
 
         [UnityTest]

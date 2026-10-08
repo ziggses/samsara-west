@@ -157,6 +157,10 @@ namespace SamsaraWest.Tests.EditMode
                     // 探索也在这一份清单里：组合根要替「遇敌 → 开战」接线（ADR-021），
                     // 于是 Flow 认识 Exploration，而 Exploration 仍只依赖 Core + Data（见上一个用例）。
                     "SamsaraWest.Exploration",
+
+                    // 经济同样只在组合根被认识（ADR-027）：战斗内核与存档都不该认识钱袋与背包，
+                    // 于是 Flow 认识 Economy，而 Economy 仍只依赖 Core + Data。
+                    "SamsaraWest.Economy",
                 },
                 references);
 

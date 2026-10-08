@@ -14,7 +14,7 @@
 # 1. 挂载外部素材 + 初始化工程（新机器、新克隆跑一次；幂等，可反复执行）
 powershell -NoProfile -ExecutionPolicy Bypass -File E:\tx2\samsara-west\Tools\setup-project.ps1
 
-# 2. 跑全套测试（当前基线：EditMode 591 + PlayMode 45）
+# 2. 跑全套测试（当前基线：EditMode 637 + PlayMode 48）
 powershell -NoProfile -ExecutionPolicy Bypass -File E:\tx2\samsara-west\Tools\run-tests.ps1 -Platform All
 ```
 
@@ -31,10 +31,11 @@ powershell -NoProfile -ExecutionPolicy Bypass -File E:\tx2\samsara-west\Tools\ru
 
 三个诊断层会自己挂上来，场景里不需要挂任何东西：
 
-- `F1` 自检面板；`F2` 打一场首章遭遇、`F3` 收起
+- `F1` 自检面板；`F2` 打一场首章遭遇、`F3` 收起（打赢一场会按掉落表结算：
+  赏金与掉落物进钱袋与背包，日志 `Economy` 频道报一行；目前没有钱袋界面，只能在日志与测试里看）
 - `F4` 进首章野外图 `CH01_MAP01`（再按一次离图）：方向键／`WASD` 走格、`E` 交互。左上角是格子图
   （`@` 自己、`*` 面朝、`#` 交互物、`.` 空地），下方一行报「刚才那下为什么被拒」。
-- `F5` 存一次档、`F9` 读回来（固定槽位 1，面板在左下角）：账本、所在位置与随机种子一起进出；
+- `F5` 存一次档、`F9` 读回来（固定槽位 1，面板在左下角）：账本、钱袋与背包、所在位置与随机种子一起进出；
   `F5`／`F9` 只在编辑器与开发版里生效。
 
 它们是**诊断层，不是正式界面**：字符格子图、按键直接走格、没有移动表现与镜头（ADR-014、ADR-022）。
@@ -48,14 +49,15 @@ powershell -NoProfile -ExecutionPolicy Bypass -File E:\tx2\samsara-west\Tools\ru
 |---|---|---|
 | `Core/` | 服务定位、事件总线、时间、可复现随机、对象池、日志 | InputSystem |
 | `Data/` | ID 规则、定义基类、CSV 解析、导入映射、校验 | Core |
-| `Flow/` | 启动装配、场景与章节状态、探索与战斗／剧情状态／换图／存档搬运／战果回写的接线 | Core, Data, Localization, Save, Battle, Narrative, Exploration, InputSystem |
+| `Flow/` | 启动装配、场景与章节状态、探索与战斗／剧情状态／换图／存档搬运／战果回写／战利品结算的接线 | Core, Data, Localization, Save, Battle, Narrative, Exploration, Economy, InputSystem |
 | `Battle/` | 战斗内核（行动队列、意图预告、护体/破防、状态与冷却）、伤害计算、战斗数值配置 | Core, Data |
 | `Save/` | 版本化 JSON 存档 + 迁移钩子 | Core |
 | `Localization/` | 文本键服务、表资产、常量生成 | Core |
 | `UI/` | 本地化标签、运行期错误面板、战斗与探索的诊断界面、存档面板 | Core, Data, Battle, Exploration, Save, Localization, TextMeshPro |
 | `Exploration/` | 探索运行时：走格、交互、遭遇掷骰（不认识战斗，遇敌只发事件） | Core, Data |
 | `Narrative/` | 剧情状态账：状态键 → 整数、心念三轴，账本整本进出存档（对话与任务运行时仍未做） | Core, Data |
-| `Progression/` `Economy/` | 骨架占位（目录 + asmdef + 接口契约） | Core, Data |
+| `Economy/` | 钱袋与背包：金币、物品堆叠、战利品结算（只依赖目录与随机流，不认识战斗）；整袋进出存档（ADR-027） | Core, Data |
+| `Progression/` | 骨架占位（目录 + asmdef + 接口契约） | Core, Data |
 | `Audio/` | 骨架占位 | Core |
 | `Editor/` | 导入、校验、出包、工具窗口 | 全部运行时模块 |
 | `Tests/EditMode` `Tests/PlayMode` | 自动化测试 | Editor / 运行时模块 |
@@ -190,7 +192,7 @@ Unity.exe -batchmode -quit -projectPath E:\tx2\samsara-west ^
 
 工程自身的文档在 `Docs/`（随仓库分发）：
 
-- `Docs/架构决策.md`：26 条架构决策（模块与依赖、服务定位、事件总线、随机、日志、存档迁移、生成物不白写盘、UI 框架、装备 8 槽与存档 v3、战斗数学契约、装备/经文加成的进场快照口径、经文的每回合效果、装备/经文带来的技能挂载、被动登记与常驻状态、探索与剧情状态、换图接线、存档接线、战果回写等）与未决事项。
+- `Docs/架构决策.md`：27 条架构决策（模块与依赖、服务定位、事件总线、随机、日志、存档迁移、生成物不白写盘、UI 框架、装备 8 槽与存档 v3、战斗数学契约、装备/经文加成的进场快照口径、经文的每回合效果、装备/经文带来的技能挂载、被动登记与常驻状态、探索与剧情状态、换图接线、存档接线、战果回写、经济（钱袋与背包）等）与未决事项。
 - `Docs/数据管线.md`：18 张表 → 资产的映射、解析与列映射规则、增量导入的跳过条件、校验码表、常用操作与故障排查。
 - `Docs/战斗数值-v1.md`：伤害公式与运算顺序、五行倍率（相克 + 相生）、暴击、护体/破防、行动速度、首章数值快照、输出与回合数校算，以及待人工拍板的遗留（第 7.4 节）。
 - `Docs/战斗内核-v1.md`：一场战斗的推进顺序（`BeginNextTurn` / `FinishTurn`）、行动队列与平局判据、意图预告与 AI 选招、目标结算、破防与状态的计时口径、冷却、随机与可复现、13 个战斗事件、装配现状，以及遗留清单（11.1 待拍板 / 11.2 已定口径的取舍）。

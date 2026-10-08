@@ -9,6 +9,7 @@
         "SamsaraWest.Battle",
         "SamsaraWest.Exploration",
         "SamsaraWest.Narrative",
+        "SamsaraWest.Economy",
         "Unity.InputSystem"
     ],
     "includePlatforms": [],

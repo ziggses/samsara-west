@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using SamsaraWest.Core;
 using SamsaraWest.Data;
+using SamsaraWest.Economy;
 using SamsaraWest.Exploration;
 using SamsaraWest.Narrative;
 using SamsaraWest.Save;
@@ -13,12 +14,16 @@ namespace SamsaraWest.Flow
     /// </summary>
     /// <remarks>
     /// <para>它为什么必须长在组合根：左手是探索（人站在哪张图的哪一格）、右手是剧情（那本状态账）、
-    /// 兜里还有随机服务的母种子，而这三样都<b>不许</b>被 <c>Save</c> 认识。
+    /// 手上还拎着钱袋与背包、兜里还有随机服务的母种子，而这些都<b>不许</b>被 <c>Save</c> 认识。
     /// 与三条 Link 同一处境，区别只在它是「按接口被调用」而不是「订阅事件」。</para>
     ///
     /// <para>两处顺序是有意的：<b>先校验再动状态</b>（目标图查不到时整体拒绝，
     /// 免得留下「账本换了、人还在旧图上」这种半截状态），以及<b>先复位母种子再进图</b>
     /// （探索流是在进图那一刻取的，晚一步复位就落在旧种子的序列上）。</para>
+    ///
+    /// <para><b>钱与物是第二十一轮接上的</b>：<c>SaveData</c> 里 <c>Gold</c> 与
+    /// <c>InventoryItemIds/Counts</c> 早就备好了字段，缺的从来是运行期真源（ADR-025 的代价栏）。
+    /// 经济模块落地之后，这里才第一次有东西可搬——搬运方式与状态账完全一样：整本进、整本出。</para>
     /// </remarks>
     public sealed class SaveCoordinator : ISaveCoordinator
     {
@@ -27,24 +32,30 @@ namespace SamsaraWest.Flow
         private readonly IExplorationService _exploration;
         private readonly IDefinitionRegistry _definitions;
         private readonly IRandomService _random;
+        private readonly IEconomyService _economy;
 
         /// <param name="saves">存档读写（落盘与校验）。</param>
         /// <param name="state">剧情状态账：整本进、整本出。</param>
         /// <param name="exploration">探索服务：位置从它来，读档也回到它身上。</param>
         /// <param name="definitions">定义目录；给了就先查「存档指向的图还在不在」再动状态。</param>
         /// <param name="random">随机服务；给了就搬运主种子（缺省则不搬，读档后随机序列不会回到原处）。</param>
+        /// <param name="economy">
+        /// 钱袋与背包；给了就搬运金钱与物品（缺省则不搬，钱与物不进档、读档也换不回来）。
+        /// </param>
         public SaveCoordinator(
             ISaveService saves,
             IStoryState state,
             IExplorationService exploration,
             IDefinitionRegistry definitions = null,
-            IRandomService random = null)
+            IRandomService random = null,
+            IEconomyService economy = null)
         {
             _saves = saves ?? throw new ArgumentNullException(nameof(saves));
             _state = state ?? throw new ArgumentNullException(nameof(state));
             _exploration = exploration ?? throw new ArgumentNullException(nameof(exploration));
             _definitions = definitions;
             _random = random;
+            _economy = economy;
         }
 
         /// <summary>最近一次成功存／读的槽位；一次都没动过时为 -1。诊断面板显示用。</summary>
@@ -85,6 +96,22 @@ namespace SamsaraWest.Flow
             {
                 data.FlagKeys.Add(keys[i]);
                 data.FlagValues.Add(_state.Values[keys[i]]);
+            }
+
+            // 钱与物：这两个字段在 SaveData 里躺了很久，第二十一轮之前没有任何运行期真源可搬
+            // （经济模块还没有实现），所以一直是空的。
+            if (_economy != null)
+            {
+                data.Gold = _economy.Gold;
+
+                // 顺序不必再排：IEconomyService.Items 本身就是按 ID 排序的快照，
+                // 与上面状态键同一个理由——同一份状态两次采集必须得到同样的排列。
+                var stacks = _economy.Items;
+                for (var i = 0; i < stacks.Count; i++)
+                {
+                    data.InventoryItemIds.Add(stacks[i].ItemId);
+                    data.InventoryItemCounts.Add(stacks[i].Count);
+                }
             }
 
             GameLog.Info(
@@ -137,6 +164,21 @@ namespace SamsaraWest.Flow
 
             _state.Restore(values, data.KarmaCompassion, data.KarmaTruth, data.KarmaFreedom);
 
+            // 钱与物跟账本一起整本换掉：读档是「换成另一份状态」，不是「往现在的钱袋里加」。
+            if (_economy != null)
+            {
+                var itemIds = data.InventoryItemIds ?? new List<string>();
+                var itemCounts = data.InventoryItemCounts ?? new List<int>();
+                var stackCount = Math.Min(itemIds.Count, itemCounts.Count);
+                var stacks = new List<ItemStack>(stackCount);
+                for (var i = 0; i < stackCount; i++)
+                {
+                    stacks.Add(new ItemStack(itemIds[i], itemCounts[i]));
+                }
+
+                _economy.Restore(data.Gold, stacks);
+            }
+
             // 母种子先复位、再进图：探索流是进图那一刻取的（ExplorationService.EnterMapCore），
             // 晚一步复位，这次进图就落在旧种子的序列上了。
             if (_random != null && data.RandomSeed != 0UL)
@@ -156,10 +198,10 @@ namespace SamsaraWest.Flow
             if (session == null)
             {
                 // 进图失败只可能是「查表时还认得、建会话时又不认了」这类异常；
-                // 账本与种子已经灌回去了，如实报出来而不是假装成功。
+                // 账本、钱袋与种子已经灌回去了，如实报出来而不是假装成功。
                 GameLog.Error(
                     LogChannel.Save,
-                    $"读档时进图失败：{data.MapId}。账本与主种子已灌回，位置没有恢复。",
+                    $"读档时进图失败：{data.MapId}。账本、钱袋与主种子已灌回，位置没有恢复。",
                     data.MapId);
                 return false;
             }

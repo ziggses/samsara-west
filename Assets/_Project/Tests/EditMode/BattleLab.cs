@@ -233,6 +233,61 @@ namespace SamsaraWest.Tests.EditMode
         }
 
         /// <summary>
+        /// 造一张掉落表。
+        /// </summary>
+        /// <remarks>
+        /// 默认<b>什么都不掉</b>（没有物品、没有必掉、抽取次数为 0、金钱区间 0–0）：
+        /// 战利品用例要验的是「某个字段起了作用」，默认值不参与任何计算才好断言。
+        /// 权重与数量的数组由调用方自己对齐长度——导入期会校验等长，测试里刻意不替它兜底。
+        /// </remarks>
+        internal LootTableDefinition LootTable(
+            string id,
+            string[] itemIds = null,
+            int[] weights = null,
+            int[] minCounts = null,
+            int[] maxCounts = null,
+            string[] guaranteedItemIds = null,
+            int[] guaranteedItemCounts = null,
+            int dropRolls = 0,
+            int goldMin = 0,
+            int goldMax = 0)
+        {
+            var table = New<LootTableDefinition>(id, "lut");
+            Set(table, "_itemIds", itemIds ?? Array.Empty<string>());
+            Set(table, "_weights", weights ?? Array.Empty<int>());
+            Set(table, "_minCounts", minCounts ?? Array.Empty<int>());
+            Set(table, "_maxCounts", maxCounts ?? Array.Empty<int>());
+            Set(table, "_guaranteedItemIds", guaranteedItemIds ?? Array.Empty<string>());
+            Set(table, "_guaranteedItemCounts", guaranteedItemCounts ?? Array.Empty<int>());
+            Set(table, "_dropRolls", dropRolls);
+            Set(table, "_goldMin", goldMin);
+            Set(table, "_goldMax", goldMax);
+            return table;
+        }
+
+        /// <summary>
+        /// 给敌人挂上掉落表与两笔固定奖励。
+        /// </summary>
+        /// <remarks>
+        /// 单独一个方法而不是往 <see cref="Enemy"/> 上加可选参数：那个方法的末尾是
+        /// <c>params string[] skillIds</c>，可选参数压在它后面会让所有现有调用点都得改写。
+        /// </remarks>
+        internal static void SetLoot(
+            EnemyDefinition enemy,
+            string lootTableId,
+            int goldReward = 0,
+            int experienceReward = 0)
+        {
+            SetPrivate(enemy, "_lootTableId", lootTableId);
+            SetPrivate(enemy, "_goldReward", goldReward);
+            SetPrivate(enemy, "_experienceReward", experienceReward);
+        }
+
+        /// <summary>造一条独立的掉落随机流（<c>RandomStreams.Loot</c>），与战斗流互不干扰。</summary>
+        internal static IRandomStream LootStream(ulong seed = DefaultSeed) =>
+            new PcgRandomStream(RandomStreams.Loot, seed);
+
+        /// <summary>
         /// 造一件战斗内可用的消耗品。
         /// </summary>
         /// <remarks>

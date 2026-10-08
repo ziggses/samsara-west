@@ -55,6 +55,9 @@ namespace SamsaraWest.Flow
         /// <summary>「战斗结局 → 记进剧情账本」的接线；同样在 <see cref="OnDestroy"/> 里释放。</summary>
         private BattleStoryLink _battleStoryLink;
 
+        /// <summary>「战斗胜利 → 战利品入账」的接线；同样在 <see cref="OnDestroy"/> 里释放。</summary>
+        private LootBattleLink _lootBattleLink;
+
         /// <summary>已完成的引导次数。PlayMode 测试用它证明「第二次启动没有重复安装」。</summary>
         public static int BootstrapCount { get; private set; }
 
@@ -84,6 +87,9 @@ namespace SamsaraWest.Flow
 
         /// <summary>「战斗结局 → 记进剧情账本」的接线。同样装在引导末尾。</summary>
         public BattleStoryLink BattleStory => _battleStoryLink;
+
+        /// <summary>「战斗胜利 → 战利品入账」的接线。同样装在引导末尾。</summary>
+        public LootBattleLink LootLink => _lootBattleLink;
 
         /// <summary>其它模块安装自身服务的挂载点。</summary>
         public event Action<IServiceRegistry> ModuleInstalled;
@@ -135,6 +141,12 @@ namespace SamsaraWest.Flow
             {
                 _battleStoryLink.Dispose();
                 _battleStoryLink = null;
+            }
+
+            if (_lootBattleLink != null)
+            {
+                _lootBattleLink.Dispose();
+                _lootBattleLink = null;
             }
 
             if (_explorationBattleLink != null)
@@ -191,6 +203,12 @@ namespace SamsaraWest.Flow
                 DataModule.Install(registry, _definitionCatalog);
                 Track("Data");
 
+                // 玩家的钱袋与背包就位：它只依赖 Core 与 Data（掉落表、道具），
+                // 所以紧跟数据之后。战斗与存档都要读它，但都不认识它——
+                // 两边分别由 VaultBattleInventory 与 SaveCoordinator 在组合根接上（ADR-027）。
+                Economy.EconomyModule.Install(registry);
+                Track("Economy");
+
                 LocModule.Install(registry, _localizationTable);
                 Track("Localization");
 
@@ -225,7 +243,12 @@ namespace SamsaraWest.Flow
                     registry.Resolve<Narrative.IStoryState>(),
                     registry.Resolve<Exploration.IExplorationService>(),
                     registry.Resolve<IDefinitionRegistry>(),
-                    registry.Resolve<IRandomService>()));
+                    registry.Resolve<IRandomService>(),
+                    registry.Resolve<Economy.IEconomyService>()));
+
+                // 内核要的「还有几个、扣掉一个」由这里转述给真背包：两边都不必认识对方
+                // （与 NarrativeStateSourceAdapter 同一种手法）。
+                var vault = new VaultBattleInventory(registry.Resolve<Economy.IEconomyService>());
 
                 // 接线最后装：它要同时拿到探索与战斗两个服务。
                 // 它不是一个模块（没有服务要注册），所以不计进 InstalledModules —— 那份清单只说「装上了哪些服务」。
@@ -233,7 +256,8 @@ namespace SamsaraWest.Flow
                     registry.Resolve<Battle.IBattleService>(),
                     registry.Resolve<IDefinitionRegistry>(),
                     registry.Resolve<IEventBus>(),
-                    registry.Resolve<Exploration.IExplorationService>());
+                    registry.Resolve<Exploration.IExplorationService>(),
+                    vault);
 
                 // 剧情状态接线：账本（flag 或心念）一变就重建探索的可行格，让条件交互物当场显隐。
                 _narrativeStateLink = new NarrativeStateLink(
@@ -260,6 +284,16 @@ namespace SamsaraWest.Flow
                 _battleStoryLink = new BattleStoryLink(
                     registry.Resolve<IEventBus>(),
                     registry.Resolve<Narrative.IStoryState>());
+
+                // 战利品结算线：打赢一场才发东西（败、逃、剧情撤退都不发），
+                // 钱与物直接进经济服务，掷骰走独立的掉落流（RandomStreams.Loot）。
+                // 它与上一条读同一个事件，但失败方式不同——账本键写重了只是记错一件事，
+                // 战利品发重了是玩家凭空多拿到钱，所以两条线分开。
+                _lootBattleLink = new LootBattleLink(
+                    registry.Resolve<IEventBus>(),
+                    registry.Resolve<IDefinitionRegistry>(),
+                    registry.Resolve<Economy.IEconomyService>(),
+                    registry.Resolve<IRandomService>());
             }
             catch (Exception exception)
             {

@@ -29,6 +29,7 @@ namespace SamsaraWest.Flow
         private readonly IBattleService _battle;
         private readonly IDefinitionRegistry _definitions;
         private readonly IExplorationService _exploration;
+        private readonly IBattleInventory _inventory;
         private readonly SubscriptionBag _subscriptions = new SubscriptionBag();
         private bool _disposed;
 
@@ -38,11 +39,16 @@ namespace SamsaraWest.Flow
         /// <param name="exploration">
         /// 探索服务，用来在战斗结束后了结遭遇。允许为空（不接探索时这条链只做「遇敌 → 开战」）。
         /// </param>
+        /// <param name="inventory">
+        /// 这场战斗能用的道具来源（正式流程传 <see cref="VaultBattleInventory"/>）。
+        /// 允许为空——为空时道具指令问谁都要不到东西，战斗其余部分照常。
+        /// </param>
         public ExplorationBattleLink(
             IBattleService battle,
             IDefinitionRegistry definitions,
             IEventBus bus,
-            IExplorationService exploration = null)
+            IExplorationService exploration = null,
+            IBattleInventory inventory = null)
         {
             _battle = battle ?? throw new ArgumentNullException(nameof(battle));
             _definitions = definitions ?? throw new ArgumentNullException(nameof(definitions));
@@ -52,6 +58,7 @@ namespace SamsaraWest.Flow
             }
 
             _exploration = exploration;
+            _inventory = inventory;
 
             _subscriptions.Add(bus.Subscribe<EncounterTriggeredEvent>(
                 ExplorationEventChannel.Channel,
@@ -100,8 +107,9 @@ namespace SamsaraWest.Flow
                 return;
             }
 
-            // 骨架期的队伍口径：目录里全部可操作角色（BattleFactory.DefaultParty）。
-            // 存档的队伍与背包接上之后，换的是这一行，不是这条链。
+            // 队伍口径仍是骨架期的：目录里全部可操作角色（BattleFactory.DefaultParty）。
+            // 背包已经不是了——第二十一轮起，从这里开出的战斗带的是真正的钱袋与背包
+            // （VaultBattleInventory 转述给 IEconomyService），打赢得来的丹药当场就能用。
             var party = BattleFactory.DefaultParty(_definitions);
             if (party.Count == 0)
             {
@@ -113,7 +121,7 @@ namespace SamsaraWest.Flow
                 return;
             }
 
-            var setup = BattleFactory.FromEncounter(encounter, party);
+            var setup = BattleFactory.FromEncounter(encounter, party, _inventory);
             if (!setup.Validate(out var error))
             {
                 IgnoredEncounters++;
