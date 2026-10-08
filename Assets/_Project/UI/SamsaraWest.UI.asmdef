@@ -4,6 +4,7 @@
     "references": [
         "SamsaraWest.Core",
         "SamsaraWest.Data",
+        "SamsaraWest.Battle",
         "SamsaraWest.Localization",
         "Unity.TextMeshPro"
     ],
