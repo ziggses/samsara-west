@@ -186,8 +186,9 @@ namespace SamsaraWest.Exploration
     /// </summary>
     /// <remarks>
     /// 触发只说明「这件事发生了」，不说明「做了什么」：具体效果由订阅
-    /// <see cref="InteractionTriggeredEvent"/> 的模块决定（对话、开箱、换图）。
-    /// 换图这一条因为完全由数据决定（<c>targetId</c> 是合法地图 ID），所以在这里带出来。
+    /// <see cref="InteractionTriggeredEvent"/> 的模块决定（对话、开箱、换图、开打）。
+    /// 换图与定点遭遇这两条因为完全由数据决定（<c>targetId</c> 是合法地图 ID／遭遇 ID），
+    /// 所以在这里带出来——判据同源，不必再维护一份「哪些交互算门、哪些算仗」的名单。
     /// </remarks>
     public readonly struct InteractionResult
     {
@@ -198,7 +199,8 @@ namespace SamsaraWest.Exploration
             string targetId,
             GridPosition position,
             bool oneShot,
-            bool requestsMapChange)
+            bool requestsMapChange,
+            bool requestsEncounter)
         {
             Rejection = rejection;
             InteractableId = interactableId;
@@ -207,6 +209,7 @@ namespace SamsaraWest.Exploration
             Position = position;
             OneShot = oneShot;
             RequestsMapChange = requestsMapChange;
+            RequestsEncounter = requestsEncounter;
         }
 
         public bool Triggered => Rejection == InteractionRejection.None;
@@ -234,13 +237,20 @@ namespace SamsaraWest.Exploration
         /// <summary>要换去的地图 ID；不是换图请求时为 null。</summary>
         public string TargetMapId => RequestsMapChange ? TargetId : null;
 
+        /// <summary><see cref="TargetId"/> 是一场合法遭遇 ⇒ 这是一次定点遭遇（走上去就开打）。</summary>
+        public bool RequestsEncounter { get; }
+
+        /// <summary>要打的那场遭遇 ID；不是定点遭遇时为 null。</summary>
+        public string TargetEncounterId => RequestsEncounter ? TargetId : null;
+
         public static InteractionResult Success(
             string interactableId,
             string interactionTypeKey,
             string targetId,
             GridPosition position,
             bool oneShot,
-            bool requestsMapChange) =>
+            bool requestsMapChange,
+            bool requestsEncounter) =>
             new InteractionResult(
                 InteractionRejection.None,
                 interactableId,
@@ -248,10 +258,11 @@ namespace SamsaraWest.Exploration
                 targetId,
                 position,
                 oneShot,
-                requestsMapChange);
+                requestsMapChange,
+                requestsEncounter);
 
         public static InteractionResult Rejected(InteractionRejection rejection, GridPosition position) =>
-            new InteractionResult(rejection, null, null, null, position, false, false);
+            new InteractionResult(rejection, null, null, null, position, false, false, false);
 
         public override string ToString() =>
             Triggered

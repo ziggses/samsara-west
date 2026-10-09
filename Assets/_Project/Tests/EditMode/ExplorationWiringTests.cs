@@ -311,6 +311,51 @@ namespace SamsaraWest.Tests.EditMode
             Assert.AreSame(session, wiring.Exploration.Current);
         }
 
+        [Test]
+        public void 定点遭遇_交互物的目标是一场遭遇_挂起并把仗开起来()
+        {
+            using var lab = new ExplorationLab();
+            using var battleLab = new BattleLab();
+            lab.Interactable("INT_CH01_KING", MapId, 2, 2, targetId: EncounterId);
+            using var wiring = new Wiring(lab, battleLab);
+            var session = wiring.Exploration.EnterMap(MapId, new GridPosition(2, 1), MoveDirection.North);
+
+            var result = session.TryInteract();
+
+            Assert.IsTrue(result.RequestsEncounter, "targetId 是合法遭遇 ID，这次交互就是定点遭遇。");
+            Assert.AreEqual(EncounterId, result.TargetEncounterId);
+            Assert.IsFalse(result.RequestsMapChange, "遭遇 ID 不该被当成地图 ID。");
+            Assert.IsTrue(session.IsEncounterPending);
+            Assert.AreEqual(
+                MoveRejection.EncounterPending,
+                session.TryMove(MoveDirection.North).Rejection,
+                "挂起口径与随机遭遇一致：仗没打完就一步都走不动。");
+            Assert.IsTrue(wiring.Battle.HasActiveBattle, "定点遭遇与随机遭遇走的是同一条接线。");
+            Assert.AreEqual(1, wiring.Link.BattlesStarted);
+            Assert.AreEqual(EncounterId, wiring.Battle.Current.Setup.EncounterId);
+
+            wiring.Battle.Current.RunToEnd();
+
+            Assert.IsFalse(session.IsEncounterPending, "打完必须了结，否则玩家从此一步都走不动。");
+        }
+
+        [Test]
+        public void 定点遭遇_目标不是遭遇ID的交互物_不算开战()
+        {
+            using var lab = new ExplorationLab();
+            using var battleLab = new BattleLab();
+            lab.Interactable("INT_CH01_RELIC", MapId, 2, 2, targetId: "CH01_N28_ENTER_BY_RELIC");
+            using var wiring = new Wiring(lab, battleLab);
+            var session = wiring.Exploration.EnterMap(MapId, new GridPosition(2, 1), MoveDirection.North);
+
+            var result = session.TryInteract();
+
+            Assert.IsTrue(result.RequestsMapChange == false && result.RequestsEncounter == false);
+            Assert.IsNull(result.TargetEncounterId, "剧情节点名不是遭遇 ID。");
+            Assert.IsFalse(session.IsEncounterPending);
+            Assert.IsFalse(wiring.Battle.HasActiveBattle, "读一块碑不该顺手把仗开起来。");
+        }
+
         private static CoreOptions TestCoreOptions() => new CoreOptions
         {
             MasterSeed = ExplorationLab.DefaultSeed,

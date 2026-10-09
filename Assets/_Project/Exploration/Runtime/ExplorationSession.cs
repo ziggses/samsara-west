@@ -217,6 +217,11 @@ namespace SamsaraWest.Exploration
             // 判据是数据不是类型键：targetId 只要是合法地图 ID，这次交互就是换图请求。
             var requestsMapChange = IdRules.IsValidId(DefinitionKind.Map, interactable.TargetId);
 
+            // 同一条判据的第二种用法：targetId 是一场合法遭遇 ⇒ 定点遭遇。
+            // 走上去就开打（剧本里「子时一到，洞口关上」那一类），不必等随机率掷中，
+            // 于是 Boss 战有了落脚处，而不必把整张图挂上 Boss 的随机遭遇表。
+            var requestsEncounter = IdRules.IsValidId(DefinitionKind.Encounter, interactable.TargetId);
+
             Publish(new InteractionTriggeredEvent(
                 interactable.Id,
                 interactable.InteractionTypeKey,
@@ -229,13 +234,28 @@ namespace SamsaraWest.Exploration
                 Publish(new MapChangeRequestedEvent(MapId, interactable.TargetId, interactable.Id, cell));
             }
 
+            if (requestsEncounter)
+            {
+                // 挂起口径与随机遭遇完全一致：挂起之后走不动、也不能再交互，直到 ResolveEncounter 被调用。
+                // 开战由 Flow 侧接线决定（它订阅的是同一条 EncounterTriggeredEvent）。
+                PendingEncounterId = interactable.TargetId;
+
+                GameLog.Info(
+                    LogChannel.Exploration,
+                    $"地图 {MapId} 在 {cell} 触发定点遭遇 {interactable.TargetId}（交互物 {interactable.Id}）。",
+                    MapId);
+
+                Publish(new EncounterTriggeredEvent(MapId, interactable.TargetId, cell, StepCount));
+            }
+
             return InteractionResult.Success(
                 interactable.Id,
                 interactable.InteractionTypeKey,
                 interactable.TargetId,
                 cell,
                 interactable.OneShot,
-                requestsMapChange);
+                requestsMapChange,
+                requestsEncounter);
         }
 
         /// <summary>
