@@ -10,31 +10,30 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 1718f3f096b3c3d47ab53c32f9747652, type: 3}
-  m_Name: CH01_MAP04
+  m_Name: CH01_MAP05
   m_EditorClassIdentifier: 
-  _id: CH01_MAP04
-  _displayNameKey: map.ch01.map04.name
-  _descriptionKey: map.ch01.map04.desc
+  _id: CH01_MAP05
+  _displayNameKey: map.ch01.map05.name
+  _descriptionKey: map.ch01.map05.desc
   _tags:
   - ch01
-  - field
+  - cave
   _version: 1
   _icon: {fileID: 0}
   _chapterIndex: 1
-  _sceneName: Map_CH01_MAP04
-  _gridWidth: 80
-  _gridHeight: 55
+  _sceneName: Map_CH01_MAP05
+  _gridWidth: 100
+  _gridHeight: 70
   _tilePixelSize: 32
   _originOffsetX: 0
   _originOffsetY: 0
-  _encounterTableId: ENC_CH01_005
-  _encounterRate: 0.12
+  _encounterTableId: 
+  _encounterRate: 0
   _isTown: 0
   _isSafeZone: 0
   _allowsSaving: 1
-  _bgmKey: music.ch01.waterfall
-  _ambientKey: amb.ch01.water
-  _backgroundSpriteKey: sprite.map.ch01.waterfall
+  _bgmKey: music.ch01.stronghold
+  _ambientKey: amb.ch01.cave
+  _backgroundSpriteKey: sprite.map.ch01.stronghold
   _connections:
-  - CH01_MAP03
-  - CH01_MAP05
+  - CH01_MAP04

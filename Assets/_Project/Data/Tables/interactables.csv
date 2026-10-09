@@ -9,8 +9,15 @@
 #   而墓穴那一批还没做。031 因此是本阶段唯一打不开的路线——这是有意的依赖，不是漏配。
 # 门位口径（ADR-024）：025 与 026 嵌在 (52,22)/(52,21) 这一对上，
 #   从宴场 (52,22) 出门落在水帘洞外的 (52,22)，进门一律面朝南，正前方正好是 (52,21) 的回程门。
-# MAP04 通魔王洞窟（CH01_MAP05）的那扇门**本批故意没做**：目标图还不存在，
-#   换图接线会记一条错误日志并把玩家留在原地（见 MapChangeLink）。等 MAP05 落地时再补。
+# 魔王洞窟（MAP05）那一批：034 是 MAP04 最深处新开的口子，035 是洞内的回程门，仍是「落点先挑、门位倒推」——
+#   出洞落点 (52,50)、回程门 (52,49)，进门一律面朝南，正前方正好是回程门。
+#   ⚠️ 041 是本项目第一件**定点遭遇**交互物：targetId 直接写遭遇 ID（BENC_CH01_001），
+#   判据与门同源（targetId 是合法遭遇 ID 就是开打，见 ADR-031）。这张图没有随机遭遇（maps.csv 里两项都空着）。
+#   042~046 是魔王战之后的五件东西（空王座 + 三种处理 + 出洞），统一以 flag.battle.benc_ch01_001.won 为门槛
+#   （战果回写那一行由战斗层写，见 ADR-026），配上 isHiddenUntilConditionMet，打完才现形。
+#   ⚠️ 043~045 那三条处理**不互斥**：引擎没有玩家选择系统，而条件是单条件（requiredStateKey 只有一列），
+#   表达不了「选过一条就把另外两条封掉」。玩家可以把三条都做一遍，账本会同时记下杀死与放走。
+#   这是本批最大的已知缺口，与鼓楼的「三选」同源，见 Docs/待拍板清单.md。
 id,displayNameKey,descriptionKey,tags,version,mapId,gridX,gridY,interactionTypeKey,targetId,requiredStateKey,requiredOperator,requiredValue,oneShot,isHiddenUntilConditionMet,promptKey,interactSpriteKey
 INT_CH01_001_GREETER_MONKEY,int.ch01.001.name,int.ch01.001.desc,ch01;npc,1,CH01_MAP01,20,8,interact.dialogue,DLG_CH01_002,,Equal,0,false,false,ui.prompt.talk,sprite.int.greeter_monkey
 INT_CH01_002_BROKEN_DRUM,int.ch01.002.name,int.ch01.002.desc,ch01;prop,1,CH01_MAP01,31,20,interact.examine,DLG_CH01_004,,Equal,0,false,false,ui.prompt.examine,sprite.int.broken_drum
@@ -43,3 +50,16 @@ INT_CH01_030_GREAT_SAGE_SEAT,int.ch01.030.name,int.ch01.030.desc,ch01;prop,1,CH0
 INT_CH01_031_ENTER_BY_RELIC,int.ch01.031.name,int.ch01.031.desc,ch01;prop,1,CH01_MAP04,46,38,interact.examine,DLG_CH01_028,flag.ch01.old_ring_held,Equal,1,false,true,ui.prompt.examine,sprite.int.old_ring
 INT_CH01_032_ENTER_BY_REASON,int.ch01.032.name,int.ch01.032.desc,ch01;prop,1,CH01_MAP04,58,38,interact.dialogue,DLG_CH01_029,karma.truth,GreaterOrEqual,2,false,true,ui.prompt.talk,sprite.int.gate_monkey
 INT_CH01_033_ENTER_BY_FORCE,int.ch01.033.name,int.ch01.033.desc,ch01;prop,1,CH01_MAP04,52,43,interact.examine,DLG_CH01_030,,Equal,0,false,false,ui.prompt.examine,sprite.int.gate_monkey
+INT_CH01_034_STRONGHOLD_GATE,int.ch01.034.name,int.ch01.034.desc,ch01;door,1,CH01_MAP04,52,50,interact.door,CH01_MAP05,,Equal,0,false,false,ui.prompt.enter,sprite.int.gate
+INT_CH01_035_STRONGHOLD_EXIT,int.ch01.035.name,int.ch01.035.desc,ch01;door,1,CH01_MAP05,52,49,interact.door,CH01_MAP04,,Equal,0,false,false,ui.prompt.enter,sprite.int.gate
+INT_CH01_036_SHATTERED_WEAPONS,int.ch01.036.name,int.ch01.036.desc,ch01;prop,1,CH01_MAP05,34,44,interact.examine,DLG_CH01_031,,Equal,0,false,false,ui.prompt.examine,sprite.int.shattered_weapons
+INT_CH01_037_EMPTY_WINE_JARS,int.ch01.037.name,int.ch01.037.desc,ch01;prop,1,CH01_MAP05,70,44,interact.examine,DLG_CH01_032,,Equal,0,false,false,ui.prompt.examine,sprite.int.wine_jars
+INT_CH01_038_WALL_INSCRIPTION,int.ch01.038.name,int.ch01.038.desc,ch01;prop,1,CH01_MAP05,52,33,interact.examine,DLG_CH01_033,,Equal,0,false,false,ui.prompt.examine,sprite.int.wall_inscription
+INT_CH01_039_MONKEY_KING,int.ch01.039.name,int.ch01.039.desc,ch01;npc;boss,1,CH01_MAP05,52,26,interact.dialogue,DLG_CH01_034,,Equal,0,false,false,ui.prompt.talk,sprite.int.monkey_king
+INT_CH01_040_BROKEN_SAGE_STATUE,int.ch01.040.name,int.ch01.040.desc,ch01;prop,1,CH01_MAP05,70,26,interact.examine,DLG_CH01_035,,Equal,0,false,false,ui.prompt.examine,sprite.int.broken_sage_statue
+INT_CH01_041_REINCARNATION_ALTAR,int.ch01.041.name,int.ch01.041.desc,ch01;boss,1,CH01_MAP05,52,12,interact.examine,BENC_CH01_001,,Equal,0,false,false,ui.prompt.fight,sprite.int.reincarnation_altar
+INT_CH01_042_EMPTY_THRONE,int.ch01.042.name,int.ch01.042.desc,ch01;prop,1,CH01_MAP05,52,6,interact.dialogue,DLG_CH01_036,flag.battle.benc_ch01_001.won,Equal,1,false,true,ui.prompt.talk,sprite.int.empty_throne
+INT_CH01_043_JUDGE_KILL,int.ch01.043.name,int.ch01.043.desc,ch01;prop,1,CH01_MAP05,44,6,interact.dialogue,DLG_CH01_037,flag.battle.benc_ch01_001.won,Equal,1,false,true,ui.prompt.talk,sprite.int.monkey_king
+INT_CH01_044_JUDGE_SEAL,int.ch01.044.name,int.ch01.044.desc,ch01;prop,1,CH01_MAP05,52,3,interact.dialogue,DLG_CH01_038,flag.battle.benc_ch01_001.won,Equal,1,false,true,ui.prompt.talk,sprite.int.memory_stone
+INT_CH01_045_JUDGE_FREE,int.ch01.045.name,int.ch01.045.desc,ch01;prop,1,CH01_MAP05,60,6,interact.dialogue,DLG_CH01_039,flag.battle.benc_ch01_001.won,Equal,1,false,true,ui.prompt.talk,sprite.int.monkey_king
+INT_CH01_046_DEPARTURE,int.ch01.046.name,int.ch01.046.desc,ch01;prop,1,CH01_MAP05,52,46,interact.examine,DLG_CH01_041,flag.battle.benc_ch01_001.won,Equal,1,false,true,ui.prompt.examine,sprite.int.exit_light

@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using NUnit.Framework;
+using SamsaraWest.Battle;
 using SamsaraWest.Core;
 using SamsaraWest.Exploration;
 using SamsaraWest.Flow;
@@ -492,6 +493,142 @@ namespace SamsaraWest.Tests.PlayMode
             yield return null;
         }
 
+        [UnityTest]
+        public IEnumerator MeetingTheMonkeyKing_HearsWhatHeNeverForgot()
+        {
+            var screen = EnterStronghold(new GridPosition(52, 25));
+
+            var missingBefore = _localization.MissingKeys.Count;
+            Assert.IsTrue(screen.Interact(), "前置条件：混世魔王就在面朝的那一格。");
+
+            Assert.IsTrue(screen.IsDialogueActive);
+            Assert.AreEqual(
+                _localization.Get(LocalizationKeys.DLG_CH01_034_LINE_1_WHO),
+                screen.DialogueSpeaker,
+                "头一行就是魔王自己开口：「你来了。」——他也不装，认得每一个来杀他的人。");
+
+            Assert.AreEqual(
+                10,
+                AdvanceToTheEnd(screen),
+                "魔王那段一次念完十行：他没有忘，只是每天醒来都当第一次。");
+            Assert.AreEqual(1, _story.GetValue("flag.ch01.monkey_king_met"));
+            Assert.AreEqual(
+                0,
+                _story.GetKarma(KarmaAxis.Truth),
+                "听他说完不算真相——他把记得的事说了一遍，但没有答案。");
+            Assert.AreEqual(
+                missingBefore,
+                _localization.MissingKeys.Count,
+                "魔王那十行连说话人，必须一行不落地命中文本表。");
+            yield return null;
+        }
+
+        [UnityTest]
+        public IEnumerator TheReincarnationAltar_SendsThePartyIntoTheLastFight()
+        {
+            var screen = EnterStronghold(new GridPosition(52, 11));
+
+            var battle = GameServices.Registry.Resolve<IBattleService>();
+            Assert.IsFalse(battle.HasActiveBattle, "前置条件：进洞那会儿没有仗在打。");
+
+            Assert.IsTrue(screen.Interact(), "前置条件：轮回台就在面朝的那一格。");
+
+            // 定点遭遇（ADR-031）：targetId 直接写遭遇 ID，走上去就开打，
+            // 不像洞里别的东西那样先念一段再让你走。
+            Assert.AreEqual(
+                "BENC_CH01_001",
+                screen.PendingEncounterId,
+                "轮回台要把混世魔王那场仗挂进探索会话，而不是当成一次调查。");
+            Assert.IsFalse(screen.IsDialogueActive, "开打不是搭话：这一下不该弹出对白面板。");
+            Assert.IsTrue(battle.HasActiveBattle, "「探索遇敌 → 进战斗」这条线要真的把仗开起来。");
+            Assert.AreEqual("BENC_CH01_001", battle.Current.Setup.EncounterId);
+            yield return null;
+        }
+
+        [UnityTest]
+        public IEnumerator TheKingsRemains_OnlyRiseAfterTheFightIsWon()
+        {
+            var screen = EnterStronghold(new GridPosition(52, 5));
+
+            // 没赢下那场仗之前：空王座、杀封放三条处理、出洞的光都不该在图上。
+            Assert.IsNull(
+                screen.Session.Grid.InteractableAt(new GridPosition(52, 6)),
+                "没赢下那场仗，空王座不该现形——它是战利品，不是布景。");
+            Assert.IsNull(
+                screen.Session.Grid.InteractableAt(new GridPosition(44, 6)),
+                "杀、封、放三条处理同理，都得等魔王先倒下。");
+            Assert.IsNull(
+                screen.Session.Grid.InteractableAt(new GridPosition(52, 46)),
+                "出洞的光同理：没打完这一章就出不去。");
+
+            // 战果回写那一行由战斗层写（ADR-026），这里替它写，证明「门槛一过五件就现形」。
+            _story.SetValue("flag.battle.benc_ch01_001.won", 1);
+
+            screen = EnterStronghold(new GridPosition(52, 5));
+
+            Assert.IsNotNull(
+                screen.Session.Grid.InteractableAt(new GridPosition(52, 6)),
+                "赢下之后，空王座该出现。");
+            Assert.IsNotNull(screen.Session.Grid.InteractableAt(new GridPosition(44, 6)), "杀。");
+            Assert.IsNotNull(screen.Session.Grid.InteractableAt(new GridPosition(52, 3)), "封。");
+            Assert.IsNotNull(screen.Session.Grid.InteractableAt(new GridPosition(60, 6)), "放。");
+            Assert.IsNotNull(screen.Session.Grid.InteractableAt(new GridPosition(52, 46)), "出洞的光。");
+            yield return null;
+        }
+
+        [UnityTest]
+        public IEnumerator JudgingTheKing_RecordsWhicheverHandWasDealt()
+        {
+            _story.SetValue("flag.battle.benc_ch01_001.won", 1);
+
+            // 杀（043）：取他性命，慈悲掉一点。
+            var screen = EnterStronghold(new GridPosition(44, 5));
+            Assert.IsTrue(screen.Interact(), "前置条件：处刑的位置就在面朝的那一格。");
+            Assert.AreEqual(3, AdvanceToTheEnd(screen), "杀那一段三行。");
+            Assert.AreEqual(1, _story.GetValue("flag.ch01.king_killed"));
+            Assert.AreEqual(-1, _story.GetKarma(KarmaAxis.Compassion), "取他性命，慈悲要掉一点。");
+
+            // 封（044）：压进记忆石，不记慈悲账。
+            screen = EnterStronghold(new GridPosition(52, 2));
+            Assert.IsTrue(screen.Interact(), "前置条件：封印的位置就在面朝的那一格。");
+            Assert.AreEqual(5, AdvanceToTheEnd(screen), "封那一段五行。");
+            Assert.AreEqual(1, _story.GetValue("flag.ch01.king_sealed"));
+            Assert.AreEqual(-1, _story.GetKarma(KarmaAxis.Compassion), "封不等于杀，慈悲不该再掉。");
+
+            // 放（045）：一条对话只有一对 karma，于是用串节把自由 +1 与慈悲 +1 各记一次。
+            screen = EnterStronghold(new GridPosition(60, 5));
+            Assert.IsTrue(screen.Interact(), "前置条件：放走的位置就在面朝的那一格。");
+            Assert.AreEqual(4, AdvanceToTheEnd(screen), "放那一段四行，末尾那节没有台词。");
+            Assert.AreEqual(1, _story.GetValue("flag.ch01.king_freed"));
+            Assert.AreEqual(1, _story.GetKarma(KarmaAxis.Freedom), "放他走这一笔记自由。");
+            Assert.AreEqual(
+                0,
+                _story.GetKarma(KarmaAxis.Compassion),
+                "慈悲账从 −1 回到 0：放他走补回的那一点落在串节上。");
+            yield return null;
+        }
+
+        [UnityTest]
+        public IEnumerator LeavingTheCave_ClosesChapterOne()
+        {
+            _story.SetValue("flag.battle.benc_ch01_001.won", 1);
+            var screen = EnterStronghold(new GridPosition(52, 45));
+
+            Assert.IsTrue(screen.Interact(), "前置条件：出洞的光就在面朝的那一格。");
+            Assert.IsTrue(screen.IsDialogueActive);
+            Assert.AreEqual(_localization.Get(LocalizationKeys.DLG_CH01_041_LINE_1), screen.DialogueLine);
+            Assert.AreEqual(
+                7,
+                AdvanceToTheEnd(screen),
+                "章节尾声七行：晨光、经纸上的字、五行山方向的光。");
+            Assert.AreEqual(1, _story.GetValue("flag.ch01.chapter_one_cleared"), "念完这一章就算清了。");
+            Assert.AreEqual(
+                0,
+                _localization.MissingKeys.Count,
+                "尾声那七行连说话人，必须一行不落地命中文本表。");
+            yield return null;
+        }
+
         private static ExplorationScreenView EnterBanquet(GridPosition approach)
         {
             var screen = ExplorationScreenView.Instance;
@@ -517,6 +654,20 @@ namespace SamsaraWest.Tests.PlayMode
             Assert.IsTrue(
                 screen.EnterDiagnosticMap("CH01_MAP04", approach, MoveDirection.North),
                 "前置条件：进得了水帘洞外那张图。");
+            return screen;
+        }
+
+        private static ExplorationScreenView EnterStronghold(GridPosition approach)
+        {
+            var screen = ExplorationScreenView.Instance;
+            screen.Tick();
+
+            // 同一个入口不允许抢会话：先离图，再按坐标进魔王洞窟。
+            screen.LeaveMap();
+
+            Assert.IsTrue(
+                screen.EnterDiagnosticMap("CH01_MAP05", approach, MoveDirection.North),
+                "前置条件：进得了魔王洞窟那张图。");
             return screen;
         }
 

@@ -23,7 +23,7 @@ MonoBehaviour:
   _chapterIndex: 1
   _enemyIds:
   - ENM_CH01_MONKEY_KING
-  _formation: 1x1
+  _formation: 1x0
   _isElite: 0
   _isBoss: 1
   _bossPhaseIds:

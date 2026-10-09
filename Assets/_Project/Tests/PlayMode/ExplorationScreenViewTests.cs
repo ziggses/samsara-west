@@ -658,9 +658,9 @@ namespace SamsaraWest.Tests.PlayMode
 
             var grid = screen.Session.Grid;
 
-            // 剧本给了水帘洞外五站，第五站「魔王洞门」通向还没做的 CH01_MAP05，
-            // 本批故意没画那扇门（目标图不存在，换图会记一条错误日志并把玩家留在原地）。
-            // 所以这里守的是「四段调查 + 那条无条件的兜底路线」一个不落，按 ID 点名，不数总数。
+            // 剧本给了水帘洞外五站，第五站「魔王洞门」通到 CH01_MAP05——本批那张图落地了，
+            // 门就真的画上了，不再是一扇指着空处的口子。
+            // 这里守的是「四段调查 + 兜底路线 + 那扇洞门」一个不落，按 ID 点名，不数总数。
             var stations = new (string Id, int X, int Y)[]
             {
                 ("INT_CH01_026_WATERFALL_EXIT", 52, 21),
@@ -669,6 +669,7 @@ namespace SamsaraWest.Tests.PlayMode
                 ("INT_CH01_029_WEAPON_RACK", 40, 42),
                 ("INT_CH01_030_GREAT_SAGE_SEAT", 64, 42),
                 ("INT_CH01_033_ENTER_BY_FORCE", 52, 43),
+                ("INT_CH01_034_STRONGHOLD_GATE", 52, 50),
             };
 
             foreach (var station in stations)
@@ -677,6 +678,100 @@ namespace SamsaraWest.Tests.PlayMode
                 Assert.IsNotNull(
                     found,
                     $"水帘洞外缺了 {station.Id}：剧本那几站要一个不落地画在图上，落位也不能漂。");
+                Assert.AreEqual(station.Id, found.Id);
+            }
+        }
+
+        [UnityTest]
+        public IEnumerator Screen_TheStrongholdPathLeadsBeyondTheDeepestWaterCurtain()
+        {
+            yield return LoadBootstrapScene();
+
+            var screen = ExplorationScreenView.Instance;
+            screen.Tick();
+
+            // 水帘洞外最深处 (52,50) 是通往魔王洞窟的口子：站到 (52,49) 朝北，正前方就是它。
+            Assert.IsTrue(screen.EnterDiagnosticMap("CH01_MAP04", new GridPosition(52, 49), MoveDirection.North));
+
+            var localization = GameServices.Registry.Resolve<ILocalizationService>();
+            StringAssert.Contains(
+                localization.Get(LocalizationKeys.INT_CH01_034_NAME),
+                screen.FacingLine,
+                "面朝的那一格是通往魔王洞窟的口子，就该报出它的名字。");
+
+            Assert.IsTrue(screen.Interact(), "门是可以交互的。");
+
+            var session = screen.Session;
+            Assert.AreEqual("CH01_MAP05", session.MapId);
+            Assert.AreEqual(100, session.Grid.Width, "换图之后网格得重建，魔王洞窟的尺寸来自 maps.csv。");
+            Assert.AreEqual(70, session.Grid.Height);
+            Assert.IsTrue(session.Grid.IsWalkable(session.Position), "落点必须是能站的格子。");
+
+            // 门位口径跟水帘洞那两扇一样：034 与 035 嵌在 (52,50)/(52,49) 这一对上。
+            // 锚点自己就是可行走格，落点留在原地；进门一律面朝南，正前方正好是回程门。
+            Assert.AreEqual(new GridPosition(52, 50), session.Position);
+            Assert.AreEqual(new GridPosition(52, 49), session.FacingPosition, "落点应当就在回程门跟前。");
+
+            var gateBack = session.Grid.InteractableAt(session.FacingPosition);
+            Assert.IsNotNull(gateBack, "回程门应当就在落点正前方。");
+            Assert.AreEqual("INT_CH01_035_STRONGHOLD_EXIT", gateBack.Id);
+            StringAssert.Contains("CH01_MAP05", screen.StatusLine, "状态行得跟着报出新图。");
+            Assert.AreEqual(0, localization.MissingKeys.Count, "新加的门与提示文案必须都在文本表里。");
+        }
+
+        [UnityTest]
+        public IEnumerator Screen_TheStrongholdExitLeadsBackIntoTheWaterCurtain()
+        {
+            yield return LoadBootstrapScene();
+
+            var screen = ExplorationScreenView.Instance;
+            screen.Tick();
+
+            // 反过来走一遍：魔王洞窟 (52,50) 朝南，正前方是 (52,49) 的回程门。
+            // 朝南正是进门时被摆好的朝向（ADR-024），所以从水帘洞过来的人一落地就能原路按回去。
+            Assert.IsTrue(screen.EnterDiagnosticMap("CH01_MAP05", new GridPosition(52, 50), MoveDirection.South));
+            Assert.IsTrue(screen.Interact());
+
+            var session = screen.Session;
+            Assert.AreEqual("CH01_MAP04", session.MapId, "门是双向的：两张图的 connections 互相指着对方。");
+            Assert.AreEqual(
+                new GridPosition(52, 49),
+                session.Position,
+                "回程门在 (52,49)，水帘洞外 80x55 装得下这个坐标，落点就是它自己，不必搜索。");
+            Assert.AreEqual(1, GameBootstrap.Instance.MapChange.MapChanges);
+        }
+
+        [UnityTest]
+        public IEnumerator Screen_TheStrongholdCarriesItsFiveStations()
+        {
+            yield return LoadBootstrapScene();
+
+            var screen = ExplorationScreenView.Instance;
+            screen.Tick();
+            Assert.IsTrue(screen.EnterDiagnosticMap("CH01_MAP05", new GridPosition(52, 50), MoveDirection.North));
+
+            var grid = screen.Session.Grid;
+
+            // 剧本给了魔王洞窟五站：断兵器、空酒坛、壁上字、断掉的石像，加魔王本人。
+            // 战后那五件（空王座 + 杀封放 + 出洞的光）以战果为门槛，没打仗之前不该出现，
+            // 由 ExplorationDialogueTests 那几条单独守着。
+            var stations = new (string Id, int X, int Y)[]
+            {
+                ("INT_CH01_035_STRONGHOLD_EXIT", 52, 49),
+                ("INT_CH01_036_SHATTERED_WEAPONS", 34, 44),
+                ("INT_CH01_037_EMPTY_WINE_JARS", 70, 44),
+                ("INT_CH01_038_WALL_INSCRIPTION", 52, 33),
+                ("INT_CH01_039_MONKEY_KING", 52, 26),
+                ("INT_CH01_040_BROKEN_SAGE_STATUE", 70, 26),
+                ("INT_CH01_041_REINCARNATION_ALTAR", 52, 12),
+            };
+
+            foreach (var station in stations)
+            {
+                var found = grid.InteractableAt(new GridPosition(station.X, station.Y));
+                Assert.IsNotNull(
+                    found,
+                    $"魔王洞窟缺了 {station.Id}：剧本那几站要一个不落地画在图上，落位也不能漂。");
                 Assert.AreEqual(station.Id, found.Id);
             }
         }

@@ -19,6 +19,16 @@
 #   真实的分岔在 interactables.csv（031 要石环 / 032 要真相 >= 2 / 033 无条件），
 #   这里只管三条路线各自念什么、记什么：028 记 flag.ch01.gate_opened_by_relic，
 #   029 记 flag.ch01.gate_opened_by_words 并自由 +1，030 记 flag.ch01.gate_opened_by_force 并慈悲 −1。
+#   魔王洞窟（MAP05）那一批：031/032/033/035/036 是单点调查，各自 isTerminal，念完写自己的「看过」旗标。
+#   034 是战前对白，念完记 flag.ch01.monkey_king_met。
+#   037/038/039 是魔王战之后的三条处理（杀 / 封 / 放）：真实分岔同样在 interactables.csv 的三个条件上，
+#   而它们**不互斥**（单条件表达不了「选过就封掉另外两条」，见该表头部与 Docs/待拍板清单.md）。
+#   ⚠️ 剧本里 A（杀）要的是因果 judgment +2，可引擎三轴只有慈悲/真相/自由，没有这一轴；
+#   这里只落「慈悲线下降」那半句（karma.compassion -1），judgment +2 无处可放，如实登记为缺口。
+#   ⚠️ C（放他走）要同时加自由 +1 与慈悲 +1，而一条对话只有一对 karmaChannel/karmaDelta——
+#   这里用既有的 nextNodeIds 串了一节：039 落自由 +1，再接 040（0 行、只结算）落慈悲 +1。
+#   040 没有台词，进来就收场，是山门出口那种「结算节点」，不是漏写。
+#   041 是章节尾声（11.3），念完记 flag.ch01.chapter_one_cleared，末尾带出第二章五行山的钩子。
 id,displayNameKey,descriptionKey,tags,version,chapterIndex,inkKnotName,speakerCharacterId,lineCount,nextNodeIds,requiredStateKey,requiredOperator,requiredValue,setsStateKeys,karmaChannel,karmaDelta,bgmKey,portraitKey,isTerminal
 DLG_CH01_001,dlg.ch01.001.name,dlg.ch01.001.desc,ch01;dialogue,1,1,CH01_N01_MONKEY_PEACH,,3,,,Equal,0,flag.ch01.repeating_action,,0,music.ch01.field,,true
 DLG_CH01_002,dlg.ch01.002.name,dlg.ch01.002.desc,ch01;dialogue,1,1,CH01_N02_GREETER_TALK,,7,CH01_N03_ASK_THE_WOUND,,Equal,0,flag.ch01.greeted_monkey,,0,music.ch01.field,,false
@@ -50,3 +60,14 @@ DLG_CH01_027,dlg.ch01.027.name,dlg.ch01.027.desc,ch01;dialogue,1,1,CH01_N27_SAGE
 DLG_CH01_028,dlg.ch01.028.name,dlg.ch01.028.desc,ch01;dialogue;branch,1,1,CH01_N28_ENTER_BY_RELIC,,3,,,Equal,0,flag.ch01.gate_opened_by_relic,,0,music.ch01.waterfall,,true
 DLG_CH01_029,dlg.ch01.029.name,dlg.ch01.029.desc,ch01;dialogue;branch,1,1,CH01_N29_ENTER_BY_REASON,,5,,,Equal,0,flag.ch01.gate_opened_by_words,karma.freedom,1,music.ch01.waterfall,,true
 DLG_CH01_030,dlg.ch01.030.name,dlg.ch01.030.desc,ch01;dialogue;branch,1,1,CH01_N30_ENTER_BY_FORCE,,4,,,Equal,0,flag.ch01.gate_opened_by_force,karma.compassion,-1,music.ch01.waterfall,,true
+DLG_CH01_031,dlg.ch01.031.name,dlg.ch01.031.desc,ch01;dialogue,1,1,CH01_N31_SHATTERED_WEAPONS,,3,,,Equal,0,flag.ch01.weapons_seen,,0,music.ch01.stronghold,,true
+DLG_CH01_032,dlg.ch01.032.name,dlg.ch01.032.desc,ch01;dialogue,1,1,CH01_N32_EMPTY_WINE_JARS,,3,,,Equal,0,flag.ch01.wine_jars_seen,,0,music.ch01.stronghold,,true
+DLG_CH01_033,dlg.ch01.033.name,dlg.ch01.033.desc,ch01;dialogue,1,1,CH01_N33_WALL_INSCRIPTION,,4,,,Equal,0,flag.ch01.wall_inscription_seen,,0,music.ch01.stronghold,,true
+DLG_CH01_034,dlg.ch01.034.name,dlg.ch01.034.desc,ch01;dialogue;boss,1,1,CH01_N34_MONKEY_KING_TALK,,10,,,Equal,0,flag.ch01.monkey_king_met,,0,music.ch01.stronghold,,true
+DLG_CH01_035,dlg.ch01.035.name,dlg.ch01.035.desc,ch01;dialogue,1,1,CH01_N35_BROKEN_SAGE_STATUE,,3,,,Equal,0,flag.ch01.broken_statue_seen,,0,music.ch01.stronghold,,true
+DLG_CH01_036,dlg.ch01.036.name,dlg.ch01.036.desc,ch01;dialogue;boss,1,1,CH01_N36_EMPTY_THRONE,,4,,,Equal,0,flag.ch01.king_broken,,0,music.ch01.stronghold,,true
+DLG_CH01_037,dlg.ch01.037.name,dlg.ch01.037.desc,ch01;dialogue;branch,1,1,CH01_N37_JUDGE_KILL,,3,,,Equal,0,flag.ch01.king_killed,karma.compassion,-1,music.ch01.stronghold,,true
+DLG_CH01_038,dlg.ch01.038.name,dlg.ch01.038.desc,ch01;dialogue;branch,1,1,CH01_N38_JUDGE_SEAL,,5,,,Equal,0,flag.ch01.king_sealed,,0,music.ch01.stronghold,,true
+DLG_CH01_039,dlg.ch01.039.name,dlg.ch01.039.desc,ch01;dialogue;branch,1,1,CH01_N39_JUDGE_FREE,,4,CH01_N40_JUDGE_FREE_AFTER,,Equal,0,flag.ch01.king_freed,karma.freedom,1,music.ch01.stronghold,,false
+DLG_CH01_040,dlg.ch01.040.name,dlg.ch01.040.desc,ch01;dialogue;branch,1,1,CH01_N40_JUDGE_FREE_AFTER,,0,,flag.ch01.king_freed,Equal,1,,karma.compassion,1,music.ch01.stronghold,,true
+DLG_CH01_041,dlg.ch01.041.name,dlg.ch01.041.desc,ch01;dialogue;exit,1,1,CH01_N41_CHAPTER_ONE_END,,7,,,Equal,0,flag.ch01.chapter_one_cleared,,0,music.ch01.stronghold,,true

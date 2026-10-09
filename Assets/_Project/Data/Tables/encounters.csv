@@ -1,6 +1,8 @@
 # 《西游：第八十二难》遭遇定义表 v1
 # enemyIds 顺序即 3×2 阵型的布阵顺序（前三个为前排，后面为后排）。
 # formation 为策划备注用的阵型标签，运行时按 enemyIds 顺序落位。
+#   写法是「前排 x 后排」，两数之和必须等于 enemyIds 的数量（导入时对不上会报 ENC_FORMATION_LABEL_STALE）。
+#   Boss 单人成阵，所以 BENC_CH01_001 是 1x0 而不是 1x1——1x1 那个「1」是空位，不是敌人。
 id,displayNameKey,descriptionKey,tags,version,chapterIndex,enemyIds,formation,isElite,isBoss,bossPhaseIds,backgroundKey,bgmKey,allowFlee,defeatGameOver
 ENC_CH01_001,enc.ch01.001.name,enc.ch01.001.desc,ch01;random,1,1,ENM_CH01_DRUNK_MONKEY;ENM_CH01_DRUNK_MONKEY;ENM_CH01_STONE_THROWER,2x1,false,false,,bg.ch01.road,music.battle.normal,true,false
 ENC_CH01_002,enc.ch01.002.name,enc.ch01.002.desc,ch01;random,1,1,ENM_CH01_ROTTEN_PEACH;ENM_CH01_ROTTEN_PEACH;ENM_CH01_VINE_SPIRIT,2x1,false,false,,bg.ch01.peach,music.battle.normal,true,false
@@ -8,4 +10,4 @@ ENC_CH01_003,enc.ch01.003.name,enc.ch01.003.desc,ch01;random,1,1,ENM_CH01_VINE_S
 ENC_CH01_004,enc.ch01.004.name,enc.ch01.004.desc,ch01;random,1,1,ENM_CH01_BANQUET_MONKEY;ENM_CH01_BANQUET_MONKEY;ENM_CH01_ROTTEN_PEACH;ENM_CH01_STONE_THROWER,2x2,false,false,,bg.ch01.banquet,music.battle.normal,true,false
 ENC_CH01_005,enc.ch01.005.name,enc.ch01.005.desc,ch01;random,1,1,ENM_CH01_MONKEY_GRUNT;ENM_CH01_MONKEY_GRUNT;ENM_CH01_MOUNTAIN_APE;ENM_CH01_STONE_THROWER,2x2,false,false,,bg.ch01.cave,music.battle.normal,true,false
 OPT_CH01_001,enc.ch01.hidden.name,enc.ch01.hidden.desc,ch01;hidden,1,1,ENM_CH01_NAMELESS_BONE;ENM_CH01_NAMELESS_BONE;ENM_CH01_NAMELESS_BONE,3x0,false,false,,bg.ch01.tomb,music.battle.hidden,true,false
-BENC_CH01_001,enc.ch01.boss.name,enc.ch01.boss.desc,ch01;boss,1,1,ENM_CH01_MONKEY_KING,1x1,false,true,BSP_CH01_001_P1;BSP_CH01_001_P2;BSP_CH01_001_P3;BSP_CH01_001_P4,bg.ch01.stronghold,music.battle.boss,false,true
+BENC_CH01_001,enc.ch01.boss.name,enc.ch01.boss.desc,ch01;boss,1,1,ENM_CH01_MONKEY_KING,1x0,false,true,BSP_CH01_001_P1;BSP_CH01_001_P2;BSP_CH01_001_P3;BSP_CH01_001_P4,bg.ch01.stronghold,music.battle.boss,false,true

@@ -1,8 +1,12 @@
 # 《西游：第八十二难》地图定义表 v1
 # tilePixelSize 固定 32（与已交付素材基线一致），改动会触发 MAP_TILE_SIZE_OFF_BASELINE 警告。
 # encounterTableId 目前填该地图的默认遭遇 ID，多遭遇权重表留到垂直切片阶段引入。
+# CH01_MAP05（混世魔王洞窟）两项都空着是有意的：这一张图的仗全是定点遭遇
+#   （轮回台上的 BENC_CH01_001 由交互物 INT_CH01_041 直接开，见 ADR-031），
+#   洞里不该有随便走走就撞上最终 Boss 的随机遭遇。encounterRate = 0 与空表都不报警告。
 id,displayNameKey,descriptionKey,tags,version,chapterIndex,sceneName,gridWidth,gridHeight,tilePixelSize,originOffsetX,originOffsetY,encounterTableId,encounterRate,isTown,isSafeZone,allowsSaving,bgmKey,ambientKey,backgroundSpriteKey,connections
 CH01_MAP01,map.ch01.map01.name,map.ch01.map01.desc,ch01;field,1,1,Map_CH01_MAP01,60,40,32,0,0,ENC_CH01_001,0.12,false,false,true,music.ch01.field,amb.ch01.wind,sprite.map.ch01.front,CH01_MAP02
 CH01_MAP02,map.ch01.map02.name,map.ch01.map02.desc,ch01;field,1,1,Map_CH01_MAP02,70,50,32,0,0,ENC_CH01_002,0.14,false,false,true,music.ch01.peach,amb.ch01.petals,sprite.map.ch01.peach,CH01_MAP01;CH01_MAP03
 CH01_MAP03,map.ch01.map03.name,map.ch01.map03.desc,ch01;field,1,1,Map_CH01_MAP03,90,70,32,0,0,ENC_CH01_004,0.12,false,false,true,music.ch01.banquet,amb.ch01.drums,sprite.map.ch01.banquet,CH01_MAP02;CH01_MAP04
-CH01_MAP04,map.ch01.map04.name,map.ch01.map04.desc,ch01;field,1,1,Map_CH01_MAP04,80,55,32,0,0,ENC_CH01_005,0.12,false,false,true,music.ch01.waterfall,amb.ch01.water,sprite.map.ch01.waterfall,CH01_MAP03
+CH01_MAP04,map.ch01.map04.name,map.ch01.map04.desc,ch01;field,1,1,Map_CH01_MAP04,80,55,32,0,0,ENC_CH01_005,0.12,false,false,true,music.ch01.waterfall,amb.ch01.water,sprite.map.ch01.waterfall,CH01_MAP03;CH01_MAP05
+CH01_MAP05,map.ch01.map05.name,map.ch01.map05.desc,ch01;cave,1,1,Map_CH01_MAP05,100,70,32,0,0,,0,false,false,true,music.ch01.stronghold,amb.ch01.cave,sprite.map.ch01.stronghold,CH01_MAP04
