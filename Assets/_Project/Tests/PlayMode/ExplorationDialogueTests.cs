@@ -386,6 +386,112 @@ namespace SamsaraWest.Tests.PlayMode
             yield return null;
         }
 
+        [UnityTest]
+        public IEnumerator MeetingTheGateMonkey_HearsTheOneWhoForgotEveryNight()
+        {
+            var screen = EnterWaterCurtain(new GridPosition(52, 37));
+
+            var missingBefore = _localization.MissingKeys.Count;
+            Assert.IsTrue(screen.Interact(), "前置条件：守门猴就在面朝的那一格。");
+
+            Assert.IsTrue(screen.IsDialogueActive);
+            Assert.AreEqual(
+                _localization.Get(LocalizationKeys.UI_DIALOGUE_NARRATOR),
+                screen.DialogueSpeaker,
+                "第一行是旁白，表里没有登记 .who——该画「旁白」，而不是那个键的占位符。");
+
+            Assert.AreEqual(
+                10,
+                AdvanceToTheEnd(screen),
+                "守门猴那段一次念完十行：他每晚都先杀他们，再坐在大王的位子上哭。");
+            Assert.AreEqual(1, _story.GetValue("flag.ch01.gate_monkey_met"));
+            Assert.AreEqual(
+                0,
+                _story.GetKarma(KarmaAxis.Truth),
+                "听他说完不算真相——他手里没有答案，只有记得自己忘了这件事。");
+            Assert.AreEqual(
+                missingBefore,
+                _localization.MissingKeys.Count,
+                "守门猴那十行连说话人，必须一行不落地命中文本表。");
+            yield return null;
+        }
+
+        [UnityTest]
+        public IEnumerator TheRingOnlyOpensTheGateOnceItIsOutOfTheTomb()
+        {
+            var screen = EnterWaterCurtain(new GridPosition(46, 37));
+
+            // 缺口石环出自隐藏墓穴 OPT_CH01_001，而墓穴那一批还没做——
+            // 「出示石环」因此是本阶段唯一打不开的路线。这是有意的依赖，不是漏配。
+            Assert.IsFalse(
+                screen.Interact(),
+                "信物还在墓里，出示石环这条路线的条件不该成立。");
+
+            // 墓穴落地后由它写这个键；这里先替它写，证明「条件一成立，路线就亮」。
+            _story.SetValue("flag.ch01.old_ring_held", 1);
+
+            Assert.IsTrue(screen.Interact(), "信物到手之后，同一条路线就该亮起来。");
+            Assert.IsTrue(screen.IsDialogueActive);
+            Assert.AreEqual(_localization.Get(LocalizationKeys.DLG_CH01_028_LINE_1), screen.DialogueLine);
+            Assert.AreEqual(
+                3,
+                AdvanceToTheEnd(screen),
+                "出示石环那一段三行：取出石环、守门猴认出旧部、放行。");
+            Assert.AreEqual(1, _story.GetValue("flag.ch01.gate_opened_by_relic"));
+            Assert.AreEqual(0, _localization.MissingKeys.Count, "出示石环那三行也得全在文本表里。");
+            yield return null;
+        }
+
+        [UnityTest]
+        public IEnumerator PersuadingTheGateMonkey_NeedsTwoTruths()
+        {
+            var screen = EnterWaterCurtain(new GridPosition(58, 37));
+
+            // 真相值来自前两张图：迎客猴那一问 +1，公开账本那一读 +1。
+            Assert.AreEqual(0, _story.GetKarma(KarmaAxis.Truth), "刚开场，一点真相都还没攒下。");
+            Assert.IsFalse(
+                screen.Interact(),
+                "一点真相都没有的人说服不了守门猴——这是三条路线里唯一要心念的那条。");
+
+            _story.AdjustKarma(KarmaAxis.Truth, 1);
+            Assert.IsFalse(screen.Interact(), "一点还不够：门槛是 2，表里写的是 GreaterOrEqual。");
+
+            _story.AdjustKarma(KarmaAxis.Truth, 1);
+            Assert.IsTrue(screen.Interact(), "攒到两点，守门猴就该愿意听了。");
+            Assert.IsTrue(screen.IsDialogueActive);
+            Assert.AreEqual(
+                5,
+                AdvanceToTheEnd(screen),
+                "说服那一段五行：问出口、他沉默、他也想知道、让路、旁白记下那半步。");
+            Assert.AreEqual(1, _story.GetValue("flag.ch01.gate_opened_by_words"));
+            Assert.AreEqual(
+                1,
+                _story.GetKarma(KarmaAxis.Freedom),
+                "让他开口的是「他也想知道答案」，这一笔记自由。");
+            Assert.AreEqual(2, _story.GetKarma(KarmaAxis.Truth), "说服不该吃掉已经攒下的真相。");
+            Assert.AreEqual(0, _localization.MissingKeys.Count, "说服那五行也得全在文本表里。");
+            yield return null;
+        }
+
+        [UnityTest]
+        public IEnumerator ForcingPastTheGateMonkey_CostsAPointOfCompassion()
+        {
+            var screen = EnterWaterCurtain(new GridPosition(52, 42));
+
+            Assert.IsTrue(screen.Interact(), "前置条件：绕过去的落脚点就在面朝的那一格。");
+            Assert.AreEqual(
+                4,
+                AdvanceToTheEnd(screen),
+                "绕过那一段四行：让开、不让、从侧面过去、他又对着洞口念了一遍。");
+            Assert.AreEqual(1, _story.GetValue("flag.ch01.gate_opened_by_force"));
+            Assert.AreEqual(
+                -1,
+                _story.GetKarma(KarmaAxis.Compassion),
+                "把他一个人晾在岗位上，慈悲要掉一点。");
+            Assert.AreEqual(0, _localization.MissingKeys.Count, "绕过那四行也得全在文本表里。");
+            yield return null;
+        }
+
         private static ExplorationScreenView EnterBanquet(GridPosition approach)
         {
             var screen = ExplorationScreenView.Instance;
@@ -397,6 +503,20 @@ namespace SamsaraWest.Tests.PlayMode
             Assert.IsTrue(
                 screen.EnterDiagnosticMap("CH01_MAP03", approach, MoveDirection.North),
                 "前置条件：进得了宴场那张图。");
+            return screen;
+        }
+
+        private static ExplorationScreenView EnterWaterCurtain(GridPosition approach)
+        {
+            var screen = ExplorationScreenView.Instance;
+            screen.Tick();
+
+            // 同一个入口不允许抢会话：先离图，再按坐标进水帘洞外。
+            screen.LeaveMap();
+
+            Assert.IsTrue(
+                screen.EnterDiagnosticMap("CH01_MAP04", approach, MoveDirection.North),
+                "前置条件：进得了水帘洞外那张图。");
             return screen;
         }
 

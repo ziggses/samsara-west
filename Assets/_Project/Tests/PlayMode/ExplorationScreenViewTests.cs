@@ -588,6 +588,99 @@ namespace SamsaraWest.Tests.PlayMode
             }
         }
 
+        [UnityTest]
+        public IEnumerator Screen_TheWaterfallPathLeadsOutsideTheWaterCurtain()
+        {
+            yield return LoadBootstrapScene();
+
+            var screen = ExplorationScreenView.Instance;
+            screen.Tick();
+
+            // 宴场北缘的石径在 (52,22)：站到 (52,21) 朝北，正前方就是它。
+            Assert.IsTrue(screen.EnterDiagnosticMap("CH01_MAP03", new GridPosition(52, 21), MoveDirection.North));
+
+            var localization = GameServices.Registry.Resolve<ILocalizationService>();
+            StringAssert.Contains(
+                localization.Get(LocalizationKeys.INT_CH01_025_NAME),
+                screen.FacingLine,
+                "面朝的那一格是通往水帘洞的石径，就该报出它的名字。");
+
+            Assert.IsTrue(screen.Interact(), "门是可以交互的。");
+
+            var session = screen.Session;
+            Assert.AreEqual("CH01_MAP04", session.MapId);
+            Assert.AreEqual(80, session.Grid.Width, "换图之后网格得重建，水帘洞外的尺寸来自 maps.csv。");
+            Assert.AreEqual(55, session.Grid.Height);
+            Assert.IsTrue(session.Grid.IsWalkable(session.Position), "落点必须是能站的格子。");
+
+            // 门位口径跟桃林那两扇一样：025 与 026 嵌在 (52,22)/(52,21) 这一对上。
+            // 锚点自己就是可行走格，落点留在原地；进门一律面朝南，正前方正好是回程门。
+            Assert.AreEqual(new GridPosition(52, 22), session.Position);
+            Assert.AreEqual(new GridPosition(52, 21), session.FacingPosition, "落点应当就在回程门跟前。");
+
+            var gateBack = session.Grid.InteractableAt(session.FacingPosition);
+            Assert.IsNotNull(gateBack, "回程门应当就在落点正前方。");
+            Assert.AreEqual("INT_CH01_026_WATERFALL_EXIT", gateBack.Id);
+            StringAssert.Contains("CH01_MAP04", screen.StatusLine, "状态行得跟着报出新图。");
+            Assert.AreEqual(0, localization.MissingKeys.Count, "新加的门与提示文案必须都在文本表里。");
+        }
+
+        [UnityTest]
+        public IEnumerator Screen_TheWaterfallExitLeadsBackIntoTheBanquetGround()
+        {
+            yield return LoadBootstrapScene();
+
+            var screen = ExplorationScreenView.Instance;
+            screen.Tick();
+
+            // 反过来走一遍：水帘洞外 (52,22) 朝南，正前方是 (52,21) 的回程门。
+            // 朝南正是进门时被摆好的朝向（ADR-024），所以从宴场过来的人一落地就能原路按回去。
+            Assert.IsTrue(screen.EnterDiagnosticMap("CH01_MAP04", new GridPosition(52, 22), MoveDirection.South));
+            Assert.IsTrue(screen.Interact());
+
+            var session = screen.Session;
+            Assert.AreEqual("CH01_MAP03", session.MapId, "门是双向的：两张图的 connections 互相指着对方。");
+            Assert.AreEqual(
+                new GridPosition(52, 21),
+                session.Position,
+                "回程门在 (52,21)，宴场 90x70 装得下这个坐标，落点就是它自己，不必搜索。");
+            Assert.AreEqual(1, GameBootstrap.Instance.MapChange.MapChanges);
+        }
+
+        [UnityTest]
+        public IEnumerator Screen_TheWaterCurtainCarriesItsFourInvestigations()
+        {
+            yield return LoadBootstrapScene();
+
+            var screen = ExplorationScreenView.Instance;
+            screen.Tick();
+            Assert.IsTrue(screen.EnterDiagnosticMap("CH01_MAP04", new GridPosition(52, 22), MoveDirection.North));
+
+            var grid = screen.Session.Grid;
+
+            // 剧本给了水帘洞外五站，第五站「魔王洞门」通向还没做的 CH01_MAP05，
+            // 本批故意没画那扇门（目标图不存在，换图会记一条错误日志并把玩家留在原地）。
+            // 所以这里守的是「四段调查 + 那条无条件的兜底路线」一个不落，按 ID 点名，不数总数。
+            var stations = new (string Id, int X, int Y)[]
+            {
+                ("INT_CH01_026_WATERFALL_EXIT", 52, 21),
+                ("INT_CH01_027_BROKEN_WATERFALL", 52, 30),
+                ("INT_CH01_028_GATE_MONKEY", 52, 38),
+                ("INT_CH01_029_WEAPON_RACK", 40, 42),
+                ("INT_CH01_030_GREAT_SAGE_SEAT", 64, 42),
+                ("INT_CH01_033_ENTER_BY_FORCE", 52, 43),
+            };
+
+            foreach (var station in stations)
+            {
+                var found = grid.InteractableAt(new GridPosition(station.X, station.Y));
+                Assert.IsNotNull(
+                    found,
+                    $"水帘洞外缺了 {station.Id}：剧本那几站要一个不落地画在图上，落位也不能漂。");
+                Assert.AreEqual(station.Id, found.Id);
+            }
+        }
+
         private static IEnumerator LoadBootstrapScene()
         {
             SceneManager.LoadScene(BootstrapSceneName, LoadSceneMode.Single);

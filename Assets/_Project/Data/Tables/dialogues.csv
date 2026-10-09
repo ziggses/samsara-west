@@ -14,6 +14,11 @@
 #   先查哪一处都不影响另外两处，所以不能像账本那样用 nextNodeIds 排出唯一顺序。
 #   鼓楼那条带了 ;branch 标签：剧本里 A/B/C 三选还没落进数据（没有玩家选择系统，见未决第 5 条九记），
 #   本轮先如实登记为「条件后继冒充选择」的缺口，不假装它能选。
+#   水帘洞外（MAP04）那一批仍全是单点调查：024~027 各自 isTerminal，念完写自己的「看过」旗标。
+#   守门猴那三条进门路线（028/029/030）跟鼓楼一样落在「条件后继冒充选择」上——
+#   真实的分岔在 interactables.csv（031 要石环 / 032 要真相 >= 2 / 033 无条件），
+#   这里只管三条路线各自念什么、记什么：028 记 flag.ch01.gate_opened_by_relic，
+#   029 记 flag.ch01.gate_opened_by_words 并自由 +1，030 记 flag.ch01.gate_opened_by_force 并慈悲 −1。
 id,displayNameKey,descriptionKey,tags,version,chapterIndex,inkKnotName,speakerCharacterId,lineCount,nextNodeIds,requiredStateKey,requiredOperator,requiredValue,setsStateKeys,karmaChannel,karmaDelta,bgmKey,portraitKey,isTerminal
 DLG_CH01_001,dlg.ch01.001.name,dlg.ch01.001.desc,ch01;dialogue,1,1,CH01_N01_MONKEY_PEACH,,3,,,Equal,0,flag.ch01.repeating_action,,0,music.ch01.field,,true
 DLG_CH01_002,dlg.ch01.002.name,dlg.ch01.002.desc,ch01;dialogue,1,1,CH01_N02_GREETER_TALK,,7,CH01_N03_ASK_THE_WOUND,,Equal,0,flag.ch01.greeted_monkey,,0,music.ch01.field,,false
@@ -38,3 +43,10 @@ DLG_CH01_020,dlg.ch01.020.name,dlg.ch01.020.desc,ch01;dialogue,1,1,CH01_N20_SHRI
 DLG_CH01_021,dlg.ch01.021.name,dlg.ch01.021.desc,ch01;dialogue,1,1,CH01_N21_MONKEY_DORM,,3,,,Equal,0,flag.ch01.dorm_seen,,0,music.ch01.banquet,,true
 DLG_CH01_022,dlg.ch01.022.name,dlg.ch01.022.desc,ch01;dialogue,1,1,CH01_N22_BAI_MEI,,9,,,Equal,0,flag.ch01.bai_mei_met,,0,music.ch01.banquet,,true
 DLG_CH01_023,dlg.ch01.023.name,dlg.ch01.023.desc,ch01;dialogue;battle,1,1,CH01_N23_MIDNIGHT_STAGE,,4,,,Equal,0,flag.ch01.midnight_stage_seen,,0,music.ch01.banquet,,true
+DLG_CH01_024,dlg.ch01.024.name,dlg.ch01.024.desc,ch01;dialogue,1,1,CH01_N24_BROKEN_WATERFALL,,3,,,Equal,0,flag.ch01.waterfall_seen,,0,music.ch01.waterfall,,true
+DLG_CH01_025,dlg.ch01.025.name,dlg.ch01.025.desc,ch01;dialogue,1,1,CH01_N25_GATE_MONKEY,,10,,,Equal,0,flag.ch01.gate_monkey_met,,0,music.ch01.waterfall,,true
+DLG_CH01_026,dlg.ch01.026.name,dlg.ch01.026.desc,ch01;dialogue,1,1,CH01_N26_WEAPON_RACK,,4,,,Equal,0,flag.ch01.weapon_rack_seen,,0,music.ch01.waterfall,,true
+DLG_CH01_027,dlg.ch01.027.name,dlg.ch01.027.desc,ch01;dialogue,1,1,CH01_N27_SAGE_SEAT,,9,,,Equal,0,flag.ch01.sage_seat_seen,,0,music.ch01.waterfall,,true
+DLG_CH01_028,dlg.ch01.028.name,dlg.ch01.028.desc,ch01;dialogue;branch,1,1,CH01_N28_ENTER_BY_RELIC,,3,,,Equal,0,flag.ch01.gate_opened_by_relic,,0,music.ch01.waterfall,,true
+DLG_CH01_029,dlg.ch01.029.name,dlg.ch01.029.desc,ch01;dialogue;branch,1,1,CH01_N29_ENTER_BY_REASON,,5,,,Equal,0,flag.ch01.gate_opened_by_words,karma.freedom,1,music.ch01.waterfall,,true
+DLG_CH01_030,dlg.ch01.030.name,dlg.ch01.030.desc,ch01;dialogue;branch,1,1,CH01_N30_ENTER_BY_FORCE,,4,,,Equal,0,flag.ch01.gate_opened_by_force,karma.compassion,-1,music.ch01.waterfall,,true

@@ -10,31 +10,30 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 1718f3f096b3c3d47ab53c32f9747652, type: 3}
-  m_Name: CH01_MAP03
+  m_Name: CH01_MAP04
   m_EditorClassIdentifier: 
-  _id: CH01_MAP03
-  _displayNameKey: map.ch01.map03.name
-  _descriptionKey: map.ch01.map03.desc
+  _id: CH01_MAP04
+  _displayNameKey: map.ch01.map04.name
+  _descriptionKey: map.ch01.map04.desc
   _tags:
   - ch01
   - field
   _version: 1
   _icon: {fileID: 0}
   _chapterIndex: 1
-  _sceneName: Map_CH01_MAP03
-  _gridWidth: 90
-  _gridHeight: 70
+  _sceneName: Map_CH01_MAP04
+  _gridWidth: 80
+  _gridHeight: 55
   _tilePixelSize: 32
   _originOffsetX: 0
   _originOffsetY: 0
-  _encounterTableId: ENC_CH01_004
+  _encounterTableId: ENC_CH01_005
   _encounterRate: 0.12
   _isTown: 0
   _isSafeZone: 0
   _allowsSaving: 1
-  _bgmKey: music.ch01.banquet
-  _ambientKey: amb.ch01.drums
-  _backgroundSpriteKey: sprite.map.ch01.banquet
+  _bgmKey: music.ch01.waterfall
+  _ambientKey: amb.ch01.water
+  _backgroundSpriteKey: sprite.map.ch01.waterfall
   _connections:
-  - CH01_MAP02
-  - CH01_MAP04
+  - CH01_MAP03

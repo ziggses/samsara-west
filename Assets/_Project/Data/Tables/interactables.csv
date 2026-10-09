@@ -1,6 +1,16 @@
 # 《西游：第八十二难》可交互物定义表 v1
 # interactionTypeKey 必须是键名（如 interact.dialogue / interact.chest / interact.examine）。
 # targetId 指向被触发的目标（对话 ID / 掉落表 ID 等），纯装饰物留空。
+# 水帘洞外（MAP04）那一批：N02 守门猴的三条进门路线（031/032/033）落在数据上就是三件并列的条件交互物。
+#   没有玩家选择系统（见 dialogues.csv 头部与 Docs/待拍板清单.md），「三选」只能靠 requiredStateKey 分岔：
+#   031 以 flag.ch01.old_ring_held 为条件且 isHiddenUntilConditionMet，石环没到手它根本不出现；
+#   032 要 karma.truth >= 2（GreaterOrEqual）；033 无条件，是唯一的兜底路线。
+#   ⚠️ flag.ch01.old_ring_held 现在没有任何地方写它：缺口石环出自隐藏墓穴 OPT_CH01_001（灵石守墓人的奖励），
+#   而墓穴那一批还没做。031 因此是本阶段唯一打不开的路线——这是有意的依赖，不是漏配。
+# 门位口径（ADR-024）：025 与 026 嵌在 (52,22)/(52,21) 这一对上，
+#   从宴场 (52,22) 出门落在水帘洞外的 (52,22)，进门一律面朝南，正前方正好是 (52,21) 的回程门。
+# MAP04 通魔王洞窟（CH01_MAP05）的那扇门**本批故意没做**：目标图还不存在，
+#   换图接线会记一条错误日志并把玩家留在原地（见 MapChangeLink）。等 MAP05 落地时再补。
 id,displayNameKey,descriptionKey,tags,version,mapId,gridX,gridY,interactionTypeKey,targetId,requiredStateKey,requiredOperator,requiredValue,oneShot,isHiddenUntilConditionMet,promptKey,interactSpriteKey
 INT_CH01_001_GREETER_MONKEY,int.ch01.001.name,int.ch01.001.desc,ch01;npc,1,CH01_MAP01,20,8,interact.dialogue,DLG_CH01_002,,Equal,0,false,false,ui.prompt.talk,sprite.int.greeter_monkey
 INT_CH01_002_BROKEN_DRUM,int.ch01.002.name,int.ch01.002.desc,ch01;prop,1,CH01_MAP01,31,20,interact.examine,DLG_CH01_004,,Equal,0,false,false,ui.prompt.examine,sprite.int.broken_drum
@@ -24,3 +34,12 @@ INT_CH01_021_SHRINE,int.ch01.021.name,int.ch01.021.desc,ch01;prop,1,CH01_MAP03,2
 INT_CH01_022_MONKEY_DORM,int.ch01.022.name,int.ch01.022.desc,ch01;prop,1,CH01_MAP03,16,26,interact.examine,DLG_CH01_021,,Equal,0,false,false,ui.prompt.examine,sprite.int.dorm
 INT_CH01_023_BAI_MEI,int.ch01.023.name,int.ch01.023.desc,ch01;npc,1,CH01_MAP03,68,20,interact.dialogue,DLG_CH01_022,,Equal,0,false,false,ui.prompt.talk,sprite.int.bai_mei
 INT_CH01_024_MIDNIGHT_STAGE,int.ch01.024.name,int.ch01.024.desc,ch01;prop,1,CH01_MAP03,48,66,interact.examine,DLG_CH01_023,,Equal,0,false,false,ui.prompt.examine,sprite.int.banquet_stage
+INT_CH01_025_WATERFALL_GATE,int.ch01.025.name,int.ch01.025.desc,ch01;door,1,CH01_MAP03,52,22,interact.door,CH01_MAP04,,Equal,0,false,false,ui.prompt.enter,sprite.int.gate
+INT_CH01_026_WATERFALL_EXIT,int.ch01.026.name,int.ch01.026.desc,ch01;door,1,CH01_MAP04,52,21,interact.door,CH01_MAP03,,Equal,0,false,false,ui.prompt.enter,sprite.int.gate
+INT_CH01_027_BROKEN_WATERFALL,int.ch01.027.name,int.ch01.027.desc,ch01;prop,1,CH01_MAP04,52,30,interact.examine,DLG_CH01_024,,Equal,0,false,false,ui.prompt.examine,sprite.int.waterfall
+INT_CH01_028_GATE_MONKEY,int.ch01.028.name,int.ch01.028.desc,ch01;npc,1,CH01_MAP04,52,38,interact.dialogue,DLG_CH01_025,,Equal,0,false,false,ui.prompt.talk,sprite.int.gate_monkey
+INT_CH01_029_WEAPON_RACK,int.ch01.029.name,int.ch01.029.desc,ch01;prop,1,CH01_MAP04,40,42,interact.examine,DLG_CH01_026,,Equal,0,false,false,ui.prompt.examine,sprite.int.weapon_rack
+INT_CH01_030_GREAT_SAGE_SEAT,int.ch01.030.name,int.ch01.030.desc,ch01;prop,1,CH01_MAP04,64,42,interact.examine,DLG_CH01_027,,Equal,0,false,false,ui.prompt.examine,sprite.int.sage_seat
+INT_CH01_031_ENTER_BY_RELIC,int.ch01.031.name,int.ch01.031.desc,ch01;prop,1,CH01_MAP04,46,38,interact.examine,DLG_CH01_028,flag.ch01.old_ring_held,Equal,1,false,true,ui.prompt.examine,sprite.int.old_ring
+INT_CH01_032_ENTER_BY_REASON,int.ch01.032.name,int.ch01.032.desc,ch01;prop,1,CH01_MAP04,58,38,interact.dialogue,DLG_CH01_029,karma.truth,GreaterOrEqual,2,false,true,ui.prompt.talk,sprite.int.gate_monkey
+INT_CH01_033_ENTER_BY_FORCE,int.ch01.033.name,int.ch01.033.desc,ch01;prop,1,CH01_MAP04,52,43,interact.examine,DLG_CH01_030,,Equal,0,false,false,ui.prompt.examine,sprite.int.gate_monkey

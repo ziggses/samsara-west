@@ -402,6 +402,160 @@ MonoBehaviour:
     _text: "\u963F\u7384\u628A\u624B\u6309\u5728\u4E86\u5200\u4E0A\u3002"
   - _key: dlg.ch01.023.name
     _text: "\u5B50\u65F6\u5C06\u81F3"
+  - _key: dlg.ch01.024.desc
+    _text: "\u4E00\u5757\u6C34\u5E55\u5F62\u72B6\u7684\u65E7\u5E03\uFF0C\u6E7F\u7740\uFF0C\u8FD8\u5728\u6EF4\u6C34\u3002"
+  - _key: dlg.ch01.024.line.1
+    _text: "\u7011\u5E03\u65E9\u65AD\u4E86\u3002\u6D1E\u53E3\u6302\u7740\u4E00\u9762\u6C34\u5E55\u5F62\u72B6\u7684\u65E7\u5E03\u3002"
+  - _key: dlg.ch01.024.line.2
+    _text: "\u5E03\u9762\u6E7F\u7740\uFF0C\u8FD8\u5728\u6EF4\u6C34\u2014\u2014\u4ECA\u665A\u6709\u4EBA\u6765\u6CFC\u8FC7\u3002"
+  - _key: dlg.ch01.024.line.3
+    _text: "\u4ED6\u4EEC\u5728\u5047\u88C5\u6C34\u8FD8\u5728\u6D41\u3002"
+  - _key: dlg.ch01.024.line.3.who
+    _text: "\u963F\u7384"
+  - _key: dlg.ch01.024.name
+    _text: "\u65AD\u6D41\u6C34\u5E18"
+  - _key: dlg.ch01.025.desc
+    _text: "\u591A\u5E74\u6CA1\u79BB\u5F00\u5C97\u4F4D\u7684\u8001\u7334\uFF0C\u624B\u91CC\u7684\u6728\u68CD\u65E9\u5C31\u70C2\u4E86\u3002"
+  - _key: dlg.ch01.025.line.1
+    _text: "\u5B88\u95E8\u7334\u597D\u51E0\u5E74\u6CA1\u79BB\u5F00\u8FC7\u5C97\u4F4D\uFF0C\u624B\u91CC\u7684\u6728\u68CD\u65E9\u5C31\u70C2\u4E86\u3002"
+  - _key: dlg.ch01.025.line.10
+    _text: "\u6CA1\u6709\u3002\u7B2C\u4E8C\u5929\u5C31\u5FD8\u4E86\u3002\u53EF\u6211\u77E5\u9053\u3002"
+  - _key: dlg.ch01.025.line.10.who
+    _text: "\u5B88\u95E8\u7334"
+  - _key: dlg.ch01.025.line.2
+    _text: "\u5927\u738B\u56DE\u6765\u4E4B\u524D\uFF0C\u8C01\u4E5F\u4E0D\u80FD\u8FDB\u53BB\u3002"
+  - _key: dlg.ch01.025.line.2.who
+    _text: "\u5B88\u95E8\u7334"
+  - _key: dlg.ch01.025.line.3
+    _text: "\u91CC\u9762\u662F\u8C01\uFF1F"
+  - _key: dlg.ch01.025.line.3.who
+    _text: "\u963F\u7384"
+  - _key: dlg.ch01.025.line.4
+    _text: "\u662F\u9B54\u738B\u3002"
+  - _key: dlg.ch01.025.line.4.who
+    _text: "\u5B88\u95E8\u7334"
+  - _key: dlg.ch01.025.line.5
+    _text: "\u9B54\u738B\u5728\u91CC\u9762\uFF0C\u4F60\u4EEC\u4E3A\u4EC0\u4E48\u4E0D\u8DD1\uFF1F"
+  - _key: dlg.ch01.025.line.5.who
+    _text: "\u963F\u7384"
+  - _key: dlg.ch01.025.line.6
+    _text: "\u8FDB\u53BB\u7684\u662F\u9B54\u738B\uFF0C\u51FA\u6765\u7684\u662F\u5927\u738B\u3002"
+  - _key: dlg.ch01.025.line.6.who
+    _text: "\u5B88\u95E8\u7334"
+  - _key: dlg.ch01.025.line.7
+    _text: "\u4EC0\u4E48\u610F\u601D\uFF1F"
+  - _key: dlg.ch01.025.line.7.who
+    _text: "\u963F\u7384"
+  - _key: dlg.ch01.025.line.8
+    _text: "\u6BCF\u665A\u4ED6\u90FD\u5148\u6740\u6211\u4EEC\uFF0C\u518D\u5750\u5728\u5927\u738B\u7684\u4F4D\u5B50\u4E0A\u54ED\u3002"
+  - _key: dlg.ch01.025.line.8.who
+    _text: "\u5B88\u95E8\u7334"
+  - _key: dlg.ch01.025.line.9
+    _text: "\u4F60\u89C1\u8FC7\uFF1F"
+  - _key: dlg.ch01.025.line.9.who
+    _text: "\u963F\u7384"
+  - _key: dlg.ch01.025.name
+    _text: "\u5B88\u95E8\u7334"
+  - _key: dlg.ch01.026.desc
+    _text: "\u5012\u4E86\u4E00\u534A\u7684\u6728\u67B6\uFF0C\u4E0A\u5C42\u7A7A\u7740\uFF0C\u7070\u79EF\u5F97\u5F88\u5300\u3002"
+  - _key: dlg.ch01.026.line.1
+    _text: "\u5175\u5668\u67B6\u5012\u4E86\u4E00\u534A\uFF0C\u5269\u4E0B\u7684\u68CD\u68D2\u70C2\u6210\u4E86\u6728\u5C51\u3002"
+  - _key: dlg.ch01.026.line.2
+    _text: "\u6700\u4E0A\u5C42\u662F\u7A7A\u7684\u3002\u539F\u5148\u6446\u5728\u90A3\u91CC\u7684\u4E1C\u897F\uFF0C\u88AB\u53D6\u8D70\u5F88\u4E45\u4E86\u3002"
+  - _key: dlg.ch01.026.line.3
+    _text: "\u8C01\u62FF\u8D70\u7684\uFF1F"
+  - _key: dlg.ch01.026.line.3.who
+    _text: "\u963F\u7384"
+  - _key: dlg.ch01.026.line.4
+    _text: "\u6CA1\u6709\u4EBA\u56DE\u7B54\u3002\u67B6\u5B50\u4E0A\u7684\u7070\u79EF\u5F97\u5F88\u5300\uFF0C\u5F88\u4E45\u6CA1\u4EBA\u78B0\u8FC7\u3002"
+  - _key: dlg.ch01.026.name
+    _text: "\u65E7\u5175\u5668\u67B6"
+  - _key: dlg.ch01.027.desc
+    _text: "\u6905\u80CC\u523B\u7740\u300C\u9F50\u5929\u300D\uFF0C\u53F3\u4FA7\u88AB\u524A\u6389\u4E00\u534A\uFF0C\u722A\u75D5\u65B0\u65E7\u4E0D\u4E00\u3002"
+  - _key: dlg.ch01.027.line.1
+    _text: "\u6D1E\u91CC\u7A7A\u65E0\u4E00\u4EBA\uFF0C\u53EA\u6709\u4E00\u5F20\u5DE8\u5927\u77F3\u5EA7\u3002\u6905\u80CC\u523B\u7740\u300C\u9F50\u5929\u300D\uFF0C\u53F3\u4FA7\u88AB\u524A\u6389\u4E00\u534A\u3002"
+  - _key: dlg.ch01.027.line.2
+    _text: "\u722A\u75D5\u65B0\u65E7\u4E0D\u4E00\u3002\u624B\u6309\u4E0A\u53BB\u65F6\uFF0C\u4E09\u6BB5\u6B8B\u5F71\u6D6E\u4E86\u51FA\u6765\u3002"
+  - _key: dlg.ch01.027.line.3
+    _text: "\u6211\u4EE5\u540E\u8981\u8BA9\u6240\u6709\u7334\u5B50\u90FD\u4E0D\u6015\u5929\u3002"
+  - _key: dlg.ch01.027.line.3.who
+    _text: "\u5E7C\u5E74\u609F\u7A7A"
+  - _key: dlg.ch01.027.line.4
+    _text: "\u90A3\u6211\u4EEC\u5C31\u53EB\u8FD9\u91CC\u9F50\u5929\u5927\u5723\u5E9C\uFF01"
+  - _key: dlg.ch01.027.line.4.who
+    _text: "\u7FA4\u7334"
+  - _key: dlg.ch01.027.line.5
+    _text: "\u7B49\u6211\u53D6\u5B8C\u7ECF\uFF0C\u5C31\u56DE\u82B1\u679C\u5C71\u770B\u770B\u3002"
+  - _key: dlg.ch01.027.line.5.who
+    _text: "\u609F\u7A7A"
+  - _key: dlg.ch01.027.line.6
+    _text: "\u56DE\u53BB\u4EE5\u540E\uFF0C\u4F60\u8FD8\u505A\u9F50\u5929\u5927\u5723\u5417\uFF1F"
+  - _key: dlg.ch01.027.line.6.who
+    _text: "\u5510\u50E7"
+  - _key: dlg.ch01.027.line.7
+    _text: "\u505A\u4E0D\u505A\u90FD\u884C\u3002\u4FFA\u53EA\u8981\u4ED6\u4EEC\u8FC7\u5F97\u597D\u3002"
+  - _key: dlg.ch01.027.line.7.who
+    _text: "\u609F\u7A7A"
+  - _key: dlg.ch01.027.line.8
+    _text: "\u7B2C\u4E09\u6BB5\u6B8B\u5F71\u91CC\u6CA1\u6709\u4EBA\u8BF4\u8BDD\u3002\u7A7A\u6905\u3001\u51B7\u9152\u3001\u6EE1\u5730\u67AF\u6843\u3002"
+  - _key: dlg.ch01.027.line.9
+    _text: "\u7B49\u7684\u4EBA\u6CA1\u6709\u56DE\u6765\u3002\u7B49\uFF0C\u5374\u6210\u4E86\u6240\u6709\u4EBA\u7684\u804C\u8D23\u3002"
+  - _key: dlg.ch01.027.name
+    _text: "\u5927\u5723\u77F3\u5EA7"
+  - _key: dlg.ch01.028.desc
+    _text: "\u8BA9\u5B88\u95E8\u7334\u770B\u770B\u90A3\u679A\u7F3A\u4E86\u4E00\u89D2\u7684\u77F3\u73AF\u3002"
+  - _key: dlg.ch01.028.line.1
+    _text: "\u963F\u7384\u628A\u77F3\u73AF\u4ECE\u6000\u91CC\u53D6\u51FA\u6765\uFF0C\u4E3E\u5230\u5B88\u95E8\u7334\u773C\u524D\u3002"
+  - _key: dlg.ch01.028.line.2
+    _text: "\u2026\u2026\u4F60\u6709\u8FD9\u4E2A\u3002"
+  - _key: dlg.ch01.028.line.2.who
+    _text: "\u5B88\u95E8\u7334"
+  - _key: dlg.ch01.028.line.3
+    _text: "\u8FDB\u53BB\u5427\u3002\u65E7\u90E8\u56DE\u6765\uFF0C\u4E0D\u8BE5\u88AB\u62E6\u5728\u5916\u9762\u3002"
+  - _key: dlg.ch01.028.line.3.who
+    _text: "\u5B88\u95E8\u7334"
+  - _key: dlg.ch01.028.name
+    _text: "\u51FA\u793A\u7F3A\u53E3\u77F3\u73AF"
+  - _key: dlg.ch01.029.desc
+    _text: "\u4ED6\u62E6\u7740\u95E8\uFF0C\u800C\u4ED6\u5176\u5B9E\u4E5F\u60F3\u77E5\u9053\u7B54\u6848\u3002"
+  - _key: dlg.ch01.029.line.1
+    _text: "\u4ED6\u5230\u5E95\u56DE\u6765\u8FC7\u6CA1\u6709\uFF0C\u4F60\u4E0D\u60F3\u77E5\u9053\u5417\uFF1F"
+  - _key: dlg.ch01.029.line.1.who
+    _text: "\u963F\u7384"
+  - _key: dlg.ch01.029.line.2
+    _text: "\u2026\u2026"
+  - _key: dlg.ch01.029.line.2.who
+    _text: "\u5B88\u95E8\u7334"
+  - _key: dlg.ch01.029.line.3
+    _text: "\u6211\u60F3\u77E5\u9053\u3002\u5927\u738B\u5F53\u5E74\u5230\u5E95\u6709\u6CA1\u6709\u56DE\u6765\u3002"
+  - _key: dlg.ch01.029.line.3.who
+    _text: "\u5B88\u95E8\u7334"
+  - _key: dlg.ch01.029.line.4
+    _text: "\u4F60\u8FDB\u53BB\u5427\u3002\u770B\u5B8C\u56DE\u6765\u544A\u8BC9\u6211\u3002"
+  - _key: dlg.ch01.029.line.4.who
+    _text: "\u5B88\u95E8\u7334"
+  - _key: dlg.ch01.029.line.5
+    _text: "\u5B88\u95E8\u7334\u8BA9\u5F00\u4E86\u534A\u6B65\u3002\u8FD9\u534A\u6B65\uFF0C\u4ED6\u6512\u4E86\u5F88\u591A\u5E74\u3002"
+  - _key: dlg.ch01.029.name
+    _text: "\u8BF4\u670D\u5B88\u95E8\u7334"
+  - _key: dlg.ch01.030.desc
+    _text: "\u4ED6\u4E0D\u80AF\u8BA9\u8DEF\uFF0C\u90A3\u5C31\u4ECE\u65C1\u8FB9\u8D70\u3002"
+  - _key: dlg.ch01.030.line.1
+    _text: "\u8BA9\u5F00\u3002"
+  - _key: dlg.ch01.030.line.1.who
+    _text: "\u963F\u7384"
+  - _key: dlg.ch01.030.line.2
+    _text: "\u4E0D\u8BA9\u3002"
+  - _key: dlg.ch01.030.line.2.who
+    _text: "\u5B88\u95E8\u7334"
+  - _key: dlg.ch01.030.line.3
+    _text: "\u963F\u7384\u4ECE\u4FA7\u9762\u7ED5\u4E86\u8FC7\u53BB\u3002\u5B88\u95E8\u7334\u6CA1\u6709\u8FFD\uFF0C\u53EA\u662F\u8F6C\u8FC7\u8EAB\uFF0C\u7EE7\u7EED\u5BF9\u7740\u6D1E\u53E3\u7AD9\u7740\u3002"
+  - _key: dlg.ch01.030.line.4
+    _text: "\u5927\u738B\u56DE\u6765\u4E4B\u524D\uFF0C\u8C01\u4E5F\u4E0D\u80FD\u8FDB\u53BB\u3002"
+  - _key: dlg.ch01.030.line.4.who
+    _text: "\u5B88\u95E8\u7334"
+  - _key: dlg.ch01.030.name
+    _text: "\u7ED5\u8FC7\u5B88\u95E8\u7334"
   - _key: enc.ch01.001.desc
     _text: "\u4E24\u540D\u9189\u7334\u5996\u6321\u5728\u9053\u4E0A\uFF0C\u77F3\u7334\u6295\u624B\u5728\u540E\u5934\u63B7\u77F3\u3002"
   - _key: enc.ch01.001.name
@@ -624,6 +778,42 @@ MonoBehaviour:
     _text: "\u7A7A\u6905\u540E\u9762\u6302\u7740\u4E00\u5E45\u753B\u50CF\uFF0C\u753B\u4E0A\u90A3\u5F20\u8138\u88AB\u96E8\u6C34\u51B2\u6389\u4E86\u3002"
   - _key: int.ch01.024.name
     _text: "\u5B50\u65F6\u821E\u53F0"
+  - _key: int.ch01.025.desc
+    _text: "\u5BB4\u573A\u5317\u7F18\u7684\u4E00\u6761\u77F3\u5F84\uFF0C\u5F80\u5317\u901A\u5411\u65AD\u6D41\u7684\u7011\u5E03\u3002"
+  - _key: int.ch01.025.name
+    _text: "\u901A\u5F80\u6C34\u5E18\u6D1E\u7684\u77F3\u5F84"
+  - _key: int.ch01.026.desc
+    _text: "\u77F3\u5F84\u5F80\u5357\uFF0C\u56DE\u5230\u6446\u7740\u957F\u684C\u7684\u90A3\u7247\u7A7A\u5730\u3002"
+  - _key: int.ch01.026.name
+    _text: "\u56DE\u5BB4\u573A\u7684\u77F3\u5F84"
+  - _key: int.ch01.027.desc
+    _text: "\u4E00\u5757\u6C34\u5E55\u5F62\u72B6\u7684\u65E7\u5E03\uFF0C\u6E7F\u7740\uFF0C\u8FD8\u5728\u6EF4\u6C34\u3002"
+  - _key: int.ch01.027.name
+    _text: "\u65AD\u6D41\u6C34\u5E18"
+  - _key: int.ch01.028.desc
+    _text: "\u591A\u5E74\u6CA1\u79BB\u5F00\u8FC7\u5C97\u4F4D\u7684\u8001\u7334\uFF0C\u624B\u91CC\u7684\u6728\u68CD\u65E9\u5C31\u70C2\u4E86\u3002"
+  - _key: int.ch01.028.name
+    _text: "\u5B88\u95E8\u7334"
+  - _key: int.ch01.029.desc
+    _text: "\u5012\u4E86\u4E00\u534A\u7684\u6728\u67B6\uFF0C\u4E0A\u5C42\u7A7A\u7740\uFF0C\u7070\u79EF\u5F97\u5F88\u5300\u3002"
+  - _key: int.ch01.029.name
+    _text: "\u65E7\u5175\u5668\u67B6"
+  - _key: int.ch01.030.desc
+    _text: "\u6905\u80CC\u523B\u7740\u300C\u9F50\u5929\u300D\uFF0C\u53F3\u4FA7\u88AB\u524A\u6389\u4E00\u534A\uFF0C\u722A\u75D5\u65B0\u65E7\u4E0D\u4E00\u3002"
+  - _key: int.ch01.030.name
+    _text: "\u5927\u5723\u77F3\u5EA7"
+  - _key: int.ch01.031.desc
+    _text: "\u8BA9\u5B88\u95E8\u7334\u770B\u770B\u90A3\u679A\u7F3A\u4E86\u4E00\u89D2\u7684\u77F3\u73AF\u3002"
+  - _key: int.ch01.031.name
+    _text: "\u51FA\u793A\u7F3A\u53E3\u77F3\u73AF"
+  - _key: int.ch01.032.desc
+    _text: "\u4ED6\u62E6\u7740\u95E8\uFF0C\u800C\u4ED6\u5176\u5B9E\u4E5F\u60F3\u77E5\u9053\u7B54\u6848\u3002"
+  - _key: int.ch01.032.name
+    _text: "\u8BF4\u670D\u5B88\u95E8\u7334"
+  - _key: int.ch01.033.desc
+    _text: "\u4ED6\u4E0D\u80AF\u8BA9\u8DEF\uFF0C\u90A3\u5C31\u4ECE\u65C1\u8FB9\u8D70\u3002"
+  - _key: int.ch01.033.name
+    _text: "\u7ED5\u8FC7\u5B88\u95E8\u7334"
   - _key: item.antidote.desc
     _text: "\u89E3\u9664\u4E00\u540D\u961F\u53CB\u8EAB\u4E0A\u7684\u8D1F\u9762\u72B6\u6001\u3002"
   - _key: item.antidote.name
@@ -760,6 +950,10 @@ MonoBehaviour:
     _text: "\u6C34\u5E18\u6D1E\u5916\u642D\u7740\u5DE8\u5927\u7684\u68DA\u67B6\uFF0C\u957F\u684C\u4E00\u8DEF\u6446\u5230\u6700\u4E0A\u65B9\u7684\u7A7A\u6905\u524D\uFF0C\u6240\u6709\u5EA7\u4F4D\u90FD\u671D\u7740\u90A3\u628A\u7A7A\u6905\u3002"
   - _key: map.ch01.map03.name
     _text: "\u82B1\u679C\u5C71\xB7\u5E9F\u5F03\u5BB4\u573A"
+  - _key: map.ch01.map04.desc
+    _text: "\u7011\u5E03\u65AD\u4E86\uFF0C\u6D1E\u53E3\u6302\u7740\u4E00\u9762\u6C34\u5E55\u5F62\u72B6\u7684\u65E7\u5E03\uFF1B\u6BCF\u665A\u90FD\u6709\u7334\u5B50\u6765\u628A\u5B83\u6CFC\u6E7F\u3002"
+  - _key: map.ch01.map04.name
+    _text: "\u82B1\u679C\u5C71\xB7\u6C34\u5E18\u6D1E\u5916"
   - _key: passive.staff_force.desc
     _text: "\u63E1\u7740\u94C1\u7985\u6756\u65F6\u51FA\u624B\u66F4\u72E0\uFF0C\u653B\u51FB\u63D0\u5347\u4E00\u6210\u4E8C\u3002"
   - _key: passive.staff_force.name
