@@ -22,8 +22,8 @@ MonoBehaviour:
   _icon: {fileID: 0}
   _chapterIndex: 1
   _sceneName: Map_CH01_MAP01
-  _gridWidth: 20
-  _gridHeight: 12
+  _gridWidth: 60
+  _gridHeight: 40
   _tilePixelSize: 32
   _originOffsetX: 0
   _originOffsetY: 0
@@ -34,6 +34,6 @@ MonoBehaviour:
   _allowsSaving: 1
   _bgmKey: music.ch01.field
   _ambientKey: amb.ch01.wind
-  _backgroundSpriteKey: sprite.map.ch01.road
+  _backgroundSpriteKey: sprite.map.ch01.front
   _connections:
   - CH01_MAP02

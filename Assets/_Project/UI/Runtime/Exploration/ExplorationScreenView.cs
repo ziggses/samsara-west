@@ -45,14 +45,14 @@ namespace SamsaraWest.UI
         public const string DiagnosticMapId = "CH01_MAP01";
 
         /// <summary>
-        /// 诊断入口的落点：村人左边一格、面朝东。
+        /// 诊断入口的落点：迎客猴左边一格、面朝东。
         /// </summary>
         /// <remarks>
-        /// 挑这个落点不是随手写的：<c>CH01_MAP01</c> 在 (3,4) 有一个村人交互物，
-        /// 从 (2,4) 朝东进图，面板一出现就同时有「脚下是自己、旁边是交互物」两件事可核对，
+        /// 挑这个落点不是随手写的：<c>CH01_MAP01</c> 在 (20,8) 有一个迎客猴交互物，
+        /// 从 (19,8) 朝东进图，面板一出现就同时有「脚下是自己、旁边是交互物」两件事可核对，
         /// 按一下 E 又能把交互通路走通。
         /// </remarks>
-        public static readonly GridPosition DiagnosticStart = new GridPosition(2, 4);
+        public static readonly GridPosition DiagnosticStart = new GridPosition(19, 8);
 
         /// <summary>诊断入口的朝向。与 <see cref="DiagnosticStart"/> 配套。</summary>
         public const MoveDirection DiagnosticFacing = MoveDirection.East;

@@ -24,6 +24,12 @@ namespace SamsaraWest.Localization
         public const string DLG_CH01_003_NAME = "dlg.ch01.003.name";
         public const string DLG_CH01_004_DESC = "dlg.ch01.004.desc";
         public const string DLG_CH01_004_NAME = "dlg.ch01.004.name";
+        public const string DLG_CH01_005_DESC = "dlg.ch01.005.desc";
+        public const string DLG_CH01_005_NAME = "dlg.ch01.005.name";
+        public const string DLG_CH01_006_DESC = "dlg.ch01.006.desc";
+        public const string DLG_CH01_006_NAME = "dlg.ch01.006.name";
+        public const string DLG_CH01_007_DESC = "dlg.ch01.007.desc";
+        public const string DLG_CH01_007_NAME = "dlg.ch01.007.name";
         public const string ENC_CH01_001_DESC = "enc.ch01.001.desc";
         public const string ENC_CH01_001_NAME = "enc.ch01.001.name";
         public const string ENC_CH01_002_DESC = "enc.ch01.002.desc";
@@ -101,6 +107,10 @@ namespace SamsaraWest.Localization
         public const string INT_CH01_004_NAME = "int.ch01.004.name";
         public const string INT_CH01_005_DESC = "int.ch01.005.desc";
         public const string INT_CH01_005_NAME = "int.ch01.005.name";
+        public const string INT_CH01_006_DESC = "int.ch01.006.desc";
+        public const string INT_CH01_006_NAME = "int.ch01.006.name";
+        public const string INT_CH01_007_DESC = "int.ch01.007.desc";
+        public const string INT_CH01_007_NAME = "int.ch01.007.name";
         public const string ITEM_ANTIDOTE_DESC = "item.antidote.desc";
         public const string ITEM_ANTIDOTE_NAME = "item.antidote.name";
         public const string ITEM_APE_FANG_DESC = "item.ape_fang.desc";

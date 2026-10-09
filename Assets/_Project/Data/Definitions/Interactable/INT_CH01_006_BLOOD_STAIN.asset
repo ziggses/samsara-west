@@ -10,25 +10,25 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: ccb1b488a09f9b749ae4291be2fa6ed3, type: 3}
-  m_Name: INT_CH01_004_ROAD_GATE
+  m_Name: INT_CH01_006_BLOOD_STAIN
   m_EditorClassIdentifier: 
-  _id: INT_CH01_004_ROAD_GATE
-  _displayNameKey: int.ch01.004.name
-  _descriptionKey: int.ch01.004.desc
+  _id: INT_CH01_006_BLOOD_STAIN
+  _displayNameKey: int.ch01.006.name
+  _descriptionKey: int.ch01.006.desc
   _tags:
   - ch01
-  - door
+  - prop
   _version: 1
   _icon: {fileID: 0}
   _mapId: CH01_MAP01
-  _gridX: 18
-  _gridY: 6
-  _interactionTypeKey: interact.door
-  _targetId: CH01_MAP02
+  _gridX: 36
+  _gridY: 16
+  _interactionTypeKey: interact.examine
+  _targetId: DLG_CH01_005
   _requiredStateKey: 
   _requiredOperator: 0
   _requiredValue: 0
   _oneShot: 0
   _isHiddenUntilConditionMet: 0
-  _promptKey: ui.prompt.enter
-  _interactSpriteKey: sprite.int.gate
+  _promptKey: ui.prompt.examine
+  _interactSpriteKey: sprite.int.blood_stain

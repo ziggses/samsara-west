@@ -18,19 +18,21 @@ MonoBehaviour:
   _tags:
   - ch01
   - dialogue
+  - branch
   _version: 1
   _icon: {fileID: 0}
   _chapterIndex: 1
-  _inkKnotName: CH01_N03_FAREWELL
-  _speakerCharacterId: CHR_TANGSENG
-  _lineCount: 4
+  _inkKnotName: CH01_N03_ASK_THE_WOUND
+  _speakerCharacterId: 
+  _lineCount: 2
   _nextNodeIds:
-  - CH01_N04_EXIT
-  _requiredStateKey: 
+  - CH01_N04_BROKEN_DRUM
+  _requiredStateKey: flag.ch01.monkey_questioned
   _requiredOperator: 0
   _requiredValue: 0
-  _setsStateKeys: []
-  _karmaChannel: 
-  _karmaDelta: 0
+  _setsStateKeys:
+  - flag.ch01.monkey_questioned
+  _karmaChannel: karma.truth
+  _karmaDelta: 1
   _bgmKey: music.ch01.field
-  _portraitKey: portrait.chr.tangseng
+  _portraitKey: 

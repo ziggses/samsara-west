@@ -18,20 +18,19 @@ MonoBehaviour:
   _tags:
   - ch01
   - dialogue
-  - exit
   _version: 1
   _icon: {fileID: 0}
   _chapterIndex: 1
-  _inkKnotName: CH01_N04_EXIT
-  _speakerCharacterId: CHR_WUKONG
-  _lineCount: 0
-  _nextNodeIds: []
+  _inkKnotName: CH01_N04_BROKEN_DRUM
+  _speakerCharacterId: 
+  _lineCount: 1
+  _nextNodeIds:
+  - CH01_N05_BLOOD_STAIN
   _requiredStateKey: 
   _requiredOperator: 0
   _requiredValue: 0
-  _setsStateKeys:
-  - flag.ch01.prologue_done
+  _setsStateKeys: []
   _karmaChannel: 
   _karmaDelta: 0
   _bgmKey: music.ch01.field
-  _portraitKey: portrait.chr.wukong
+  _portraitKey: 

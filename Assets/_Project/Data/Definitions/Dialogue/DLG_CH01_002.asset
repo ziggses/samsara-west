@@ -18,21 +18,19 @@ MonoBehaviour:
   _tags:
   - ch01
   - dialogue
-  - branch
   _version: 1
   _icon: {fileID: 0}
   _chapterIndex: 1
-  _inkKnotName: CH01_N02_TRUTH_CHOICE
-  _speakerCharacterId: CHR_WUKONG
-  _lineCount: 8
+  _inkKnotName: CH01_N02_GREETER_TALK
+  _speakerCharacterId: 
+  _lineCount: 6
   _nextNodeIds:
-  - CH01_N03_FAREWELL
-  _requiredStateKey: flag.ch01.met_woodcutter
+  - CH01_N03_ASK_THE_WOUND
+  _requiredStateKey: 
   _requiredOperator: 0
-  _requiredValue: 1
-  _setsStateKeys:
-  - flag.ch01.truth_told
-  _karmaChannel: karma.truth
-  _karmaDelta: 1
+  _requiredValue: 0
+  _setsStateKeys: []
+  _karmaChannel: 
+  _karmaDelta: 0
   _bgmKey: music.ch01.field
-  _portraitKey: portrait.chr.wukong
+  _portraitKey: 

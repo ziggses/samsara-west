@@ -10,25 +10,25 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: ccb1b488a09f9b749ae4291be2fa6ed3, type: 3}
-  m_Name: INT_CH01_001_VILLAGER
+  m_Name: INT_CH01_007_MONKEY_PEACH
   m_EditorClassIdentifier: 
-  _id: INT_CH01_001_VILLAGER
-  _displayNameKey: int.ch01.001.name
-  _descriptionKey: int.ch01.001.desc
+  _id: INT_CH01_007_MONKEY_PEACH
+  _displayNameKey: int.ch01.007.name
+  _descriptionKey: int.ch01.007.desc
   _tags:
   - ch01
-  - npc
+  - prop
   _version: 1
   _icon: {fileID: 0}
   _mapId: CH01_MAP01
-  _gridX: 3
-  _gridY: 4
-  _interactionTypeKey: interact.dialogue
+  _gridX: 9
+  _gridY: 8
+  _interactionTypeKey: interact.examine
   _targetId: DLG_CH01_001
   _requiredStateKey: 
   _requiredOperator: 0
   _requiredValue: 0
   _oneShot: 0
   _isHiddenUntilConditionMet: 0
-  _promptKey: ui.prompt.talk
-  _interactSpriteKey: sprite.int.villager
+  _promptKey: ui.prompt.examine
+  _interactSpriteKey: sprite.int.peach

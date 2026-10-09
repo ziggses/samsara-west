@@ -109,8 +109,8 @@ namespace SamsaraWest.Tests.PlayMode
             Assert.AreEqual(0, session.StepCount, "刚进图还没走过。");
 
             var grid = session.Grid;
-            Assert.AreEqual(20, grid.Width, "宽度必须来自 maps.csv，而不是界面自己编一个。");
-            Assert.AreEqual(12, grid.Height);
+            Assert.AreEqual(60, grid.Width, "宽度必须来自 maps.csv，而不是界面自己编一个。");
+            Assert.AreEqual(40, grid.Height);
 
             var localization = GameServices.Registry.Resolve<ILocalizationService>();
             Assert.AreEqual(localization.Get(LocalizationKeys.UI_EXPLORE_GRID_LEGEND), screen.LegendLine);
@@ -119,10 +119,10 @@ namespace SamsaraWest.Tests.PlayMode
                 screen.StatusLine,
                 "状态行必须报出当前是哪张图。");
 
-            // 落点与朝向是挑过的：正前方应当正好是 (3,4) 的村人，连名字一起画出来。
+            // 落点与朝向是挑过的：正前方应当正好是 (20,8) 的迎客猴，连名字一起画出来。
             var villager = grid.InteractableAt(session.FacingPosition);
             Assert.IsNotNull(villager, "诊断落点正前方应当有一个交互物，否则这个入口演示不了交互。");
-            Assert.AreEqual("INT_CH01_001_VILLAGER", villager.Id);
+            Assert.AreEqual("INT_CH01_001_GREETER_MONKEY", villager.Id);
             Assert.AreEqual(
                 localization.Format(
                     LocalizationKeys.UI_EXPLORE_FACING_TARGET,
@@ -166,7 +166,7 @@ namespace SamsaraWest.Tests.PlayMode
             Assert.IsTrue(screen.EnterDiagnosticMap());
 
             var before = screen.Position.Value;
-            Assert.IsFalse(screen.Step(MoveDirection.East), "村人占着那一格，走不过去。");
+            Assert.IsFalse(screen.Step(MoveDirection.East), "迎客猴占着那一格，走不过去。");
 
             Assert.AreEqual(MoveRejection.Blocked, screen.LastMove.Value.Rejection);
             Assert.AreEqual(before, screen.Position.Value, "被拒之后人必须在原地。");
@@ -234,12 +234,12 @@ namespace SamsaraWest.Tests.PlayMode
             screen.Tick();
             Assert.IsTrue(screen.EnterDiagnosticMap());
 
-            Assert.IsTrue(screen.Interact(), "对着村人按 E 必须触发。");
+            Assert.IsTrue(screen.Interact(), "对着迎客猴按 E 必须触发。");
 
             var result = screen.LastInteraction.Value;
-            Assert.AreEqual("INT_CH01_001_VILLAGER", result.InteractableId);
+            Assert.AreEqual("INT_CH01_001_GREETER_MONKEY", result.InteractableId);
             Assert.AreEqual("interact.dialogue", result.InteractionTypeKey);
-            Assert.AreEqual("DLG_CH01_001", result.TargetId, "对话目标必须原样带出来，交给剧情侧去认。");
+            Assert.AreEqual("DLG_CH01_002", result.TargetId, "对话目标必须原样带出来，交给剧情侧去认。");
             Assert.IsFalse(result.RequestsMapChange);
 
             var definitions = GameServices.Registry.Resolve<IDefinitionRegistry>();
@@ -401,11 +401,11 @@ namespace SamsaraWest.Tests.PlayMode
                 bootstrap.MapChange,
                 "换图接线得由引导期装起来：探索只会发出换图请求，没人接的话首章走到门口照样出不去。");
 
-            // 首章野外图东侧的古道山门在 (18,6)：站到 (18,5) 朝北，正前方就是它。
+            // 前山东侧的山门在 (57,6)：站到 (56,6) 朝东，正前方就是它。
             Assert.IsTrue(screen.EnterDiagnosticMap(
                 ExplorationScreenView.DiagnosticMapId,
-                new GridPosition(18, 5),
-                MoveDirection.North));
+                new GridPosition(56, 6),
+                MoveDirection.East));
 
             var localization = GameServices.Registry.Resolve<ILocalizationService>();
             StringAssert.Contains(
@@ -425,7 +425,7 @@ namespace SamsaraWest.Tests.PlayMode
             Assert.AreEqual(
                 new GridPosition(15, 6),
                 session.Position,
-                "门在 20x12 的 (18,6)，小镇图只有 16x10：越界的那一半要先夹回来。");
+                "门在前山的 (57,6)，桃林图只有 16x10：越界的那一半要先夹回来。");
             Assert.IsTrue(
                 session.Grid.IsWalkable(session.Position),
                 "落点必须是能站的格子，否则进门第一步就走不动。");
@@ -445,15 +445,15 @@ namespace SamsaraWest.Tests.PlayMode
             screen.Tick();
             Assert.IsTrue(screen.EnterDiagnosticMap(
                 ExplorationScreenView.DiagnosticMapId,
-                new GridPosition(18, 5),
-                MoveDirection.North));
+                new GridPosition(56, 6),
+                MoveDirection.East));
 
             Assert.IsTrue(screen.Interact());
 
             var session = screen.Session;
             Assert.AreEqual("CH01_MAP02", session.MapId);
 
-            // 两条门在各自图上的位置是对着选的：从小镇图 (15,5) 出门，就该落在山道图上与它相对的地方，
+            // 两条门在各自图上的位置是对着选的：从小镇图 (15,5) 出门，就该落在前山图上与它相对的地方，
             // 回来时才不至于被丢到地图另一头。这里锁的就是「落点在对面那扇门跟前」。
             Assert.AreEqual(
                 new GridPosition(15, 5),

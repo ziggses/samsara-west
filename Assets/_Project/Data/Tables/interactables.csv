@@ -2,8 +2,10 @@
 # interactionTypeKey 必须是键名（如 interact.dialogue / interact.chest / interact.examine）。
 # targetId 指向被触发的目标（对话 ID / 掉落表 ID 等），纯装饰物留空。
 id,displayNameKey,descriptionKey,tags,version,mapId,gridX,gridY,interactionTypeKey,targetId,requiredStateKey,requiredOperator,requiredValue,oneShot,isHiddenUntilConditionMet,promptKey,interactSpriteKey
-INT_CH01_001_VILLAGER,int.ch01.001.name,int.ch01.001.desc,ch01;npc,1,CH01_MAP01,3,4,interact.dialogue,DLG_CH01_001,,Equal,0,false,false,ui.prompt.talk,sprite.int.villager
-INT_CH01_002_SIGNPOST,int.ch01.002.name,int.ch01.002.desc,ch01;prop,1,CH01_MAP01,6,4,interact.examine,DLG_CH01_002,,Equal,0,false,false,ui.prompt.examine,sprite.int.signpost
+INT_CH01_001_GREETER_MONKEY,int.ch01.001.name,int.ch01.001.desc,ch01;npc,1,CH01_MAP01,20,8,interact.dialogue,DLG_CH01_002,,Equal,0,false,false,ui.prompt.talk,sprite.int.greeter_monkey
+INT_CH01_002_BROKEN_DRUM,int.ch01.002.name,int.ch01.002.desc,ch01;prop,1,CH01_MAP01,31,20,interact.examine,DLG_CH01_004,,Equal,0,false,false,ui.prompt.examine,sprite.int.broken_drum
 INT_CH01_003_CHEST,int.ch01.003.name,int.ch01.003.desc,ch01;chest,1,CH01_MAP02,8,5,interact.chest,LUT_ENM_BANDIT,flag.ch01.prologue_done,Equal,1,true,true,ui.prompt.open,sprite.int.chest
-INT_CH01_004_ROAD_GATE,int.ch01.004.name,int.ch01.004.desc,ch01;door,1,CH01_MAP01,18,6,interact.door,CH01_MAP02,,Equal,0,false,false,ui.prompt.enter,sprite.int.gate
+INT_CH01_004_FRONT_GATE,int.ch01.004.name,int.ch01.004.desc,ch01;door,1,CH01_MAP01,57,6,interact.door,CH01_MAP02,,Equal,0,false,false,ui.prompt.enter,sprite.int.gate
 INT_CH01_005_TOWN_GATE,int.ch01.005.name,int.ch01.005.desc,ch01;door,1,CH01_MAP02,15,5,interact.door,CH01_MAP01,,Equal,0,false,false,ui.prompt.enter,sprite.int.gate
+INT_CH01_006_BLOOD_STAIN,int.ch01.006.name,int.ch01.006.desc,ch01;prop,1,CH01_MAP01,36,16,interact.examine,DLG_CH01_005,,Equal,0,false,false,ui.prompt.examine,sprite.int.blood_stain
+INT_CH01_007_MONKEY_PEACH,int.ch01.007.name,int.ch01.007.desc,ch01;prop,1,CH01_MAP01,9,8,interact.examine,DLG_CH01_001,,Equal,0,false,false,ui.prompt.examine,sprite.int.peach
