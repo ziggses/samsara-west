@@ -6,6 +6,7 @@ using SamsaraWest.Data;
 using SamsaraWest.Exploration;
 using SamsaraWest.Localization;
 using SamsaraWest.Narrative;
+using SamsaraWest.Rendering;
 using UnityEngine;
 
 namespace SamsaraWest.UI
@@ -719,11 +720,16 @@ namespace SamsaraWest.UI
             EnsureStyles();
 
             var session = Session;
-            var gridHeight = session == null ? 0 : session.Grid.Height;
+
+            // 精灵层已经把地图画成像素画时，这块 ASCII 格子图就该让位：既不再画网格，
+            // 也不再把面板撑成网格那么大——60×40 格的网格面板会把整个屏幕盖住，正好挡掉美术。
+            var spriteLayerUp = ExplorationSpriteView.IsActive;
+            var gridWidth = session == null || spriteLayerUp ? 0 : session.Grid.Width;
+            var gridHeight = session == null || spriteLayerUp ? 0 : session.Grid.Height;
             var panel = new Rect(
                 Margin,
                 Margin,
-                PanelWidthFor(session == null ? 0 : session.Grid.Width),
+                PanelWidthFor(gridWidth),
                 PanelHeight(gridHeight, IsDialogueActive));
             DrawRect(panel, PanelColor);
             DrawRect(new Rect(panel.x, panel.y, panel.width, AccentHeight), AccentColor);
@@ -752,11 +758,15 @@ namespace SamsaraWest.UI
             _lineStyle.normal.textColor = LineColor;
 
             y += LineHeight + Gap;
-            var gridHeightPixels = session.Grid.Height * (float)CellSize;
-            var gridArea = new Rect(x, y, session.Grid.Width * (float)CellSize, gridHeightPixels);
-            DrawGrid(gridArea, session);
 
-            y += gridHeightPixels + Gap;
+            if (!spriteLayerUp)
+            {
+                var gridHeightPixels = session.Grid.Height * (float)CellSize;
+                var gridArea = new Rect(x, y, session.Grid.Width * (float)CellSize, gridHeightPixels);
+                DrawGrid(gridArea, session);
+
+                y += gridHeightPixels + Gap;
+            }
             if (!string.IsNullOrEmpty(_noteLine))
             {
                 _lineStyle.normal.textColor = WarnColor;

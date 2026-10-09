@@ -15,7 +15,8 @@
         "SamsaraWest.Economy",
         "SamsaraWest.Equipment",
         "SamsaraWest.Audio",
-        "SamsaraWest.UI"
+        "SamsaraWest.UI",
+        "SamsaraWest.Rendering"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

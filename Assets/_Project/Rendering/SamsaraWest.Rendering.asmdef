@@ -1,16 +1,10 @@
 {
-    "name": "SamsaraWest.UI",
-    "rootNamespace": "SamsaraWest.UI",
+    "name": "SamsaraWest.Rendering",
+    "rootNamespace": "SamsaraWest.Rendering",
     "references": [
         "SamsaraWest.Core",
         "SamsaraWest.Data",
-        "SamsaraWest.Narrative",
-        "SamsaraWest.Battle",
-        "SamsaraWest.Exploration",
-        "SamsaraWest.Save",
-        "SamsaraWest.Localization",
-        "SamsaraWest.Rendering",
-        "Unity.TextMeshPro"
+        "SamsaraWest.Exploration"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

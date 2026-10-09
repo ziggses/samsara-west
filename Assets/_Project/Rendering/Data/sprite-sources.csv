@@ -1,0 +1,16 @@
+# 整图素材绑定表：构建 SpriteCatalog 的输入之一。
+#
+# 只写「整张图就是一个精灵」的素材（底图、立绘、UI 底板）。
+# 图集里的元素（sprite.int.*）由各 *_元素图集.json 里的 spriteKey 字段自动绑定，
+# 不要写在这里，否则同一把键会有两处真相。
+#
+# 表头：spriteKey,assetPath,pivot,notes
+#   pivot 取 bottom-left / bottom-center / center
+#   assetPath 留空 = 这把键还没有素材。构建器会把它报成缺口，而不是静默忽略。
+#
+# 底图与网格是 1:1 的：贴图像素数必须等于 网格格数 × 32，否则渲染层会在控制台报出来。
+sprite.map.ch01.front,Assets/_External/花果山前山/花果山前山_1x.png,bottom-left,1920x1280 = 60x40 格 @32px，与 CH01_MAP01 网格 1:1
+sprite.map.ch01.peach,,bottom-left,水帘洞底图未交付
+sprite.map.ch01.banquet,,bottom-left,宴场底图未交付
+sprite.map.ch01.waterfall,,bottom-left,瀑布底图未交付
+sprite.map.ch01.stronghold,,bottom-left,魔王洞窟底图未交付

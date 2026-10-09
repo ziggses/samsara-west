@@ -48,15 +48,34 @@ namespace SamsaraWest.Tests.EditMode
             bool isSafeZone = false,
             bool isTown = false,
             params string[] connections)
+            => Map(id, width, height, 32, 0f, 0f, null, encounterId, encounterRate, isSafeZone, isTown, connections);
+
+        /// <summary>
+        /// 造一张带瓦片规格与原点偏移的地图。渲染层的坐标换算是按像素解释这两个字段的，
+        /// 因此钉住换算的用例需要能把它们摆成非零，而不是只有「32 像素、原点在零」这一种。
+        /// </summary>
+        internal MapDefinition Map(
+            string id,
+            int width,
+            int height,
+            int tilePixelSize,
+            float originOffsetX,
+            float originOffsetY,
+            string backgroundSpriteKey = null,
+            string encounterId = null,
+            float encounterRate = 0f,
+            bool isSafeZone = false,
+            bool isTown = false,
+            params string[] connections)
         {
             var map = New<MapDefinition>(id, "map");
             Set(map, "_chapterIndex", 1);
             Set(map, "_sceneName", "TestMap");
             Set(map, "_gridWidth", width);
             Set(map, "_gridHeight", height);
-            Set(map, "_tilePixelSize", 32);
-            Set(map, "_originOffsetX", 0f);
-            Set(map, "_originOffsetY", 0f);
+            Set(map, "_tilePixelSize", tilePixelSize);
+            Set(map, "_originOffsetX", originOffsetX);
+            Set(map, "_originOffsetY", originOffsetY);
             Set(map, "_encounterTableId", encounterId);
             Set(map, "_encounterRate", encounterRate);
             Set(map, "_isTown", isTown);
@@ -64,7 +83,7 @@ namespace SamsaraWest.Tests.EditMode
             Set(map, "_allowsSaving", true);
             Set(map, "_bgmKey", null);
             Set(map, "_ambientKey", null);
-            Set(map, "_backgroundSpriteKey", null);
+            Set(map, "_backgroundSpriteKey", backgroundSpriteKey);
             Set(map, "_connections", connections ?? Array.Empty<string>());
             return map;
         }
