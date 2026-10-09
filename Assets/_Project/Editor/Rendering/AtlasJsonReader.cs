@@ -51,7 +51,10 @@ namespace SamsaraWest.Editor.Rendering
         {
             public string SourcePath;
 
-            /// <summary>同目录下的贴图文件名。元素图集写 <c>atlas</c>，武器图集写 <c>image</c>。</summary>
+            /// <summary>
+            /// 同目录下的贴图文件名。元素图集写 <c>atlas</c>，剑类武器图集写 <c>image</c>，
+            /// 法杖/刀类是双层图集，本体层写 <c>body</c>。
+            /// </summary>
             public string ImageFile;
 
             public readonly List<Frame> Frames = new List<Frame>();
@@ -92,7 +95,11 @@ namespace SamsaraWest.Editor.Rendering
             atlas = new Atlas
             {
                 SourcePath = jsonPath,
-                ImageFile = ExtractString(text, "atlas") ?? ExtractString(text, "image"),
+                // 双层武器图集（法杖/刀类）没有 atlas/image，只有 body+effect：绑定取本体层——
+                // 素材报告写明 body「可直接当图标用」；effect 是叠在武器上的半透明光晕，
+                // 数据侧没有它的键，先不绑，等有需求再按独立键（如 *.fx）接。
+                // 优先级 atlas > image > body：三层都写时按更明确的字段来。
+                ImageFile = ExtractString(text, "atlas") ?? ExtractString(text, "image") ?? ExtractString(text, "body"),
             };
 
             foreach (var pair in frames)

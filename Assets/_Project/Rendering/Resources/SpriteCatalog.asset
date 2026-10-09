@@ -13,6 +13,496 @@ MonoBehaviour:
   m_Name: SpriteCatalog
   m_EditorClassIdentifier: 
   _bindings:
+  - _key: sprite.item.potion.small
+    _texture: {fileID: 2800000, guid: 72c3cb0191a8338459e5c9da2602794a, type: 3}
+    _rect:
+      serializedVersion: 2
+      x: 6
+      y: 138
+      width: 32
+      height: 32
+    _pivot: {x: 0.5, y: 0}
+    _pixelsPerUnit: 32
+  - _key: sprite.item.potion.spirit
+    _texture: {fileID: 2800000, guid: 72c3cb0191a8338459e5c9da2602794a, type: 3}
+    _rect:
+      serializedVersion: 2
+      x: 50
+      y: 138
+      width: 32
+      height: 32
+    _pivot: {x: 0.5, y: 0}
+    _pixelsPerUnit: 32
+  - _key: sprite.item.antidote
+    _texture: {fileID: 2800000, guid: 72c3cb0191a8338459e5c9da2602794a, type: 3}
+    _rect:
+      serializedVersion: 2
+      x: 94
+      y: 138
+      width: 32
+      height: 32
+    _pivot: {x: 0.5, y: 0}
+    _pixelsPerUnit: 32
+  - _key: sprite.item.herb
+    _texture: {fileID: 2800000, guid: 72c3cb0191a8338459e5c9da2602794a, type: 3}
+    _rect:
+      serializedVersion: 2
+      x: 138
+      y: 138
+      width: 32
+      height: 32
+    _pivot: {x: 0.5, y: 0}
+    _pixelsPerUnit: 32
+  - _key: sprite.item.wolf_pelt
+    _texture: {fileID: 2800000, guid: 72c3cb0191a8338459e5c9da2602794a, type: 3}
+    _rect:
+      serializedVersion: 2
+      x: 182
+      y: 138
+      width: 32
+      height: 32
+    _pivot: {x: 0.5, y: 0}
+    _pixelsPerUnit: 32
+  - _key: sprite.item.iron_shard
+    _texture: {fileID: 2800000, guid: 72c3cb0191a8338459e5c9da2602794a, type: 3}
+    _rect:
+      serializedVersion: 2
+      x: 226
+      y: 138
+      width: 32
+      height: 32
+    _pivot: {x: 0.5, y: 0}
+    _pixelsPerUnit: 32
+  - _key: sprite.item.stone_shard
+    _texture: {fileID: 2800000, guid: 72c3cb0191a8338459e5c9da2602794a, type: 3}
+    _rect:
+      serializedVersion: 2
+      x: 6
+      y: 94
+      width: 32
+      height: 32
+    _pivot: {x: 0.5, y: 0}
+    _pixelsPerUnit: 32
+  - _key: sprite.item.vine_fiber
+    _texture: {fileID: 2800000, guid: 72c3cb0191a8338459e5c9da2602794a, type: 3}
+    _rect:
+      serializedVersion: 2
+      x: 50
+      y: 94
+      width: 32
+      height: 32
+    _pivot: {x: 0.5, y: 0}
+    _pixelsPerUnit: 32
+  - _key: sprite.item.ape_fang
+    _texture: {fileID: 2800000, guid: 72c3cb0191a8338459e5c9da2602794a, type: 3}
+    _rect:
+      serializedVersion: 2
+      x: 94
+      y: 94
+      width: 32
+      height: 32
+    _pivot: {x: 0.5, y: 0}
+    _pixelsPerUnit: 32
+  - _key: sprite.item.bone_ash
+    _texture: {fileID: 2800000, guid: 72c3cb0191a8338459e5c9da2602794a, type: 3}
+    _rect:
+      serializedVersion: 2
+      x: 138
+      y: 94
+      width: 32
+      height: 32
+    _pivot: {x: 0.5, y: 0}
+    _pixelsPerUnit: 32
+  - _key: sprite.item.rotten_peach_core
+    _texture: {fileID: 2800000, guid: 72c3cb0191a8338459e5c9da2602794a, type: 3}
+    _rect:
+      serializedVersion: 2
+      x: 182
+      y: 94
+      width: 32
+      height: 32
+    _pivot: {x: 0.5, y: 0}
+    _pixelsPerUnit: 32
+  - _key: sprite.item.bandit_token
+    _texture: {fileID: 2800000, guid: 72c3cb0191a8338459e5c9da2602794a, type: 3}
+    _rect:
+      serializedVersion: 2
+      x: 226
+      y: 94
+      width: 32
+      height: 32
+    _pivot: {x: 0.5, y: 0}
+    _pixelsPerUnit: 32
+  - _key: sprite.item.map_blackwind
+    _texture: {fileID: 2800000, guid: 72c3cb0191a8338459e5c9da2602794a, type: 3}
+    _rect:
+      serializedVersion: 2
+      x: 6
+      y: 50
+      width: 32
+      height: 32
+    _pivot: {x: 0.5, y: 0}
+    _pixelsPerUnit: 32
+  - _key: sprite.item.peach_wine
+    _texture: {fileID: 2800000, guid: 72c3cb0191a8338459e5c9da2602794a, type: 3}
+    _rect:
+      serializedVersion: 2
+      x: 50
+      y: 50
+      width: 32
+      height: 32
+    _pivot: {x: 0.5, y: 0}
+    _pixelsPerUnit: 32
+  - _key: sprite.item.banquet_cup
+    _texture: {fileID: 2800000, guid: 72c3cb0191a8338459e5c9da2602794a, type: 3}
+    _rect:
+      serializedVersion: 2
+      x: 94
+      y: 50
+      width: 32
+      height: 32
+    _pivot: {x: 0.5, y: 0}
+    _pixelsPerUnit: 32
+  - _key: sprite.item.memory_shard
+    _texture: {fileID: 2800000, guid: 72c3cb0191a8338459e5c9da2602794a, type: 3}
+    _rect:
+      serializedVersion: 2
+      x: 138
+      y: 50
+      width: 32
+      height: 32
+    _pivot: {x: 0.5, y: 0}
+    _pixelsPerUnit: 32
+  - _key: sprite.item.old_ring
+    _texture: {fileID: 2800000, guid: 72c3cb0191a8338459e5c9da2602794a, type: 3}
+    _rect:
+      serializedVersion: 2
+      x: 182
+      y: 50
+      width: 32
+      height: 32
+    _pivot: {x: 0.5, y: 0}
+    _pixelsPerUnit: 32
+  - _key: sprite.item.peach_charm
+    _texture: {fileID: 2800000, guid: 72c3cb0191a8338459e5c9da2602794a, type: 3}
+    _rect:
+      serializedVersion: 2
+      x: 226
+      y: 50
+      width: 32
+      height: 32
+    _pivot: {x: 0.5, y: 0}
+    _pixelsPerUnit: 32
+  - _key: sprite.eqp.armor.leather
+    _texture: {fileID: 2800000, guid: 72c3cb0191a8338459e5c9da2602794a, type: 3}
+    _rect:
+      serializedVersion: 2
+      x: 6
+      y: 6
+      width: 32
+      height: 32
+    _pivot: {x: 0.5, y: 0}
+    _pixelsPerUnit: 32
+  - _key: sprite.eqp.talisman.jade
+    _texture: {fileID: 2800000, guid: 72c3cb0191a8338459e5c9da2602794a, type: 3}
+    _rect:
+      serializedVersion: 2
+      x: 50
+      y: 6
+      width: 32
+      height: 32
+    _pivot: {x: 0.5, y: 0}
+    _pixelsPerUnit: 32
+  - _key: sprite.sutra.stillness
+    _texture: {fileID: 2800000, guid: 72c3cb0191a8338459e5c9da2602794a, type: 3}
+    _rect:
+      serializedVersion: 2
+      x: 94
+      y: 6
+      width: 32
+      height: 32
+    _pivot: {x: 0.5, y: 0}
+    _pixelsPerUnit: 32
+  - _key: sprite.sutra.rage
+    _texture: {fileID: 2800000, guid: 72c3cb0191a8338459e5c9da2602794a, type: 3}
+    _rect:
+      serializedVersion: 2
+      x: 138
+      y: 6
+      width: 32
+      height: 32
+    _pivot: {x: 0.5, y: 0}
+    _pixelsPerUnit: 32
+  - _key: sprite.eqp.staff.iron
+    _texture: {fileID: 2800000, guid: ab870a36378661d46a41a54afad77d61, type: 3}
+    _rect:
+      serializedVersion: 2
+      x: 64
+      y: 128
+      width: 32
+      height: 32
+    _pivot: {x: 0.5, y: 0}
+    _pixelsPerUnit: 32
+  - _key: sprite.eqp.staff.ruyi
+    _texture: {fileID: 2800000, guid: ab870a36378661d46a41a54afad77d61, type: 3}
+    _rect:
+      serializedVersion: 2
+      x: 64
+      y: 32
+      width: 32
+      height: 32
+    _pivot: {x: 0.5, y: 0}
+    _pixelsPerUnit: 32
+  - _key: sprite.int.peach_gatherer
+    _texture: {fileID: 2800000, guid: 34bdb8b9088c66b46908813f99932b84, type: 3}
+    _rect:
+      serializedVersion: 2
+      x: 20
+      y: 286
+      width: 22
+      height: 30
+    _pivot: {x: 0.5, y: 0}
+    _pixelsPerUnit: 32
+  - _key: sprite.int.peach_sign
+    _texture: {fileID: 2800000, guid: 34bdb8b9088c66b46908813f99932b84, type: 3}
+    _rect:
+      serializedVersion: 2
+      x: 85
+      y: 286
+      width: 16
+      height: 22
+    _pivot: {x: 0.5, y: 0}
+    _pixelsPerUnit: 32
+  - _key: sprite.int.vine
+    _texture: {fileID: 2800000, guid: 34bdb8b9088c66b46908813f99932b84, type: 3}
+    _rect:
+      serializedVersion: 2
+      x: 141
+      y: 286
+      width: 28
+      height: 18
+    _pivot: {x: 0.5, y: 0}
+    _pixelsPerUnit: 32
+  - _key: sprite.int.tomb_gate
+    _texture: {fileID: 2800000, guid: 34bdb8b9088c66b46908813f99932b84, type: 3}
+    _rect:
+      serializedVersion: 2
+      x: 199
+      y: 286
+      width: 36
+      height: 38
+    _pivot: {x: 0.5, y: 0}
+    _pixelsPerUnit: 32
+  - _key: sprite.int.kitchen
+    _texture: {fileID: 2800000, guid: 34bdb8b9088c66b46908813f99932b84, type: 3}
+    _rect:
+      serializedVersion: 2
+      x: 257
+      y: 286
+      width: 44
+      height: 36
+    _pivot: {x: 0.5, y: 0}
+    _pixelsPerUnit: 32
+  - _key: sprite.int.banquet_table
+    _texture: {fileID: 2800000, guid: 34bdb8b9088c66b46908813f99932b84, type: 3}
+    _rect:
+      serializedVersion: 2
+      x: 9
+      y: 216
+      width: 44
+      height: 22
+    _pivot: {x: 0.5, y: 0}
+    _pixelsPerUnit: 32
+  - _key: sprite.int.drum_tower
+    _texture: {fileID: 2800000, guid: 34bdb8b9088c66b46908813f99932b84, type: 3}
+    _rect:
+      serializedVersion: 2
+      x: 76
+      y: 216
+      width: 34
+      height: 58
+    _pivot: {x: 0.5, y: 0}
+    _pixelsPerUnit: 32
+  - _key: sprite.int.shrine
+    _texture: {fileID: 2800000, guid: 34bdb8b9088c66b46908813f99932b84, type: 3}
+    _rect:
+      serializedVersion: 2
+      x: 140
+      y: 216
+      width: 30
+      height: 36
+    _pivot: {x: 0.5, y: 0}
+    _pixelsPerUnit: 32
+  - _key: sprite.int.dorm
+    _texture: {fileID: 2800000, guid: 34bdb8b9088c66b46908813f99932b84, type: 3}
+    _rect:
+      serializedVersion: 2
+      x: 195
+      y: 216
+      width: 44
+      height: 28
+    _pivot: {x: 0.5, y: 0}
+    _pixelsPerUnit: 32
+  - _key: sprite.int.bai_mei
+    _texture: {fileID: 2800000, guid: 34bdb8b9088c66b46908813f99932b84, type: 3}
+    _rect:
+      serializedVersion: 2
+      x: 267
+      y: 216
+      width: 24
+      height: 32
+    _pivot: {x: 0.5, y: 0}
+    _pixelsPerUnit: 32
+  - _key: sprite.int.banquet_stage
+    _texture: {fileID: 2800000, guid: 34bdb8b9088c66b46908813f99932b84, type: 3}
+    _rect:
+      serializedVersion: 2
+      x: 6
+      y: 146
+      width: 50
+      height: 42
+    _pivot: {x: 0.5, y: 0}
+    _pixelsPerUnit: 32
+  - _key: sprite.int.waterfall
+    _texture: {fileID: 2800000, guid: 34bdb8b9088c66b46908813f99932b84, type: 3}
+    _rect:
+      serializedVersion: 2
+      x: 78
+      y: 146
+      width: 30
+      height: 46
+    _pivot: {x: 0.5, y: 0}
+    _pixelsPerUnit: 32
+  - _key: sprite.int.gate_monkey
+    _texture: {fileID: 2800000, guid: 34bdb8b9088c66b46908813f99932b84, type: 3}
+    _rect:
+      serializedVersion: 2
+      x: 144
+      y: 146
+      width: 22
+      height: 30
+    _pivot: {x: 0.5, y: 0}
+    _pixelsPerUnit: 32
+  - _key: sprite.int.weapon_rack
+    _texture: {fileID: 2800000, guid: 34bdb8b9088c66b46908813f99932b84, type: 3}
+    _rect:
+      serializedVersion: 2
+      x: 201
+      y: 146
+      width: 32
+      height: 36
+    _pivot: {x: 0.5, y: 0}
+    _pixelsPerUnit: 32
+  - _key: sprite.int.sage_seat
+    _texture: {fileID: 2800000, guid: 34bdb8b9088c66b46908813f99932b84, type: 3}
+    _rect:
+      serializedVersion: 2
+      x: 263
+      y: 146
+      width: 32
+      height: 34
+    _pivot: {x: 0.5, y: 0}
+    _pixelsPerUnit: 32
+  - _key: sprite.int.old_ring
+    _texture: {fileID: 2800000, guid: 34bdb8b9088c66b46908813f99932b84, type: 3}
+    _rect:
+      serializedVersion: 2
+      x: 23
+      y: 76
+      width: 16
+      height: 16
+    _pivot: {x: 0.5, y: 0}
+    _pixelsPerUnit: 32
+  - _key: sprite.int.shattered_weapons
+    _texture: {fileID: 2800000, guid: 34bdb8b9088c66b46908813f99932b84, type: 3}
+    _rect:
+      serializedVersion: 2
+      x: 79
+      y: 76
+      width: 28
+      height: 16
+    _pivot: {x: 0.5, y: 0}
+    _pixelsPerUnit: 32
+  - _key: sprite.int.wine_jars
+    _texture: {fileID: 2800000, guid: 34bdb8b9088c66b46908813f99932b84, type: 3}
+    _rect:
+      serializedVersion: 2
+      x: 142
+      y: 76
+      width: 26
+      height: 20
+    _pivot: {x: 0.5, y: 0}
+    _pixelsPerUnit: 32
+  - _key: sprite.int.wall_inscription
+    _texture: {fileID: 2800000, guid: 34bdb8b9088c66b46908813f99932b84, type: 3}
+    _rect:
+      serializedVersion: 2
+      x: 205
+      y: 76
+      width: 24
+      height: 28
+    _pivot: {x: 0.5, y: 0}
+    _pixelsPerUnit: 32
+  - _key: sprite.int.monkey_king
+    _texture: {fileID: 2800000, guid: 34bdb8b9088c66b46908813f99932b84, type: 3}
+    _rect:
+      serializedVersion: 2
+      x: 265
+      y: 76
+      width: 28
+      height: 42
+    _pivot: {x: 0.5, y: 0}
+    _pixelsPerUnit: 32
+  - _key: sprite.int.broken_sage_statue
+    _texture: {fileID: 2800000, guid: 34bdb8b9088c66b46908813f99932b84, type: 3}
+    _rect:
+      serializedVersion: 2
+      x: 18
+      y: 6
+      width: 26
+      height: 38
+    _pivot: {x: 0.5, y: 0}
+    _pixelsPerUnit: 32
+  - _key: sprite.int.reincarnation_altar
+    _texture: {fileID: 2800000, guid: 34bdb8b9088c66b46908813f99932b84, type: 3}
+    _rect:
+      serializedVersion: 2
+      x: 73
+      y: 6
+      width: 40
+      height: 30
+    _pivot: {x: 0.5, y: 0}
+    _pixelsPerUnit: 32
+  - _key: sprite.int.empty_throne
+    _texture: {fileID: 2800000, guid: 34bdb8b9088c66b46908813f99932b84, type: 3}
+    _rect:
+      serializedVersion: 2
+      x: 139
+      y: 6
+      width: 32
+      height: 36
+    _pivot: {x: 0.5, y: 0}
+    _pixelsPerUnit: 32
+  - _key: sprite.int.memory_stone
+    _texture: {fileID: 2800000, guid: 34bdb8b9088c66b46908813f99932b84, type: 3}
+    _rect:
+      serializedVersion: 2
+      x: 207
+      y: 6
+      width: 20
+      height: 18
+    _pivot: {x: 0.5, y: 0}
+    _pixelsPerUnit: 32
+  - _key: sprite.int.exit_light
+    _texture: {fileID: 2800000, guid: 34bdb8b9088c66b46908813f99932b84, type: 3}
+    _rect:
+      serializedVersion: 2
+      x: 269
+      y: 6
+      width: 20
+      height: 36
+    _pivot: {x: 0.5, y: 0}
+    _pixelsPerUnit: 32
   - _key: sprite.int.greeter_monkey
     _texture: {fileID: 2800000, guid: 0cd89397f1f2c7440832ae041fe128f1, type: 3}
     _rect:
@@ -53,6 +543,16 @@ MonoBehaviour:
       height: 12
     _pivot: {x: 0.5, y: 0}
     _pixelsPerUnit: 32
+  - _key: sprite.int.stone_table
+    _texture: {fileID: 2800000, guid: 0cd89397f1f2c7440832ae041fe128f1, type: 3}
+    _rect:
+      serializedVersion: 2
+      x: 331
+      y: 216
+      width: 22
+      height: 14
+    _pivot: {x: 0.5, y: 0}
+    _pixelsPerUnit: 32
   - _key: sprite.int.gate
     _texture: {fileID: 2800000, guid: 0cd89397f1f2c7440832ae041fe128f1, type: 3}
     _rect:
@@ -63,6 +563,46 @@ MonoBehaviour:
       height: 48
     _pivot: {x: 0.5, y: 0}
     _pixelsPerUnit: 32
+  - _key: portrait.chr.wukong
+    _texture: {fileID: 2800000, guid: f537ea3d44291ca4aad0055eef3d5bbc, type: 3}
+    _rect:
+      serializedVersion: 2
+      x: 0
+      y: 0
+      width: 128
+      height: 192
+    _pivot: {x: 0.5, y: 0}
+    _pixelsPerUnit: 32
+  - _key: portrait.chr.shawujing
+    _texture: {fileID: 2800000, guid: f537ea3d44291ca4aad0055eef3d5bbc, type: 3}
+    _rect:
+      serializedVersion: 2
+      x: 256
+      y: 0
+      width: 128
+      height: 192
+    _pivot: {x: 0.5, y: 0}
+    _pixelsPerUnit: 32
+  - _key: portrait.chr.bajie
+    _texture: {fileID: 2800000, guid: f537ea3d44291ca4aad0055eef3d5bbc, type: 3}
+    _rect:
+      serializedVersion: 2
+      x: 512
+      y: 0
+      width: 128
+      height: 192
+    _pivot: {x: 0.5, y: 0}
+    _pixelsPerUnit: 32
+  - _key: portrait.chr.tangseng
+    _texture: {fileID: 2800000, guid: f537ea3d44291ca4aad0055eef3d5bbc, type: 3}
+    _rect:
+      serializedVersion: 2
+      x: 768
+      y: 0
+      width: 128
+      height: 192
+    _pivot: {x: 0.5, y: 0}
+    _pixelsPerUnit: 32
   - _key: sprite.map.ch01.front
     _texture: {fileID: 2800000, guid: 0ecdb9a369b01b14da2d61bb44704be8, type: 3}
     _rect:
@@ -71,5 +611,45 @@ MonoBehaviour:
       y: 0
       width: 1920
       height: 1280
+    _pivot: {x: 0, y: 0}
+    _pixelsPerUnit: 32
+  - _key: sprite.map.ch01.peach
+    _texture: {fileID: 2800000, guid: dac46fbb3aac2c14b9ffea82b229df19, type: 3}
+    _rect:
+      serializedVersion: 2
+      x: 0
+      y: 0
+      width: 2240
+      height: 1600
+    _pivot: {x: 0, y: 0}
+    _pixelsPerUnit: 32
+  - _key: sprite.map.ch01.banquet
+    _texture: {fileID: 2800000, guid: 4aefdf0d75ec10c4381262a35eefd0c0, type: 3}
+    _rect:
+      serializedVersion: 2
+      x: 0
+      y: 0
+      width: 2880
+      height: 2240
+    _pivot: {x: 0, y: 0}
+    _pixelsPerUnit: 32
+  - _key: sprite.map.ch01.waterfall
+    _texture: {fileID: 2800000, guid: 760fd9afb93d26e4c97791633fd4c7c4, type: 3}
+    _rect:
+      serializedVersion: 2
+      x: 0
+      y: 0
+      width: 2560
+      height: 1760
+    _pivot: {x: 0, y: 0}
+    _pixelsPerUnit: 32
+  - _key: sprite.map.ch01.stronghold
+    _texture: {fileID: 2800000, guid: f4907b15839b1504eaac39931a039c2c, type: 3}
+    _rect:
+      serializedVersion: 2
+      x: 0
+      y: 0
+      width: 3200
+      height: 2240
     _pivot: {x: 0, y: 0}
     _pixelsPerUnit: 32

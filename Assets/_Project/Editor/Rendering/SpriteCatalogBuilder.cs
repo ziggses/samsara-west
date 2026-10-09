@@ -56,6 +56,18 @@ namespace SamsaraWest.Editor.Rendering
             /// <summary>交互物素材键在数据里有、但目录里没有的，逐条列出。</summary>
             public readonly List<string> MissingInteractableKeys = new List<string>();
 
+            /// <summary>装备素材键在数据里有、但目录里没有的，逐条列出。</summary>
+            public readonly List<string> MissingEquipmentKeys = new List<string>();
+
+            /// <summary>道具素材键在数据里有、但目录里没有的，逐条列出。</summary>
+            public readonly List<string> MissingItemKeys = new List<string>();
+
+            /// <summary>经书素材键在数据里有、但目录里没有的，逐条列出。</summary>
+            public readonly List<string> MissingSutraKeys = new List<string>();
+
+            /// <summary>角色立绘／战斗图键在数据里有、但目录里没有的，逐条列出。</summary>
+            public readonly List<string> MissingCharacterKeys = new List<string>();
+
             /// <summary>提示信息（重复键、图集缺贴图等）。</summary>
             public readonly List<string> Notes = new List<string>();
 
@@ -66,8 +78,12 @@ namespace SamsaraWest.Editor.Rendering
                 var builder = new StringBuilder();
                 builder.Append("精灵目录：绑定 ").Append(Bound).Append(" 条");
                 builder.Append("（图集带键帧 ").Append(AtlasKeyedFrames).Append("／无键帧 ").Append(AtlasUnkeyedFrames).Append("）");
-                builder.Append("、底图缺口 ").Append(MissingBackgroundKeys.Count);
-                builder.Append("、交互物缺口 ").Append(MissingInteractableKeys.Count);
+                builder.Append("、数据缺口（底图 ").Append(MissingBackgroundKeys.Count);
+                builder.Append("／交互物 ").Append(MissingInteractableKeys.Count);
+                builder.Append("／装备 ").Append(MissingEquipmentKeys.Count);
+                builder.Append("／道具 ").Append(MissingItemKeys.Count);
+                builder.Append("／经书 ").Append(MissingSutraKeys.Count);
+                builder.Append("／角色 ").Append(MissingCharacterKeys.Count).Append("）");
                 builder.Append("、待交付 ").Append(PendingSourceCount);
                 builder.Append("、路径写错 ").Append(BrokenSourceCount);
                 return builder.ToString();
@@ -209,7 +225,7 @@ namespace SamsaraWest.Editor.Rendering
                 var texturePath = ResolveAtlasTexturePath(jsonPath, atlas);
                 if (texturePath == null)
                 {
-                    report.Notes.Add($"图集 {jsonPath} 的贴图找不到（字段 atlas／image 指向 {atlas.ImageFile ?? "空"}）。");
+                    report.Notes.Add($"图集 {jsonPath} 的贴图找不到（字段 atlas／image／body 指向 {atlas.ImageFile ?? "空"}）。");
                     continue;
                 }
 
@@ -367,7 +383,13 @@ namespace SamsaraWest.Editor.Rendering
             }
         }
 
-        /// <summary>拿定义目录对一遍：哪些底图键、交互物素材键还没有图。</summary>
+        /// <summary>拿定义目录对一遍：数据侧写了素材键、但精灵目录里没有图的，按类别逐条列出。</summary>
+        /// <remarks>
+        /// 覆盖六类：底图（maps）、交互物（interactables）、装备（equipment）、道具（items）、
+        /// 经书（sutras）、角色（characters）。<b>只管「数据有键、目录没图」这一个方向</b>；
+        /// 反方向（图集里有帧、数据侧还没键）由图集 JSON 那段报（<see cref="BuildReport.AtlasUnkeyedFrames"/>）。
+        /// 两个方向的数各自可读，合起来才是素材与数据之间的真实缺口。
+        /// </remarks>
         private static void ReportDefinitionGaps(SpriteCatalog catalog, BuildReport report)
         {
             var definitions = AssetDatabase.LoadAssetAtPath<DefinitionCatalog>(SamsaraWestPaths.DefinitionCatalogAsset);
@@ -379,19 +401,64 @@ namespace SamsaraWest.Editor.Rendering
 
             foreach (var map in definitions.OfKind<MapDefinition>())
             {
-                if (!string.IsNullOrEmpty(map.BackgroundSpriteKey) && !catalog.Has(map.BackgroundSpriteKey))
-                {
-                    report.MissingBackgroundKeys.Add($"{map.Id} → {map.BackgroundSpriteKey}");
-                }
+                CollectMissing(report.MissingBackgroundKeys, map.Id, "backgroundSpriteKey", map.BackgroundSpriteKey, catalog);
             }
 
             foreach (var interactable in definitions.OfKind<InteractableDefinition>())
             {
-                if (!string.IsNullOrEmpty(interactable.InteractSpriteKey) && !catalog.Has(interactable.InteractSpriteKey))
-                {
-                    report.MissingInteractableKeys.Add($"{interactable.Id} → {interactable.InteractSpriteKey}");
-                }
+                CollectMissing(report.MissingInteractableKeys, interactable.Id, "interactSpriteKey", interactable.InteractSpriteKey, catalog);
             }
+
+            foreach (var equipment in definitions.OfKind<EquipmentDefinition>())
+            {
+                CollectMissing(report.MissingEquipmentKeys, equipment.Id, "spriteKey", equipment.SpriteKey, catalog);
+            }
+
+            foreach (var item in definitions.OfKind<ItemDefinition>())
+            {
+                CollectMissing(report.MissingItemKeys, item.Id, "spriteKey", item.SpriteKey, catalog);
+            }
+
+            foreach (var sutra in definitions.OfKind<SutraDefinition>())
+            {
+                CollectMissing(report.MissingSutraKeys, sutra.Id, "spriteKey", sutra.SpriteKey, catalog);
+            }
+
+            foreach (var character in definitions.OfKind<CharacterDefinition>())
+            {
+                // 立绘与战斗图是两把独立的键，各自算一条缺口：只有立绘绑上时，缺口数仍会如实报出战斗图。
+                CollectMissing(report.MissingCharacterKeys, character.Id, "portraitKey", character.PortraitKey, catalog);
+                CollectMissing(report.MissingCharacterKeys, character.Id, "battleSpriteKey", character.BattleSpriteKey, catalog);
+            }
+
+            ReportGapNote(report, "底图", report.MissingBackgroundKeys);
+            ReportGapNote(report, "交互物", report.MissingInteractableKeys);
+            ReportGapNote(report, "装备", report.MissingEquipmentKeys);
+            ReportGapNote(report, "道具", report.MissingItemKeys);
+            ReportGapNote(report, "经书", report.MissingSutraKeys);
+            ReportGapNote(report, "角色", report.MissingCharacterKeys);
+        }
+
+        /// <summary>数据侧写了键、目录里却没图，就记一条。键留空跳过——那一列本来就没填，不是缺口。</summary>
+        private static void CollectMissing(List<string> sink, string id, string field, string key, SpriteCatalog catalog)
+        {
+            if (string.IsNullOrEmpty(key) || catalog.Has(key))
+            {
+                return;
+            }
+
+            sink.Add($"{id}.{field} → {key}");
+        }
+
+        /// <summary>把一类的缺口汇总成一条提示，以便摘要之外还能看见究竟是哪几条。空类不出声。</summary>
+        private static void ReportGapNote(BuildReport report, string label, List<string> missing)
+        {
+            if (missing.Count == 0)
+            {
+                return;
+            }
+
+            report.Notes.Add($"{label}缺素材 {missing.Count} 条：{string.Join("、", missing)}");
         }
     }
 }

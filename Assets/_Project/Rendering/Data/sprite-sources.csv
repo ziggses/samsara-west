@@ -10,7 +10,7 @@
 #
 # 底图与网格是 1:1 的：贴图像素数必须等于 网格格数 × 32，否则渲染层会在控制台报出来。
 sprite.map.ch01.front,Assets/_External/花果山前山/花果山前山_1x.png,bottom-left,1920x1280 = 60x40 格 @32px，与 CH01_MAP01 网格 1:1
-sprite.map.ch01.peach,,bottom-left,水帘洞底图未交付
-sprite.map.ch01.banquet,,bottom-left,宴场底图未交付
-sprite.map.ch01.waterfall,,bottom-left,瀑布底图未交付
-sprite.map.ch01.stronghold,,bottom-left,魔王洞窟底图未交付
+sprite.map.ch01.peach,Assets/_External/花果山_场景组图/花果山桃林_1x.png,bottom-left,2240x1600 = 70x50 格 @32px，与 CH01_MAP02 网格 1:1
+sprite.map.ch01.banquet,Assets/_External/花果山_场景组图/花果山宴场_1x.png,bottom-left,2880x2240 = 90x70 格 @32px，与 CH01_MAP03 网格 1:1
+sprite.map.ch01.waterfall,Assets/_External/花果山_场景组图/花果山水帘洞_1x.png,bottom-left,2560x1760 = 80x55 格 @32px，与 CH01_MAP04 网格 1:1
+sprite.map.ch01.stronghold,Assets/_External/花果山_场景组图/花果山魔王洞窟_1x.png,bottom-left,3200x2240 = 100x70 格 @32px，与 CH01_MAP05 网格 1:1
