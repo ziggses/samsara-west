@@ -14,7 +14,7 @@
 # 1. 挂载外部素材 + 初始化工程（新机器、新克隆跑一次；幂等，可反复执行）
 powershell -NoProfile -ExecutionPolicy Bypass -File E:\tx2\samsara-west\Tools\setup-project.ps1
 
-# 2. 跑全套测试（当前基线：EditMode 728 + PlayMode 84）
+# 2. 跑全套测试（当前基线：EditMode 728 + PlayMode 85）
 powershell -NoProfile -ExecutionPolicy Bypass -File E:\tx2\samsara-west\Tools\run-tests.ps1 -Platform All
 ```
 
@@ -32,14 +32,17 @@ powershell -NoProfile -ExecutionPolicy Bypass -File E:\tx2\samsara-west\Tools\ru
 三个诊断层会自己挂上来，场景里不需要挂任何东西：
 
 - `F1` 自检面板；`F2` 打一场首章遭遇、`F3` 收起（打赢一场会按掉落表结算：
-  赏金与掉落物进钱袋与背包，日志 `Economy` 频道报一行；目前没有钱袋界面，只能在日志与测试里看）
+  赏金与掉落物进钱袋与背包，日志 `Economy` 频道报一行；目前没有钱袋界面，只能在日志与测试里看）。
+  战斗面板里己方每个单位占一格**战斗姿态**（角色图集的 128×192 大图，键 `portrait.chr.*.battle`）：
+  行动中的那格描一圈亮边、倒下的压暗；敌人定义没有这把键，于是敌人不进这条——
+  要是哪一格画成了洋红叉，那就是「键有、图没了」
 - `F4` 进首章野外图 `CH01_MAP01`（再按一次离图）：方向键／`WASD` 走格、`E` 交互。
   首章五张图都有真底图与交互物精灵（`SpriteRenderer`，ADR-032），角色与镜头整格跟随；
   下方一行报「刚才那下为什么被拒」。
 - `F5` 存一次档、`F9` 读回来（固定槽位 1，面板在左下角）：账本、钱袋与背包、在身装备与经文、所在位置与随机种子一起进出；
   `F5`／`F9` 只在编辑器与开发版里生效。
 
-它们是**诊断层，不是正式界面**：探索画面已是真精灵（ADR-032），但战斗、对话、菜单仍是纯逻辑加字符界面；
+它们是**诊断层，不是正式界面**：探索画面已是真精灵（ADR-032），战斗面板眼下也只多了己方那一条战斗姿态，整体仍是纯逻辑加字符界面；
 正式界面要一套带中文字形的字体资产，正式场景的角色与镜头表现也还没做（ADR-014、ADR-022）。
 
 ## 目录结构

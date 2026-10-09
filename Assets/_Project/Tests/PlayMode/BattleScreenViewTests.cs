@@ -2,8 +2,10 @@ using System.Collections;
 using NUnit.Framework;
 using SamsaraWest.Battle;
 using SamsaraWest.Core;
+using SamsaraWest.Data;
 using SamsaraWest.Flow;
 using SamsaraWest.Localization;
+using SamsaraWest.Rendering;
 using SamsaraWest.UI;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -118,6 +120,58 @@ namespace SamsaraWest.Tests.PlayMode
             }
 
             Assert.AreEqual(0, localization.MissingKeys.Count, "画出来的文案必须全部命中文本表。");
+        }
+
+        /// <summary>
+        /// 战斗姿态条要真的接上素材：己方每个单位占一格，格里的键来自角色定义的
+        /// <c>battlePortraitKey</c>，且精灵目录里真有这张图。
+        /// </summary>
+        /// <remarks>
+        /// 这条同时是「战斗姿态 ≠ 战斗小图」在界面上的凭据：画出来的键必须不是
+        /// <c>battleSpriteKey</c>——那把键要的是带朝向的战斗单位小图，美术还没交付。
+        /// </remarks>
+        [UnityTest]
+        public IEnumerator Screen_ShowsThePartyBattlePortraits()
+        {
+            yield return LoadBootstrapScene();
+
+            var screen = BattleScreenView.Instance;
+            screen.Tick();
+            Assert.AreEqual(0, screen.Portraits.Count, "还没开战，姿态条不该凭空有格子。");
+
+            Assert.IsTrue(screen.StartDiagnosticBattle());
+
+            var party = screen.Controller.Hud.PlayerRows;
+            var registry = GameServices.Registry.Resolve<IDefinitionRegistry>();
+            var catalog = SpriteCatalog.Load();
+
+            Assert.IsNotNull(catalog, "工程里得有一张生成好的精灵目录，否则姿态条只剩空槽与洋红叉。");
+            Assert.AreEqual(
+                party.Count,
+                screen.Portraits.Count,
+                "己方每个单位占一格，不多不少——敌人不该混进这条。");
+
+            for (var i = 0; i < party.Count; i++)
+            {
+                var slot = screen.Portraits[i];
+                var character = registry.Get<CharacterDefinition>(party[i].DefinitionId);
+
+                Assert.AreEqual(
+                    character.BattlePortraitKey,
+                    slot.Key,
+                    $"{character.Id} 那一格画的必须是角色定义里的战斗姿态键。");
+                Assert.AreNotEqual(
+                    character.BattleSpriteKey,
+                    slot.Key,
+                    "战斗姿态与战斗小图是两把键，别把后者当成前者画出来。");
+                Assert.IsTrue(catalog.Has(slot.Key), $"{slot.Key} 必须真的在精灵目录里。");
+                Assert.IsNotNull(slot.Sprite, $"{slot.Key} 有键就该有图；真缺图时该画洋红叉。");
+                Assert.IsFalse(slot.IsMissing, $"{character.Id} 的战斗姿态不该是缺图状态。");
+                Assert.AreEqual(
+                    party[i].IsCurrentActor,
+                    slot.IsCurrentActor,
+                    "行动中的高亮得跟着单位走，不能钉在某一格上。");
+            }
         }
 
         [UnityTest]

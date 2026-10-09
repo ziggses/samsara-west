@@ -6,6 +6,7 @@ using SamsaraWest.Battle;
 using SamsaraWest.Core;
 using SamsaraWest.Data;
 using SamsaraWest.Localization;
+using SamsaraWest.Rendering;
 using UnityEngine;
 
 namespace SamsaraWest.UI
@@ -26,6 +27,10 @@ namespace SamsaraWest.UI
     /// 连置灰理由也只是把 <see cref="BattleCommandOption.Rejection"/> 转述成文本键。</para>
     /// <para><b>不每帧拼文案</b>：快照只在相位、行动数、回合数或选择态变化时重建，
     /// <see cref="OnGUI"/> 只负责把已拼好的字符串画出去（同 <see cref="SkeletonBootScreen"/> 的取舍）。</para>
+    /// <para><b>队伍的战斗姿态也画在这里</b>：己方每个单位占一格，按
+    /// <c>CharacterDefinition.BattlePortraitKey</c> 从精灵目录取图等比缩画。键有、图没有时画洋红叉
+    /// （与探索层 <c>PlaceholderSprites.Missing</c> 同一枚记号）；<b>连键都没有的格子留空槽</b>——
+    /// 敌人定义压根没有这把键，「没承诺过素材」与「承诺了没给」必须分得开。</para>
     /// </remarks>
     [DisallowMultipleComponent]
     public sealed class BattleScreenView : MonoBehaviour
@@ -53,12 +58,21 @@ namespace SamsaraWest.UI
 
         private const int Margin = 16;
         private const int PanelWidth = 760;
-        private const int PanelHeight = 452;
+        private const int PanelHeight = 560;
         private const int AccentHeight = 3;
         private const int Padding = 12;
         private const int ButtonWidth = 132;
         private const int ButtonHeight = 28;
         private const int Gap = 6;
+
+        /// <summary>战斗姿态缩略图的高度。宽度按每张图自己的比例算，立绘因此不会被压扁。</summary>
+        private const int PortraitHeight = 96;
+
+        /// <summary>查不到图时格子用的宽度（128×192 立绘的 2:3 比例算下来正是 64）。</summary>
+        private const int PortraitFallbackWidth = 64;
+
+        /// <summary>格子宽度上限：哪张素材换成了怪比例，也不许把面板撑破。</summary>
+        private const int PortraitMaxWidth = 160;
 
         private static readonly Color PanelColor = new Color(0.06f, 0.07f, 0.09f, 0.90f);
         private static readonly Color AccentColor = new Color(0.20f, 0.68f, 0.55f, 1f);
@@ -71,6 +85,12 @@ namespace SamsaraWest.UI
         private static readonly Color HintColor = new Color(0.62f, 0.66f, 0.72f);
         private static readonly Color WarnColor = new Color(0.95f, 0.66f, 0.30f);
 
+        /// <summary>空槽的底色：这一格没有素材键，于是不画东西，但位置留着。</summary>
+        private static readonly Color EmptyPortraitColor = new Color(0.11f, 0.12f, 0.15f, 1f);
+
+        /// <summary>倒下单位的压暗系数：姿态还在，但一眼看得出它不再行动。</summary>
+        private static readonly Color DownPortraitTint = new Color(1f, 1f, 1f, 0.32f);
+
         private static BattleScreenView _instance;
 
         /// <summary>界面上要填的一行（已拼好的字符串 + 决定配色的几个布尔）。</summary>
@@ -82,7 +102,30 @@ namespace SamsaraWest.UI
             public bool IsAlive;
         }
 
+        /// <summary>
+        /// 战斗姿态条上的一格：己方一个单位要画的那张图，外加「数据里有没有键、目录里有没有图」两件事。
+        /// </summary>
+        /// <remarks>
+        /// 分开记「键」与「图」是刻意的：有键无图要报出「缺图」，无键则什么都不该报——
+        /// 把这两件事合成一个「没画出来」，界面就再也说不清缺口在哪一侧了。
+        /// </remarks>
+        public struct PortraitSlot
+        {
+            /// <summary>数据侧声明的键（<c>portrait.chr.*.battle</c>）；空串 = 这个单位从没承诺过素材。</summary>
+            public string Key;
+
+            /// <summary>从精灵目录里查到的图；null = 没有图可画。</summary>
+            public Sprite Sprite;
+
+            public bool IsCurrentActor;
+            public bool IsAlive;
+
+            /// <summary>键有、图没有——这一格要画洋红叉。</summary>
+            public bool IsMissing => !string.IsNullOrEmpty(Key) && Sprite == null;
+        }
+
         private readonly List<SnapshotRow> _rows = new List<SnapshotRow>(FormationSlot.Capacity * 2);
+        private readonly List<PortraitSlot> _portraits = new List<PortraitSlot>(FormationSlot.Capacity);
         private readonly List<string> _commandLabels = new List<string>(8);
         private readonly List<bool> _commandEnabled = new List<bool>(8);
         private readonly List<string> _pickLabels = new List<string>(FormationSlot.Capacity);
@@ -91,6 +134,13 @@ namespace SamsaraWest.UI
         private IBattleService _battle;
         private IDefinitionRegistry _definitions;
         private ILocalizationService _localization;
+
+        /// <summary>
+        /// 素材目录。它<b>不是服务</b>——是渲染层自己的资产（<c>Resources/SpriteCatalog</c>），
+        /// 与探索层同一条口径：谁要画谁自己找，组合根不必知道美术目录长什么样。
+        /// 目录没生成过时为 null，这时姿态条上只会是空槽与洋红叉。
+        /// </summary>
+        private SpriteCatalog _catalog;
 
         /// <summary>已解析过的那张注册表。换了一张就说明服务重装过，缓存必须整个丢掉。</summary>
         private IServiceRegistry _registryRef;
@@ -142,6 +192,9 @@ namespace SamsaraWest.UI
 
         /// <summary>最近一次画出去的那几行，供用例核对「确实画了文本表里的字」。</summary>
         public IReadOnlyList<SnapshotRow> Rows => _rows;
+
+        /// <summary>此刻战斗姿态条上的格子，按队伍顺序与 <see cref="BattleHudModel.PlayerRows"/> 一一对应。</summary>
+        public IReadOnlyList<PortraitSlot> Portraits => _portraits;
 
         public string TitleLine => _titleLine;
 
@@ -491,6 +544,11 @@ namespace SamsaraWest.UI
             }
 
             _registryRef = registry;
+
+            // 素材目录不是服务，所以在这里顺手取一次：它与注册表无关，但「服务重装过」正好是
+            // 重新看一眼目录的好时机（美术重交付后重跑构建器就属于这一类）。
+            _catalog = SpriteCatalog.Load();
+
             GameLog.Info(LogChannel.UI, "Battle screen view bound to the service registry.");
         }
 
@@ -500,6 +558,7 @@ namespace SamsaraWest.UI
             _battle = null;
             _definitions = null;
             _localization = null;
+            _catalog = null;
             _boundSession = null;
             _controller = null;
             _pick = PickMode.None;
@@ -523,6 +582,7 @@ namespace SamsaraWest.UI
         private void RebuildRows()
         {
             _rows.Clear();
+            _portraits.Clear();
 
             if (_controller == null)
             {
@@ -532,6 +592,45 @@ namespace SamsaraWest.UI
             var hud = _controller.Hud;
             AppendSide(hud, hud.PlayerRows, isPlayer: true);
             AppendSide(hud, hud.EnemyRows, isPlayer: false);
+            RebuildPortraits(hud);
+        }
+
+        /// <summary>
+        /// 战斗姿态条：己方每个单位一格。敌人不进这条——它们连战斗姿态的键都没有，
+        /// 画一排空槽只会让人以为「敌人的图全缺了」。
+        /// </summary>
+        private void RebuildPortraits(BattleHudModel hud)
+        {
+            var rows = hud.PlayerRows;
+            for (var i = 0; i < rows.Count; i++)
+            {
+                var row = rows[i];
+                var key = ResolveBattlePortraitKey(row.DefinitionId);
+
+                _portraits.Add(new PortraitSlot
+                {
+                    Key = key,
+                    Sprite = string.IsNullOrEmpty(key) || _catalog == null ? null : _catalog.Get(key),
+                    IsCurrentActor = row.IsCurrentActor,
+                    IsAlive = row.IsAlive,
+                });
+            }
+        }
+
+        /// <summary>
+        /// 单位定义 → 战斗姿态键。<b>只有角色定义有这把键</b>，敌人定义没有，于是这里返回空串，
+        /// 界面据此留空槽而不是报缺图。
+        /// </summary>
+        private string ResolveBattlePortraitKey(string definitionId)
+        {
+            if (_definitions == null || string.IsNullOrEmpty(definitionId))
+            {
+                return string.Empty;
+            }
+
+            return _definitions.TryGet(definitionId, out CharacterDefinition character) && character != null
+                ? character.BattlePortraitKey
+                : string.Empty;
         }
 
         private void AppendSide(BattleHudModel hud, IReadOnlyList<BattleUnitRow> source, bool isPlayer)
@@ -840,6 +939,13 @@ namespace SamsaraWest.UI
             GUI.Label(new Rect(x, y, width, lineHeight), _statusLine, _lineStyle);
             y += lineHeight + Gap;
 
+            // 姿态条只在有仗可打时出现：没有战斗时它一格都没有，占一块空面板没有意义。
+            if (_portraits.Count > 0)
+            {
+                DrawPortraits(x, y);
+                y += PortraitHeight + Gap;
+            }
+
             for (var i = 0; i < _rows.Count; i++)
             {
                 var row = _rows[i];
@@ -980,6 +1086,103 @@ namespace SamsaraWest.UI
 
             _hintStyle = new GUIStyle(_lineStyle);
             _hintStyle.normal.textColor = HintColor;
+        }
+
+        /// <summary>
+        /// 画战斗姿态条：己方一格一人，等比缩到 <see cref="PortraitHeight"/> 高。
+        /// </summary>
+        /// <remarks>
+        /// 叠加顺序是「高亮框 → 空槽底色 → 图」。高亮框先画且外扩两像素，于是它成为一圈边框，
+        /// 不会被随后画上的图盖掉；倒下的单位只压暗、不隐藏——姿态还在，只是不再行动了。
+        /// </remarks>
+        private void DrawPortraits(float x, float y)
+        {
+            var cursor = x;
+            for (var i = 0; i < _portraits.Count; i++)
+            {
+                var slot = _portraits[i];
+                var slotWidth = PortraitWidth(slot.Sprite);
+
+                if (slot.IsCurrentActor)
+                {
+                    DrawRect(new Rect(cursor - 2f, y - 2f, slotWidth + 4f, PortraitHeight + 4f), AccentColor);
+                }
+
+                var box = new Rect(cursor, y, slotWidth, PortraitHeight);
+                DrawRect(box, EmptyPortraitColor);
+
+                if (slot.Sprite != null)
+                {
+                    DrawSprite(box, slot.Sprite, slot.IsAlive ? Color.white : DownPortraitTint);
+                }
+                else if (!string.IsNullOrEmpty(slot.Key))
+                {
+                    // 有键、没图：照探索层那枚洋红叉画，但按方形居中——拉成 2:3 会把这个记号扭歪。
+                    var side = Mathf.Min(box.width, box.height);
+                    DrawSprite(
+                        new Rect(
+                            box.x + ((box.width - side) * 0.5f),
+                            box.y + ((box.height - side) * 0.5f),
+                            side,
+                            side),
+                        PlaceholderSprites.Missing,
+                        Color.white);
+                }
+
+                cursor += slotWidth + Gap;
+            }
+        }
+
+        /// <summary>格子的宽度：按图自己的比例算（立绘因此不会变形），没有图时按立绘比例兜底。</summary>
+        private static float PortraitWidth(Sprite sprite)
+        {
+            if (sprite == null)
+            {
+                return PortraitFallbackWidth;
+            }
+
+            var rect = sprite.textureRect;
+            if (rect.height <= 0f)
+            {
+                return PortraitFallbackWidth;
+            }
+
+            // 上下都夹住：素材哪天换成怪比例，坏的也只是这一格，面板不会被撑破。
+            return Mathf.Clamp(
+                PortraitHeight * (rect.width / rect.height),
+                PortraitFallbackWidth * 0.5f,
+                PortraitMaxWidth);
+        }
+
+        /// <summary>把图集里切出来的一块画到屏幕矩形里。</summary>
+        /// <remarks>
+        /// IMGUI 要的是<b>归一化</b>纹理坐标，而精灵只知道自己在贴图里的像素矩形，故这里现算一次。
+        /// 纹理坐标与 <c>Sprite.textureRect</c> 同用左下原点，不必再翻 y。
+        /// </remarks>
+        private static void DrawSprite(Rect box, Sprite sprite, Color tint)
+        {
+            if (sprite == null)
+            {
+                return;
+            }
+
+            var texture = sprite.texture;
+            if (texture == null || texture.width <= 0 || texture.height <= 0)
+            {
+                return;
+            }
+
+            var rect = sprite.textureRect;
+            var coords = new Rect(
+                rect.x / texture.width,
+                rect.y / texture.height,
+                rect.width / texture.width,
+                rect.height / texture.height);
+
+            var previous = GUI.color;
+            GUI.color = tint;
+            GUI.DrawTextureWithTexCoords(box, texture, coords);
+            GUI.color = previous;
         }
 
         private static void DrawRect(Rect rect, Color color)
