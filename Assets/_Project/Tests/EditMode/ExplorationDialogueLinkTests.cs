@@ -152,7 +152,9 @@ namespace SamsaraWest.Tests.EditMode
         [Test]
         public void ChestInteraction_IsNotAskedAbout()
         {
-            Interact("INT_CH01_003_CHEST", "interact.chest", "LUT_ENM_BANDIT");
+            // 名单外的类型键一律不问。数据表里现在没有宝箱了（占位那一件随桃林重做一起删了），
+            // 这里用一件合成交互物守住这条判据：筛的是类型键，不是「表里有没有这种东西」。
+            Interact("INT_CH01_016_LAB_CHEST", "interact.chest", "LUT_ENM_LAB");
 
             Assert.AreEqual(0, _link.Started);
             Assert.IsFalse(_dialogue.IsActive);

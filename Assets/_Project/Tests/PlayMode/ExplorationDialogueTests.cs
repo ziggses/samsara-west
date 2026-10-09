@@ -217,9 +217,9 @@ namespace SamsaraWest.Tests.PlayMode
         {
             var screen = ExplorationScreenView.Instance;
             screen.Tick();
-            Assert.IsTrue(screen.EnterDiagnosticMap("CH01_MAP02", new GridPosition(15, 4), MoveDirection.North));
+            Assert.IsTrue(screen.EnterDiagnosticMap("CH01_MAP02", new GridPosition(57, 4), MoveDirection.North));
 
-            Assert.IsTrue(screen.Interact(), "前置条件：迎客的城门就在面朝的那一格。");
+            Assert.IsTrue(screen.Interact(), "前置条件：回前山的桃林入口就在面朝的那一格。");
 
             var interaction = screen.LastInteraction;
             Assert.IsTrue(interaction.HasValue);
@@ -254,6 +254,77 @@ namespace SamsaraWest.Tests.PlayMode
                 screen.DialogueLine,
                 "重新搭话是重开一段，不是接着上次停的那行——「读到哪里」不该跨图留着。");
             yield return null;
+        }
+
+        [UnityTest]
+        public IEnumerator WalkingIntoTheGathererWithoutTheLedger_EndsAtTheGreeting()
+        {
+            var screen = EnterPeachGrove(new GridPosition(52, 13));
+
+            Assert.IsTrue(screen.Interact(), "前置条件：采桃猴就在面朝的那一格。");
+            Assert.AreEqual(_localization.Get(LocalizationKeys.DLG_CH01_008_LINE_1), screen.DialogueLine);
+
+            var advances = AdvanceToTheEnd(screen);
+
+            Assert.AreEqual(
+                5,
+                advances,
+                "账本还压在石桌底下时，招呼后面那一跳以 flag.ch01.ledger_found 为进入条件——挑不到人，会话就该到此为止。");
+            Assert.AreEqual(1, _story.GetValue("flag.ch01.gatherer_met"), "招呼读过，采桃猴记住了这个人。");
+            Assert.AreEqual(0, _story.GetKarma(KarmaAxis.Truth), "账本还没露面，就谈不上说真话。");
+            yield return null;
+        }
+
+        [UnityTest]
+        public IEnumerator TheLedgerChain_PublishesTheTruthOnceAndRepeatsNothingElse()
+        {
+            // 先到旧石桌底下把账本翻出来。
+            var screen = EnterPeachGrove(new GridPosition(44, 21));
+            Assert.IsTrue(screen.Interact(), "前置条件：旧石桌就在面朝的那一格。");
+            Assert.AreEqual(3, AdvanceToTheEnd(screen), "石桌那一段三行：账本压在桌子底下，被桃汁泡硬了。");
+            Assert.AreEqual(1, _story.GetValue("flag.ch01.ledger_found"), "翻过一次，账本就算到手。");
+
+            // 拿着账本去搭采桃猴的话：招呼 5 行 → 账本 3 行 → 公开账本 3 行。
+            screen = EnterPeachGrove(new GridPosition(52, 13));
+            Assert.IsTrue(screen.Interact(), "前置条件：采桃猴就在面朝的那一格。");
+            Assert.AreEqual(11, AdvanceToTheEnd(screen), "三个节点串成一次会话：5 + 3 + 3。");
+            Assert.AreEqual(1, _story.GetKarma(KarmaAxis.Truth), "公开账本那一段读完才记这一点真相。");
+
+            // 再搭一次：账本内容还会念一遍，但公开那一段以「还没公开过」为进入条件，早该自己关上。
+            Assert.IsTrue(screen.Interact(), "前置条件：采桃猴还在那儿，还能再搭一次话。");
+            Assert.AreEqual(8, AdvanceToTheEnd(screen), "第二次只剩招呼 5 行与账本 3 行。");
+            Assert.AreEqual(
+                1,
+                _story.GetKarma(KarmaAxis.Truth),
+                "重复念账本不该再赚一点真相——否则站在桃筐边按 E 就能刷满心念。");
+            yield return null;
+        }
+
+        private static ExplorationScreenView EnterPeachGrove(GridPosition approach)
+        {
+            var screen = ExplorationScreenView.Instance;
+            screen.Tick();
+
+            // 同一个入口不允许抢会话：先离图，再按坐标进桃林。
+            screen.LeaveMap();
+
+            Assert.IsTrue(
+                screen.EnterDiagnosticMap("CH01_MAP02", approach, MoveDirection.North),
+                "前置条件：进得了桃林那张图。");
+            return screen;
+        }
+
+        private static int AdvanceToTheEnd(ExplorationScreenView screen)
+        {
+            var advances = 0;
+            while (screen.IsDialogueActive && advances < 30)
+            {
+                screen.HandleKey(KeyCode.E);
+                advances++;
+            }
+
+            Assert.IsFalse(screen.IsDialogueActive, "对白该自己收场，不该卡在最后一行上。");
+            return advances;
         }
 
         private static ExplorationScreenView EnterFrontHill()

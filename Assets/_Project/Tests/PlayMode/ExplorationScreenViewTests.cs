@@ -290,9 +290,9 @@ namespace SamsaraWest.Tests.PlayMode
             var screen = ExplorationScreenView.Instance;
             screen.Tick();
 
-            // 首章小镇图 (8,5) 的宝箱要求 flag.ch01.prologue_done == 1 才现身。
+            // 桃林 (26,38) 的灵石墓穴入口要求 flag.ch01.broken_bridge_seen == 1 才现身。
             // 引导期没有存档，旗标读出来是 0，所以它现在是「藏着的」。
-            Assert.IsTrue(screen.EnterDiagnosticMap("CH01_MAP02", new GridPosition(8, 4), MoveDirection.North));
+            Assert.IsTrue(screen.EnterDiagnosticMap("CH01_MAP02", new GridPosition(26, 37), MoveDirection.North));
 
             var localization = GameServices.Registry.Resolve<ILocalizationService>();
             Assert.AreEqual(
@@ -423,14 +423,14 @@ namespace SamsaraWest.Tests.PlayMode
             Assert.IsNotNull(session, "换图不是离图：走完门必须还在某张图上。");
             Assert.AreEqual("CH01_MAP02", session.MapId, "走了门就必须真的换图——这正是这条接线的全部理由。");
             Assert.AreEqual(
-                new GridPosition(15, 6),
+                new GridPosition(57, 6),
                 session.Position,
-                "门在前山的 (57,6)，桃林图只有 16x10：越界的那一半要先夹回来。");
+                "门在前山的 (57,6)，桃林 70x50 装得下这个坐标：落点就是它自己，不必再夹。");
             Assert.IsTrue(
                 session.Grid.IsWalkable(session.Position),
                 "落点必须是能站的格子，否则进门第一步就走不动。");
-            Assert.AreEqual(16, session.Grid.Width, "换图之后网格得重建，不然画出来的还是上一张图。");
-            Assert.AreEqual(10, session.Grid.Height);
+            Assert.AreEqual(70, session.Grid.Width, "换图之后网格得重建，不然画出来的还是上一张图。");
+            Assert.AreEqual(50, session.Grid.Height);
             Assert.AreEqual(1, bootstrap.MapChange.MapChanges);
             StringAssert.Contains("CH01_MAP02", screen.StatusLine, "状态行得跟着报出新图。");
             Assert.AreEqual(0, localization.MissingKeys.Count, "新加的门与提示文案必须都在文本表里。");
@@ -453,19 +453,19 @@ namespace SamsaraWest.Tests.PlayMode
             var session = screen.Session;
             Assert.AreEqual("CH01_MAP02", session.MapId);
 
-            // 两条门在各自图上的位置是对着选的：从小镇图 (15,5) 出门，就该落在前山图上与它相对的地方，
+            // 两条门在各自图上的位置是对着选的：从前山山门 (57,6) 出门，就该落在桃林图上与它相对的地方，
             // 回来时才不至于被丢到地图另一头。这里锁的就是「落点在对面那扇门跟前」。
             Assert.AreEqual(
-                new GridPosition(15, 5),
+                new GridPosition(57, 5),
                 session.FacingPosition,
                 "落点应当就在回程门跟前，而不是被丢到图的角落。");
 
             var gateBack = session.Grid.InteractableAt(session.FacingPosition);
             Assert.IsNotNull(gateBack, "回程门应当就在落点正前方。");
-            Assert.AreEqual("INT_CH01_005_TOWN_GATE", gateBack.Id);
+            Assert.AreEqual("INT_CH01_008_PEACH_GROVE_GATE", gateBack.Id);
 
             var localization = GameServices.Registry.Resolve<ILocalizationService>();
-            StringAssert.Contains(localization.Get(LocalizationKeys.INT_CH01_005_NAME), screen.FacingLine);
+            StringAssert.Contains(localization.Get(LocalizationKeys.INT_CH01_008_NAME), screen.FacingLine);
             Assert.AreEqual(0, localization.MissingKeys.Count);
         }
 
@@ -477,18 +477,18 @@ namespace SamsaraWest.Tests.PlayMode
             var screen = ExplorationScreenView.Instance;
             screen.Tick();
 
-            // 反过来走一遍：小镇图 (15,4) 朝北，正前方是 (15,5) 的镇口牌坊。
-            Assert.IsTrue(screen.EnterDiagnosticMap("CH01_MAP02", new GridPosition(15, 4), MoveDirection.North));
+            // 反过来走一遍：桃林 (57,4) 朝北，正前方是 (57,5) 的桃林入口。
+            Assert.IsTrue(screen.EnterDiagnosticMap("CH01_MAP02", new GridPosition(57, 4), MoveDirection.North));
             Assert.IsTrue(screen.Interact());
 
             var session = screen.Session;
             Assert.IsTrue(
                 session.MapId == "CH01_MAP01",
-                "门是双向的：数据里两张图的 connections 互相指着对方，走回去就该回到山道图。");
+                "门是双向的：数据里两张图的 connections 互相指着对方，走回去就该回到前山图。");
             Assert.AreEqual(
-                new GridPosition(15, 5),
+                new GridPosition(57, 5),
                 session.Position,
-                "回程门在 (15,5)，山道图装得下这个坐标，落点就是它自己，不必搜索。");
+                "回程门在 (57,5)，前山图装得下这个坐标，落点就是它自己，不必搜索。");
             Assert.AreEqual(1, GameBootstrap.Instance.MapChange.MapChanges);
         }
 

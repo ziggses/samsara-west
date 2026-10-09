@@ -16,30 +16,30 @@ namespace SamsaraWest.Tests.PlayMode
     /// <remarks>
     /// EditMode 用例已经证明账本自己守规矩（见 <c>StoryStateTests</c>），但那时账本与探索
     /// <b>互不认识</b>，也不在真实装配里。这一组管的是另一半：在引导器装出来的真服务、
-    /// 真数据表、真适配器之下，往账本写一个键，藏在首章小镇图里的宝箱必须<b>当场现身</b>——
+    /// 真数据表、真适配器之下，往账本写一个键，藏在首章桃林里的灵石墓穴入口必须<b>当场现身</b>——
     /// 而且<b>没有任何人手动调 RefreshVisibility</b>，全靠 Flow 侧那条接线。
     /// </remarks>
     public sealed class NarrativeStateLinkTests
     {
         private const string BootstrapSceneName = "Bootstrap";
 
-        /// <summary>首章小镇图里那只宝箱的格子；它要求 flag.ch01.prologue_done == 1 才现身。</summary>
-        private const string ChestFlagKey = "flag.ch01.prologue_done";
-        private const string ChestMapId = "CH01_MAP02";
-        private static readonly GridPosition ChestCell = new GridPosition(8, 5);
+        /// <summary>桃林里那个墓穴入口的旗标；它要求 flag.ch01.broken_bridge_seen == 1 才现身。</summary>
+        private const string TombFlagKey = "flag.ch01.broken_bridge_seen";
+        private const string TombMapId = "CH01_MAP02";
+        private static readonly GridPosition TombCell = new GridPosition(26, 38);
 
-        /// <summary>宝箱正南面那一格，站在这里朝北正对着它。</summary>
-        private static readonly GridPosition ChestApproach = new GridPosition(8, 4);
+        /// <summary>墓穴入口正南面那一格，站在这里朝北正对着它。</summary>
+        private static readonly GridPosition TombApproach = new GridPosition(26, 37);
 
         /// <summary>
-        /// 那只宝箱的定义 ID。
+        /// 那个墓穴入口的定义 ID。
         /// </summary>
         /// <remarks>
-        /// 断言「它有没有被画出来」时要按 ID 找，不能数总数：这张图上还有一扇镇口牌坊
-        /// （<c>INT_CH01_005_TOWN_GATE</c>）本来就该画出来，总数一变这条断言就会冤枉接线。
+        /// 断言「它有没有被画出来」时要按 ID 找，不能数总数：这张图上还有七件东西
+        /// （桃林入口、采桃猴、三块木牌、旧石桌、断桥藤根）本来就该画出来，总数一变这条断言就会冤枉接线。
         /// 内容会一直加，能数总数的图只有测试自己搭的那张。
         /// </remarks>
-        private const string ChestId = "INT_CH01_003_CHEST";
+        private const string TombEntranceId = "INT_CH01_015_TOMB_ENTRANCE";
 
         [UnitySetUp]
         public IEnumerator SetUp()
@@ -70,7 +70,7 @@ namespace SamsaraWest.Tests.PlayMode
             {
                 if (GameServices.Registry.TryResolve(out IStoryState story))
                 {
-                    story.SetValue(ChestFlagKey, 0);
+                    story.SetValue(TombFlagKey, 0);
                 }
 
                 if (GameServices.Registry.TryResolve(out IExplorationService exploration))
@@ -94,7 +94,7 @@ namespace SamsaraWest.Tests.PlayMode
         }
 
         [UnityTest]
-        public IEnumerator StoryFlagUnlocksHiddenChest_WithoutManualRefresh()
+        public IEnumerator StoryFlagUnlocksTheTombEntrance_WithoutManualRefresh()
         {
             yield return LoadBootstrapScene();
 
@@ -106,19 +106,19 @@ namespace SamsaraWest.Tests.PlayMode
                 GameBootstrap.Instance.NarrativeLink,
                 "剧情状态接线要装在引导末尾，否则账本变了没人去重建可行格。");
 
-            var session = exploration.EnterMap(ChestMapId, ChestApproach, MoveDirection.North);
+            var session = exploration.EnterMap(TombMapId, TombApproach, MoveDirection.North);
             Assert.IsNotNull(session);
 
-            Assert.IsTrue(session.Grid.IsWalkable(ChestCell), "条件没满足时宝箱藏着，那一格该是通的。");
-            Assert.IsFalse(IsDrawn(session, ChestId), "藏着的宝箱不该被画出来。");
+            Assert.IsTrue(session.Grid.IsWalkable(TombCell), "条件没满足时墓穴入口藏着，那一格该是通的。");
+            Assert.IsFalse(IsDrawn(session, TombEntranceId), "藏着的墓穴入口不该被画出来。");
 
             // 剧情把键改了。这里刻意不碰探索——由 NarrativeStateLink 去重建。
-            story.SetValue(ChestFlagKey, 1);
+            story.SetValue(TombFlagKey, 1);
 
             Assert.IsFalse(
-                session.Grid.IsWalkable(ChestCell),
-                "账本一变，宝箱必须当场现身并开始占格——没有任何人手动调 RefreshVisibility。");
-            Assert.IsTrue(IsDrawn(session, ChestId), "现身之后它就该被画出来。");
+                session.Grid.IsWalkable(TombCell),
+                "账本一变，墓穴入口必须当场现身并开始占格——没有任何人手动调 RefreshVisibility。");
+            Assert.IsTrue(IsDrawn(session, TombEntranceId), "现身之后它就该被画出来。");
 
             Assert.AreEqual(1, GameBootstrap.Instance.NarrativeLink.Refreshes, "重建的次数要能被数出来。");
         }
@@ -133,12 +133,12 @@ namespace SamsaraWest.Tests.PlayMode
             var story = registry.Resolve<IStoryState>();
 
             // 不在图上写账：接线不该崩，也不该去碰一个不存在的会话。
-            story.SetValue(ChestFlagKey, 1);
+            story.SetValue(TombFlagKey, 1);
 
-            var session = exploration.EnterMap(ChestMapId, ChestApproach, MoveDirection.North);
+            var session = exploration.EnterMap(TombMapId, TombApproach, MoveDirection.North);
 
             Assert.IsFalse(
-                session.Grid.IsWalkable(ChestCell),
+                session.Grid.IsWalkable(TombCell),
                 "进图那一刻就该按当前账本建格；不必等人再写一次账。");
         }
 
@@ -151,13 +151,13 @@ namespace SamsaraWest.Tests.PlayMode
             var exploration = registry.Resolve<IExplorationService>();
             var story = registry.Resolve<IStoryState>();
 
-            exploration.EnterMap(ChestMapId, ChestApproach, MoveDirection.North);
+            exploration.EnterMap(TombMapId, TombApproach, MoveDirection.North);
             var link = GameBootstrap.Instance.NarrativeLink;
 
-            story.SetValue(ChestFlagKey, 1);
+            story.SetValue(TombFlagKey, 1);
             var afterFirst = link.Refreshes;
 
-            story.SetValue(ChestFlagKey, 1);
+            story.SetValue(TombFlagKey, 1);
 
             Assert.AreEqual(
                 afterFirst,

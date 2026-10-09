@@ -13,7 +13,7 @@ namespace SamsaraWest.Exploration
     /// <c>Flow/InteractionFlagLink</c>（它两边都认识），读这一侧是
     /// <see cref="ExplorationSession.HasUsed"/>（它只认识 <see cref="IExplorationStateSource"/>）。</para>
     ///
-    /// <para>键形如 <c>flag.interact.int_ch01_003_chest</c>：前缀符合 <c>IdRules</c> 的
+    /// <para>键形如 <c>flag.interact.int_ch01_015_tomb_entrance</c>：前缀符合 <c>IdRules</c> 的
     /// <c>flag.*</c> 规则，交互物 ID 一律转小写——账本键的规则只认小写，
     /// 而交互物 ID 按数据层的规矩是大写的。</para>
     /// </remarks>

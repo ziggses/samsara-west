@@ -3,4 +3,4 @@
 # encounterTableId 目前填该地图的默认遭遇 ID，多遭遇权重表留到垂直切片阶段引入。
 id,displayNameKey,descriptionKey,tags,version,chapterIndex,sceneName,gridWidth,gridHeight,tilePixelSize,originOffsetX,originOffsetY,encounterTableId,encounterRate,isTown,isSafeZone,allowsSaving,bgmKey,ambientKey,backgroundSpriteKey,connections
 CH01_MAP01,map.ch01.map01.name,map.ch01.map01.desc,ch01;field,1,1,Map_CH01_MAP01,60,40,32,0,0,ENC_CH01_001,0.12,false,false,true,music.ch01.field,amb.ch01.wind,sprite.map.ch01.front,CH01_MAP02
-CH01_MAP02,map.ch01.map02.name,map.ch01.map02.desc,ch01;town,1,1,Map_CH01_MAP02,16,10,32,0,0,,0,true,true,true,music.ch01.town,amb.ch01.village,sprite.map.ch01.village,CH01_MAP01
+CH01_MAP02,map.ch01.map02.name,map.ch01.map02.desc,ch01;field,1,1,Map_CH01_MAP02,70,50,32,0,0,ENC_CH01_002,0.14,false,false,true,music.ch01.peach,amb.ch01.petals,sprite.map.ch01.peach,CH01_MAP01

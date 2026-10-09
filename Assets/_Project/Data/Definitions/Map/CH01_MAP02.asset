@@ -17,23 +17,23 @@ MonoBehaviour:
   _descriptionKey: map.ch01.map02.desc
   _tags:
   - ch01
-  - town
+  - field
   _version: 1
   _icon: {fileID: 0}
   _chapterIndex: 1
   _sceneName: Map_CH01_MAP02
-  _gridWidth: 16
-  _gridHeight: 10
+  _gridWidth: 70
+  _gridHeight: 50
   _tilePixelSize: 32
   _originOffsetX: 0
   _originOffsetY: 0
-  _encounterTableId: 
-  _encounterRate: 0
-  _isTown: 1
-  _isSafeZone: 1
+  _encounterTableId: ENC_CH01_002
+  _encounterRate: 0.14
+  _isTown: 0
+  _isSafeZone: 0
   _allowsSaving: 1
-  _bgmKey: music.ch01.town
-  _ambientKey: amb.ch01.village
-  _backgroundSpriteKey: sprite.map.ch01.village
+  _bgmKey: music.ch01.peach
+  _ambientKey: amb.ch01.petals
+  _backgroundSpriteKey: sprite.map.ch01.peach
   _connections:
   - CH01_MAP01

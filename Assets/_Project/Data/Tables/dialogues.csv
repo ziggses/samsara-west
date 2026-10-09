@@ -6,6 +6,9 @@
 #   为 true 时必须把 nextNodeIds 留空，否则报 DLG_TERMINAL_WITH_NEXT。
 #   选 B 路线（问伤口）挂在 DLG_CH01_002 之后：003 以 flag.ch01.monkey_questioned 为进入条件，
 #   问过一次就不再满足，所以重复搭话不会重复加真相值。
+#   桃林那条支线多一层：008（招呼）的后继 009（账本）以 flag.ch01.ledger_found 为进入条件，
+#   石桌底下的账本还没取出来时，这一跳就挑不到人，会话到此为止；010（公开账本）才是加真相的那一刻。
+#   账本取出后重复搭话会重播 009（账本内容），但 010 的「还没公开过」条件已经失效，真相值不会重复加。
 id,displayNameKey,descriptionKey,tags,version,chapterIndex,inkKnotName,speakerCharacterId,lineCount,nextNodeIds,requiredStateKey,requiredOperator,requiredValue,setsStateKeys,karmaChannel,karmaDelta,bgmKey,portraitKey,isTerminal
 DLG_CH01_001,dlg.ch01.001.name,dlg.ch01.001.desc,ch01;dialogue,1,1,CH01_N01_MONKEY_PEACH,,3,,,Equal,0,flag.ch01.repeating_action,,0,music.ch01.field,,true
 DLG_CH01_002,dlg.ch01.002.name,dlg.ch01.002.desc,ch01;dialogue,1,1,CH01_N02_GREETER_TALK,,7,CH01_N03_ASK_THE_WOUND,,Equal,0,flag.ch01.greeted_monkey,,0,music.ch01.field,,false
@@ -14,3 +17,12 @@ DLG_CH01_004,dlg.ch01.004.name,dlg.ch01.004.desc,ch01;dialogue,1,1,CH01_N04_BROK
 DLG_CH01_005,dlg.ch01.005.name,dlg.ch01.005.desc,ch01;dialogue,1,1,CH01_N05_BLOOD_STAIN,,1,,,Equal,0,,,0,music.ch01.field,,true
 DLG_CH01_006,dlg.ch01.006.name,dlg.ch01.006.desc,ch01;dialogue;battle,1,1,CH01_N06_SECOND_BEND,,5,,,Equal,0,,,0,music.ch01.field,,true
 DLG_CH01_007,dlg.ch01.007.name,dlg.ch01.007.desc,ch01;dialogue;exit,1,1,CH01_N07_FRONT_GATE,,0,,,Equal,0,,,0,music.ch01.field,,true
+DLG_CH01_008,dlg.ch01.008.name,dlg.ch01.008.desc,ch01;dialogue,1,1,CH01_N08_GATHERER_TALK,,5,CH01_N09_LEDGER_TALK,,Equal,0,flag.ch01.gatherer_met,,0,music.ch01.peach,,false
+DLG_CH01_009,dlg.ch01.009.name,dlg.ch01.009.desc,ch01;dialogue,1,1,CH01_N09_LEDGER_TALK,,3,CH01_N10_LEDGER_TRUTH,flag.ch01.ledger_found,Equal,1,,,0,music.ch01.peach,,false
+DLG_CH01_010,dlg.ch01.010.name,dlg.ch01.010.desc,ch01;dialogue;branch,1,1,CH01_N10_LEDGER_TRUTH,,3,,flag.ch01.ledger_public,Equal,0,flag.ch01.ledger_public,karma.truth,1,music.ch01.peach,,true
+DLG_CH01_011,dlg.ch01.011.name,dlg.ch01.011.desc,ch01;dialogue,1,1,CH01_N11_PEACH_SIGN_ONE,,2,,,Equal,0,flag.ch01.peach_sign_1,,0,music.ch01.peach,,true
+DLG_CH01_012,dlg.ch01.012.name,dlg.ch01.012.desc,ch01;dialogue,1,1,CH01_N12_PEACH_SIGN_TWO,,2,,,Equal,0,flag.ch01.peach_sign_2,,0,music.ch01.peach,,true
+DLG_CH01_013,dlg.ch01.013.name,dlg.ch01.013.desc,ch01;dialogue,1,1,CH01_N13_PEACH_SIGN_THREE,,3,,,Equal,0,flag.ch01.peach_sign_3,,0,music.ch01.peach,,true
+DLG_CH01_014,dlg.ch01.014.name,dlg.ch01.014.desc,ch01;dialogue,1,1,CH01_N14_OLD_STONE_TABLE,,3,,,Equal,0,flag.ch01.ledger_found,,0,music.ch01.peach,,true
+DLG_CH01_015,dlg.ch01.015.name,dlg.ch01.015.desc,ch01;dialogue,1,1,CH01_N15_BROKEN_BRIDGE,,3,,,Equal,0,flag.ch01.broken_bridge_seen,,0,music.ch01.peach,,true
+DLG_CH01_016,dlg.ch01.016.name,dlg.ch01.016.desc,ch01;dialogue;secret,1,1,CH01_N16_TOMB_KEEPER,,6,,,Equal,0,flag.ch01.tomb_found,karma.truth,1,music.ch01.peach,,true

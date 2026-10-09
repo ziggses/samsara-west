@@ -4,8 +4,14 @@
 id,displayNameKey,descriptionKey,tags,version,mapId,gridX,gridY,interactionTypeKey,targetId,requiredStateKey,requiredOperator,requiredValue,oneShot,isHiddenUntilConditionMet,promptKey,interactSpriteKey
 INT_CH01_001_GREETER_MONKEY,int.ch01.001.name,int.ch01.001.desc,ch01;npc,1,CH01_MAP01,20,8,interact.dialogue,DLG_CH01_002,,Equal,0,false,false,ui.prompt.talk,sprite.int.greeter_monkey
 INT_CH01_002_BROKEN_DRUM,int.ch01.002.name,int.ch01.002.desc,ch01;prop,1,CH01_MAP01,31,20,interact.examine,DLG_CH01_004,,Equal,0,false,false,ui.prompt.examine,sprite.int.broken_drum
-INT_CH01_003_CHEST,int.ch01.003.name,int.ch01.003.desc,ch01;chest,1,CH01_MAP02,8,5,interact.chest,LUT_ENM_BANDIT,flag.ch01.prologue_done,Equal,1,true,true,ui.prompt.open,sprite.int.chest
 INT_CH01_004_FRONT_GATE,int.ch01.004.name,int.ch01.004.desc,ch01;door,1,CH01_MAP01,57,6,interact.door,CH01_MAP02,,Equal,0,false,false,ui.prompt.enter,sprite.int.gate
-INT_CH01_005_TOWN_GATE,int.ch01.005.name,int.ch01.005.desc,ch01;door,1,CH01_MAP02,15,5,interact.door,CH01_MAP01,,Equal,0,false,false,ui.prompt.enter,sprite.int.gate
 INT_CH01_006_BLOOD_STAIN,int.ch01.006.name,int.ch01.006.desc,ch01;prop,1,CH01_MAP01,36,16,interact.examine,DLG_CH01_005,,Equal,0,false,false,ui.prompt.examine,sprite.int.blood_stain
 INT_CH01_007_MONKEY_PEACH,int.ch01.007.name,int.ch01.007.desc,ch01;prop,1,CH01_MAP01,9,8,interact.examine,DLG_CH01_001,,Equal,0,false,false,ui.prompt.examine,sprite.int.peach
+INT_CH01_008_PEACH_GROVE_GATE,int.ch01.008.name,int.ch01.008.desc,ch01;door,1,CH01_MAP02,57,5,interact.door,CH01_MAP01,,Equal,0,false,false,ui.prompt.enter,sprite.int.gate
+INT_CH01_009_PEACH_GATHERER,int.ch01.009.name,int.ch01.009.desc,ch01;npc,1,CH01_MAP02,52,14,interact.dialogue,DLG_CH01_008,,Equal,0,false,false,ui.prompt.talk,sprite.int.peach_gatherer
+INT_CH01_010_PEACH_TREE_SIGN_ONE,int.ch01.010.name,int.ch01.010.desc,ch01;prop,1,CH01_MAP02,58,10,interact.examine,DLG_CH01_011,,Equal,0,false,false,ui.prompt.examine,sprite.int.peach_sign
+INT_CH01_011_PEACH_TREE_SIGN_TWO,int.ch01.011.name,int.ch01.011.desc,ch01;prop,1,CH01_MAP02,47,18,interact.examine,DLG_CH01_012,,Equal,0,false,false,ui.prompt.examine,sprite.int.peach_sign
+INT_CH01_012_PEACH_TREE_SIGN_THREE,int.ch01.012.name,int.ch01.012.desc,ch01;prop,1,CH01_MAP02,37,27,interact.examine,DLG_CH01_013,,Equal,0,false,false,ui.prompt.examine,sprite.int.peach_sign
+INT_CH01_013_OLD_STONE_TABLE,int.ch01.013.name,int.ch01.013.desc,ch01;prop,1,CH01_MAP02,44,22,interact.examine,DLG_CH01_014,,Equal,0,false,false,ui.prompt.examine,sprite.int.stone_table
+INT_CH01_014_BROKEN_BRIDGE_VINE,int.ch01.014.name,int.ch01.014.desc,ch01;prop,1,CH01_MAP02,35,30,interact.examine,DLG_CH01_015,,Equal,0,false,false,ui.prompt.examine,sprite.int.vine
+INT_CH01_015_TOMB_ENTRANCE,int.ch01.015.name,int.ch01.015.desc,ch01;secret,1,CH01_MAP02,26,38,interact.examine,DLG_CH01_016,flag.ch01.broken_bridge_seen,Equal,1,false,true,ui.prompt.examine,sprite.int.tomb_gate

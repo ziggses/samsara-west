@@ -1,0 +1,34 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ccb1b488a09f9b749ae4291be2fa6ed3, type: 3}
+  m_Name: INT_CH01_015_TOMB_ENTRANCE
+  m_EditorClassIdentifier: 
+  _id: INT_CH01_015_TOMB_ENTRANCE
+  _displayNameKey: int.ch01.015.name
+  _descriptionKey: int.ch01.015.desc
+  _tags:
+  - ch01
+  - secret
+  _version: 1
+  _icon: {fileID: 0}
+  _mapId: CH01_MAP02
+  _gridX: 26
+  _gridY: 38
+  _interactionTypeKey: interact.examine
+  _targetId: DLG_CH01_016
+  _requiredStateKey: flag.ch01.broken_bridge_seen
+  _requiredOperator: 0
+  _requiredValue: 1
+  _oneShot: 0
+  _isHiddenUntilConditionMet: 1
+  _promptKey: ui.prompt.examine
+  _interactSpriteKey: sprite.int.tomb_gate
