@@ -31,5 +31,6 @@ MonoBehaviour:
   - SKL_BAJIE_RAKE
   - SKL_BAJIE_TAUNT
   _portraitKey: portrait.chr.bajie
+  _battlePortraitKey: portrait.chr.bajie.battle
   _battleSpriteKey: sprite.chr.bajie.front
   _isPlayable: 1

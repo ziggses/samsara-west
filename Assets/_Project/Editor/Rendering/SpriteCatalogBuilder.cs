@@ -65,7 +65,7 @@ namespace SamsaraWest.Editor.Rendering
             /// <summary>经书素材键在数据里有、但目录里没有的，逐条列出。</summary>
             public readonly List<string> MissingSutraKeys = new List<string>();
 
-            /// <summary>角色立绘／战斗图键在数据里有、但目录里没有的，逐条列出。</summary>
+            /// <summary>角色立绘／战斗姿态／战斗小图键在数据里有、但目录里没有的，逐条列出。</summary>
             public readonly List<string> MissingCharacterKeys = new List<string>();
 
             /// <summary>提示信息（重复键、图集缺贴图等）。</summary>
@@ -216,8 +216,9 @@ namespace SamsaraWest.Editor.Rendering
                 report.AtlasKeyedFrames += keyedFrames;
                 if (keyedFrames == 0)
                 {
-                    // 武器图集、角色图集都是这种：帧有名字但没有 spriteKey。
-                    // 要绑它们得先有一张「数据键 → 帧名」的对照表，那是另一件事，先如实报出来。
+                    // 三套武器图集、农场元素图集都是这种：帧有名字但没有 spriteKey。
+                    // 数据侧至今没有指向这些帧的键（战斗与农场都还没有画面），所以不臆造键名——
+                    // 键的真相只在图集 JSON 里，工程侧另建对照表等于给它造第二个真相。
                     report.Notes.Add($"图集 {jsonPath} 的 {atlas.Frames.Count} 帧都没有 spriteKey，暂不绑定。");
                     continue;
                 }
@@ -426,8 +427,10 @@ namespace SamsaraWest.Editor.Rendering
 
             foreach (var character in definitions.OfKind<CharacterDefinition>())
             {
-                // 立绘与战斗图是两把独立的键，各自算一条缺口：只有立绘绑上时，缺口数仍会如实报出战斗图。
+                // 立绘／战斗姿态／战斗小图是三把独立的键，各自算一条缺口：只有立绘绑上时，
+                // 缺口数仍会如实报出战斗姿态与战斗小图。
                 CollectMissing(report.MissingCharacterKeys, character.Id, "portraitKey", character.PortraitKey, catalog);
+                CollectMissing(report.MissingCharacterKeys, character.Id, "battlePortraitKey", character.BattlePortraitKey, catalog);
                 CollectMissing(report.MissingCharacterKeys, character.Id, "battleSpriteKey", character.BattleSpriteKey, catalog);
             }
 

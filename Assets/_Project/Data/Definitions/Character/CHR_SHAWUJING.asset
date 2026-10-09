@@ -30,5 +30,6 @@ MonoBehaviour:
   _startingSkillIds:
   - SKL_SHAWUJING_SAND
   _portraitKey: portrait.chr.shawujing
+  _battlePortraitKey: portrait.chr.shawujing.battle
   _battleSpriteKey: sprite.chr.shawujing.front
   _isPlayable: 1

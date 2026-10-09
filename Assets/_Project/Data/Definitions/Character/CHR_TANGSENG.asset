@@ -31,5 +31,6 @@ MonoBehaviour:
   - SKL_TANGSENG_HEAL
   - SKL_TANGSENG_SHIELD
   _portraitKey: portrait.chr.tangseng
+  _battlePortraitKey: portrait.chr.tangseng.battle
   _battleSpriteKey: sprite.chr.tangseng.front
   _isPlayable: 1

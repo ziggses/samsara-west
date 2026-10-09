@@ -31,5 +31,6 @@ MonoBehaviour:
   - SKL_WUKONG_STAFF
   - SKL_WUKONG_RAGE
   _portraitKey: portrait.chr.wukong
+  _battlePortraitKey: portrait.chr.wukong.battle
   _battleSpriteKey: sprite.chr.wukong.front
   _isPlayable: 1

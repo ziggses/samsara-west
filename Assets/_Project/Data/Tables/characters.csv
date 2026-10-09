@@ -1,8 +1,10 @@
 # 《西游：第八十二难》角色定义表 v1
 # 五行取值：None/Metal/Wood/Water/Fire/Earth；数组用分号分隔。
 # 数值口径见 Docs/战斗数值-v1.md，改数值只改本表，不改代码。
-id,displayNameKey,descriptionKey,tags,version,maxHealth,maxSpirit,attack,defense,speed,element,breakThreshold,startingSkillIds,portraitKey,battleSpriteKey,isPlayable
-CHR_WUKONG,chr.wukong.name,chr.wukong.desc,playable;ch01,1,120,40,22,10,16,Fire,30,SKL_WUKONG_STAFF;SKL_WUKONG_RAGE,portrait.chr.wukong,sprite.chr.wukong.front,true
-CHR_BAJIE,chr.bajie.name,chr.bajie.desc,playable;ch01,1,150,30,18,14,10,Earth,36,SKL_BAJIE_RAKE;SKL_BAJIE_TAUNT,portrait.chr.bajie,sprite.chr.bajie.front,true
-CHR_SHAWUJING,chr.shawujing.name,chr.shawujing.desc,playable;ch01,1,135,30,17,12,12,Water,32,SKL_SHAWUJING_SAND,portrait.chr.shawujing,sprite.chr.shawujing.front,true
-CHR_TANGSENG,chr.tangseng.name,chr.tangseng.desc,playable;ch01,1,95,60,10,8,14,Wood,24,SKL_TANGSENG_HEAL;SKL_TANGSENG_SHIELD,portrait.chr.tangseng,sprite.chr.tangseng.front,true
+# 三把素材键互不替代：portraitKey 立绘（512×768 单图）、battlePortraitKey 战斗姿态（角色图集 128×192 大图）、
+# battleSpriteKey 战斗单位小图（带朝向，美术未交付）。战斗姿态与战斗小图不是一件东西，别把后者填进前者。
+id,displayNameKey,descriptionKey,tags,version,maxHealth,maxSpirit,attack,defense,speed,element,breakThreshold,startingSkillIds,portraitKey,battlePortraitKey,battleSpriteKey,isPlayable
+CHR_WUKONG,chr.wukong.name,chr.wukong.desc,playable;ch01,1,120,40,22,10,16,Fire,30,SKL_WUKONG_STAFF;SKL_WUKONG_RAGE,portrait.chr.wukong,portrait.chr.wukong.battle,sprite.chr.wukong.front,true
+CHR_BAJIE,chr.bajie.name,chr.bajie.desc,playable;ch01,1,150,30,18,14,10,Earth,36,SKL_BAJIE_RAKE;SKL_BAJIE_TAUNT,portrait.chr.bajie,portrait.chr.bajie.battle,sprite.chr.bajie.front,true
+CHR_SHAWUJING,chr.shawujing.name,chr.shawujing.desc,playable;ch01,1,135,30,17,12,12,Water,32,SKL_SHAWUJING_SAND,portrait.chr.shawujing,portrait.chr.shawujing.battle,sprite.chr.shawujing.front,true
+CHR_TANGSENG,chr.tangseng.name,chr.tangseng.desc,playable;ch01,1,95,60,10,8,14,Wood,24,SKL_TANGSENG_HEAL;SKL_TANGSENG_SHIELD,portrait.chr.tangseng,portrait.chr.tangseng.battle,sprite.chr.tangseng.front,true

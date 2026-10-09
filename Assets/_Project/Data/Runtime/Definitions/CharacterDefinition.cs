@@ -15,6 +15,7 @@ namespace SamsaraWest.Data
         [CsvColumn("breakThreshold")] [SerializeField] private int _breakThreshold = 30;
         [CsvColumn("startingSkillIds")] [SerializeField] private string[] _startingSkillIds = System.Array.Empty<string>();
         [CsvColumn("portraitKey")] [SerializeField] private string _portraitKey;
+        [CsvColumn("battlePortraitKey")] [SerializeField] private string _battlePortraitKey;
         [CsvColumn("battleSpriteKey")] [SerializeField] private string _battleSpriteKey;
         [CsvColumn("isPlayable")] [SerializeField] private bool _isPlayable = true;
 
@@ -38,6 +39,12 @@ namespace SamsaraWest.Data
         public string[] StartingSkillIds => _startingSkillIds ?? System.Array.Empty<string>();
 
         public string PortraitKey => _portraitKey;
+
+        /// <summary>
+        /// 战斗姿态的素材键（<c>portrait.chr.*.battle</c>，角色图集里的 128×192 大图）。
+        /// 与 <see cref="BattleSpriteKey"/> 不是一件东西：那是战斗单位小图。
+        /// </summary>
+        public string BattlePortraitKey => _battlePortraitKey;
 
         public string BattleSpriteKey => _battleSpriteKey;
 
