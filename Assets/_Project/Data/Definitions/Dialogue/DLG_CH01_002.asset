@@ -23,14 +23,16 @@ MonoBehaviour:
   _chapterIndex: 1
   _inkKnotName: CH01_N02_GREETER_TALK
   _speakerCharacterId: 
-  _lineCount: 6
+  _lineCount: 7
   _nextNodeIds:
   - CH01_N03_ASK_THE_WOUND
   _requiredStateKey: 
   _requiredOperator: 0
   _requiredValue: 0
-  _setsStateKeys: []
+  _setsStateKeys:
+  - flag.ch01.greeted_monkey
   _karmaChannel: 
   _karmaDelta: 0
   _bgmKey: music.ch01.field
   _portraitKey: 
+  _isTerminal: 0

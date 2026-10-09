@@ -24,8 +24,7 @@ MonoBehaviour:
   _inkKnotName: CH01_N01_MONKEY_PEACH
   _speakerCharacterId: 
   _lineCount: 3
-  _nextNodeIds:
-  - CH01_N02_GREETER_TALK
+  _nextNodeIds: []
   _requiredStateKey: 
   _requiredOperator: 0
   _requiredValue: 0
@@ -35,3 +34,4 @@ MonoBehaviour:
   _karmaDelta: 0
   _bgmKey: music.ch01.field
   _portraitKey: 
+  _isTerminal: 1

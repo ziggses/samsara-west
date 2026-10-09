@@ -211,6 +211,10 @@ namespace SamsaraWest.Tests.EditMode
             Assert.IsTrue(
                 references.Contains("SamsaraWest.Save"),
                 "存档面板要读存档搬运接口（ADR-025）：界面能存能读，但认的是接口，不是组合根。");
+            Assert.IsTrue(
+                references.Contains("SamsaraWest.Narrative"),
+                "对白面板要读剧情节点推进器（ADR-029）。方向仍是单向的：推进器不产文本、不认识界面，"
+                + "「该念哪一行」由它给键，「那一行长什么样」在界面里解析。");
         }
 
         [Test]

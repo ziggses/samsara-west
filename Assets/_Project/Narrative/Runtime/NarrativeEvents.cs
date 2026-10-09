@@ -81,4 +81,76 @@ namespace SamsaraWest.Narrative
 
         public int Freedom { get; }
     }
+
+    /// <summary>一段对白开始了。</summary>
+    /// <remarks>
+    /// 与 <c>DialogueLineChangedEvent</c> 分开，是因为「开了一段」与「翻了一行」对订阅方的意思不同：
+    /// 前者要出现面板，后者只是重画一行。合成一条会让首行出现两次。
+    /// </remarks>
+    public readonly struct DialogueStartedEvent : IGameEvent
+    {
+        public DialogueStartedEvent(string dialogueId, string knotName, int lineCount)
+        {
+            DialogueId = dialogueId;
+            KnotName = knotName;
+            LineCount = lineCount;
+        }
+
+        public string DialogueId { get; }
+
+        /// <summary>起始剧本节点名，例如 <c>CH01_N02_GREETER_TALK</c>。</summary>
+        public string KnotName { get; }
+
+        /// <summary>起始节点的总行数。为 0 表示「进来就收场」的那种节点（出口、占位）。</summary>
+        public int LineCount { get; }
+    }
+
+    /// <summary>对白翻到了新的一行（也可能是翻到了一个新节点）。</summary>
+    public readonly struct DialogueLineChangedEvent : IGameEvent
+    {
+        public DialogueLineChangedEvent(string dialogueId, string knotName, int lineIndex, string lineKey, string speakerKey)
+        {
+            DialogueId = dialogueId;
+            KnotName = knotName;
+            LineIndex = lineIndex;
+            LineKey = lineKey;
+            SpeakerKey = speakerKey;
+        }
+
+        public string DialogueId { get; }
+
+        public string KnotName { get; }
+
+        /// <summary>行号，<b>从 0 数起</b>；界面上显示时加一。</summary>
+        public int LineIndex { get; }
+
+        /// <summary>这一行正文的文本键，例如 <c>dlg.ch01.002.line.3</c>。正文本身不在这里。</summary>
+        public string LineKey { get; }
+
+        /// <summary>这一行说话人的文本键，例如 <c>dlg.ch01.002.line.3.who</c>。</summary>
+        public string SpeakerKey { get; }
+    }
+
+    /// <summary>一段对白结束了（读完、或者被中断）。</summary>
+    public readonly struct DialogueEndedEvent : IGameEvent
+    {
+        public DialogueEndedEvent(string dialogueId, string lastKnotName, int linesPlayed, bool completed)
+        {
+            DialogueId = dialogueId;
+            LastKnotName = lastKnotName;
+            LinesPlayed = linesPlayed;
+            Completed = completed;
+        }
+
+        public string DialogueId { get; }
+
+        /// <summary>最后读到的剧本节点名。</summary>
+        public string LastKnotName { get; }
+
+        /// <summary>本次会话一共播了多少行。</summary>
+        public int LinesPlayed { get; }
+
+        /// <summary>是读完自然收场，还是被中断（换图、读档、界面上按了退出）。</summary>
+        public bool Completed { get; }
+    }
 }

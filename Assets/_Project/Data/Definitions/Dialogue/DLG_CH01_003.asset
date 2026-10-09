@@ -25,8 +25,7 @@ MonoBehaviour:
   _inkKnotName: CH01_N03_ASK_THE_WOUND
   _speakerCharacterId: 
   _lineCount: 2
-  _nextNodeIds:
-  - CH01_N04_BROKEN_DRUM
+  _nextNodeIds: []
   _requiredStateKey: flag.ch01.monkey_questioned
   _requiredOperator: 0
   _requiredValue: 0
@@ -36,3 +35,4 @@ MonoBehaviour:
   _karmaDelta: 1
   _bgmKey: music.ch01.field
   _portraitKey: 
+  _isTerminal: 1

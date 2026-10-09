@@ -24,8 +24,7 @@ MonoBehaviour:
   _inkKnotName: CH01_N04_BROKEN_DRUM
   _speakerCharacterId: 
   _lineCount: 1
-  _nextNodeIds:
-  - CH01_N05_BLOOD_STAIN
+  _nextNodeIds: []
   _requiredStateKey: 
   _requiredOperator: 0
   _requiredValue: 0
@@ -34,3 +33,4 @@ MonoBehaviour:
   _karmaDelta: 0
   _bgmKey: music.ch01.field
   _portraitKey: 
+  _isTerminal: 1

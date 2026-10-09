@@ -14,7 +14,7 @@
 # 1. 挂载外部素材 + 初始化工程（新机器、新克隆跑一次；幂等，可反复执行）
 powershell -NoProfile -ExecutionPolicy Bypass -File E:\tx2\samsara-west\Tools\setup-project.ps1
 
-# 2. 跑全套测试（当前基线：EditMode 663 + PlayMode 50）
+# 2. 跑全套测试（当前基线：EditMode 699 + PlayMode 57）
 powershell -NoProfile -ExecutionPolicy Bypass -File E:\tx2\samsara-west\Tools\run-tests.ps1 -Platform All
 ```
 
@@ -53,9 +53,9 @@ powershell -NoProfile -ExecutionPolicy Bypass -File E:\tx2\samsara-west\Tools\ru
 | `Battle/` | 战斗内核（行动队列、意图预告、护体/破防、状态与冷却）、伤害计算、战斗数值配置 | Core, Data |
 | `Save/` | 版本化 JSON 存档 + 迁移钩子 | Core |
 | `Localization/` | 文本键服务、表资产、常量生成 | Core |
-| `UI/` | 本地化标签、运行期错误面板、战斗与探索的诊断界面、存档面板 | Core, Data, Battle, Exploration, Save, Localization, TextMeshPro |
+| `UI/` | 本地化标签、运行期错误面板、战斗与探索的诊断界面（含对白块）、存档面板 | Core, Data, Battle, Narrative, Exploration, Save, Localization, TextMeshPro |
 | `Exploration/` | 探索运行时：走格、交互、遭遇掷骰（不认识战斗，遇敌只发事件） | Core, Data |
-| `Narrative/` | 剧情状态账：状态键 → 整数、心念三轴，账本整本进出存档（对话与任务运行时仍未做） | Core, Data |
+| `Narrative/` | 剧情状态账：状态键 → 整数、心念三轴，账本整本进出存档；对话（剧情节点）运行时已落地（ADR-029，任务运行时仍未做） | Core, Data |
 | `Economy/` | 钱袋与背包：金币、物品堆叠、战利品结算（只依赖目录与随机流，不认识战斗与在身清单）；整袋进出存档（ADR-027） | Core, Data |
 | `Equipment/` | 在身清单：谁穿/带了什么（成员 × 栏位 → 定义 ID，8 槽，不认识战斗与背包）；整本进出存档（ADR-028） | Core, Data |
 | `Progression/` | 骨架占位（目录 + asmdef + 接口契约） | Core, Data |
@@ -65,7 +65,7 @@ powershell -NoProfile -ExecutionPolicy Bypass -File E:\tx2\samsara-west\Tools\ru
 | `Assets/_External/` | 外部素材 junction，**不入库** | — |
 
 方向约定：`Core` 不依赖任何模块；`Data` 只依赖 `Core`；`Flow`/`Battle`/`UI` 消费 `Data`；
-`UI` 是唯一允许读玩法模块（`Battle`、`Exploration`）与存档语义（`Save/ISaveCoordinator`）的层——
+`UI` 是唯一允许读玩法模块（`Battle`、`Exploration`、`Narrative`）与存档语义（`Save/ISaveCoordinator`）的层——
 界面要读服务才画得出正在发生的事，而「按一下存、按一下读」也只能由界面发起——
 但它不碰 `Flow` 与 `Editor`；`Editor` 只读消费全部运行时模块，运行时模块不反向依赖 `Editor`。
 
@@ -193,7 +193,7 @@ Unity.exe -batchmode -quit -projectPath E:\tx2\samsara-west ^
 
 工程自身的文档在 `Docs/`（随仓库分发）：
 
-- `Docs/架构决策.md`：28 条架构决策（模块与依赖、服务定位、事件总线、随机、日志、存档迁移、生成物不白写盘、UI 框架、装备 8 槽与存档 v3、战斗数学契约、装备/经文加成的进场快照口径、经文的每回合效果、装备/经文带来的技能挂载、被动登记与常驻状态、探索与剧情状态、换图接线、存档接线、战果回写、经济（钱袋与背包）、在身清单（装备与经文的运行期持有者）等）与未决事项。
+- `Docs/架构决策.md`：29 条架构决策（模块与依赖、服务定位、事件总线、随机、日志、存档迁移、生成物不白写盘、UI 框架、装备 8 槽与存档 v3、战斗数学契约、装备/经文加成的进场快照口径、经文的每回合效果、装备/经文带来的技能挂载、被动登记与常驻状态、探索与剧情状态、换图接线、存档接线、战果回写、经济（钱袋与背包）、在身清单（装备与经文的运行期持有者）、剧情节点（对话）运行时等）与未决事项。
 - `Docs/数据管线.md`：18 张表 → 资产的映射、解析与列映射规则、增量导入的跳过条件、校验码表、常用操作与故障排查。
 - `Docs/战斗数值-v1.md`：伤害公式与运算顺序、五行倍率（相克 + 相生）、暴击、护体/破防、行动速度、首章数值快照、输出与回合数校算，以及待人工拍板的遗留（第 7.4 节）。
 - `Docs/战斗内核-v1.md`：一场战斗的推进顺序（`BeginNextTurn` / `FinishTurn`）、行动队列与平局判据、意图预告与 AI 选招、目标结算、破防与状态的计时口径、冷却、随机与可复现、13 个战斗事件、装配现状，以及遗留清单（11.1 待拍板 / 11.2 已定口径的取舍）。

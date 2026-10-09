@@ -125,6 +125,44 @@ dlg.ch01.006.name,第二弯道遭遇,对话名
 dlg.ch01.006.desc,三个醉猴妖从宴席方向冲来，互相指责偷酒。,对话说明
 dlg.ch01.007.name,前山出口,对话名
 dlg.ch01.007.desc,第一章前山的收束节点。,对话说明
+dlg.ch01.001.line.1,别挡路。大圣回来前，桌上不能空。,对白行
+dlg.ch01.001.line.1.who,小猴,说话人
+dlg.ch01.001.line.2,你已经放了三十七次。,对白行
+dlg.ch01.001.line.2.who,阿玄,说话人
+dlg.ch01.001.line.3,那……这一次不能算。,对白行
+dlg.ch01.001.line.3.who,小猴,说话人
+dlg.ch01.002.line.1,客人来了！花果山今日大宴，来者都有桃！,对白行
+dlg.ch01.002.line.1.who,迎客猴,说话人
+dlg.ch01.002.line.2,你们在庆什么？,对白行
+dlg.ch01.002.line.2.who,阿玄,说话人
+dlg.ch01.002.line.3,庆大圣归来呀。,对白行
+dlg.ch01.002.line.3.who,迎客猴,说话人
+dlg.ch01.002.line.4,大圣在哪里？,对白行
+dlg.ch01.002.line.4.who,阿玄,说话人
+dlg.ch01.002.line.5,今夜便回。,对白行
+dlg.ch01.002.line.5.who,迎客猴,说话人
+dlg.ch01.002.line.6,每天都是今夜？,对白行
+dlg.ch01.002.line.6.who,阿玄,说话人
+dlg.ch01.002.line.7,你怎么会问这个？客人只要吃桃就好了。,对白行
+dlg.ch01.002.line.7.who,迎客猴,说话人
+dlg.ch01.003.line.1,这是昨日撞的。,对白行
+dlg.ch01.003.line.1.who,迎客猴,说话人
+dlg.ch01.003.line.2,昨日不是已经过去了吗？,对白行
+dlg.ch01.003.line.2.who,阿玄,说话人
+dlg.ch01.004.line.1,这不是年份。是次数。,对白行
+dlg.ch01.004.line.1.who,阿玄,说话人
+dlg.ch01.005.line.1,血只有在没人看的时候才存在。,对白行
+dlg.ch01.005.line.1.who,阿玄,说话人
+dlg.ch01.006.line.1,我是不是刚才已经打过你？,对白行
+dlg.ch01.006.line.1.who,醉猴妖甲,说话人
+dlg.ch01.006.line.2,打过。,对白行
+dlg.ch01.006.line.2.who,阿玄,说话人
+dlg.ch01.006.line.3,那我得再打一次，不能让白眉知道我输了。,对白行
+dlg.ch01.006.line.3.who,醉猴妖甲,说话人
+dlg.ch01.006.line.4,白眉是谁？,对白行
+dlg.ch01.006.line.4.who,阿玄,说话人
+dlg.ch01.006.line.5,老猴子。他不喝酒，所以只有他记得倒霉事。,对白行
+dlg.ch01.006.line.5.who,醉猴妖乙,说话人
 map.ch01.map01.name,花果山·前山,地图名
 map.ch01.map01.desc,山门挂着新红绸，石阶洗得干净；走几步就能听见猴子们第无数次齐声呼喊。,地图说明
 map.ch01.map02.name,黑风岭·山寨,地图名
@@ -362,6 +400,11 @@ ui.explore.interact.already_used,已经用过了。,交互被拒：一次性交�
 ui.explore.interact.triggered,触发了 {0}。,交互成功。{0} 交互物名字
 ui.explore.interact.map_change,前往 {0}。,交互要求换图。{0} 目标地图 ID
 ui.explore.grid.legend,@ 自己  * 面朝  # 交互物  . 空地,探索界面格子图例
+ui.dialogue.title,对白,对白面板标题
+ui.dialogue.status,{0} · 第 {1}/{2} 行,对白面板状态行。{0} 节点名 {1} 当前行 {2} 总行数
+ui.dialogue.hint,E／空格／回车：继续,对白面板底部提示
+ui.dialogue.narrator,旁白,对白行没有登记说话人时的兜底
+ui.dialogue.missing,对话 {0} 缺文本：没有 {1} 这一行。,对白缺文本提示。{0} 对话 ID {1} 文本键
 ui.save.title,存档,存档界面标题
 ui.save.view.hint,诊断用存档面板：F5 保存到槽位 1，F9 从槽位 1 读取，F3 收起。,存档界面诊断层提示
 ui.save.status.empty,槽位 {0}：还没有存档。,存档界面：槽位空

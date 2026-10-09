@@ -25,8 +25,7 @@ MonoBehaviour:
   _inkKnotName: CH01_N06_SECOND_BEND
   _speakerCharacterId: 
   _lineCount: 5
-  _nextNodeIds:
-  - CH01_N07_FRONT_GATE
+  _nextNodeIds: []
   _requiredStateKey: 
   _requiredOperator: 0
   _requiredValue: 0
@@ -35,3 +34,4 @@ MonoBehaviour:
   _karmaDelta: 0
   _bgmKey: music.ch01.field
   _portraitKey: 
+  _isTerminal: 1

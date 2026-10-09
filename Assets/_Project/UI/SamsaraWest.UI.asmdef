@@ -4,6 +4,7 @@
     "references": [
         "SamsaraWest.Core",
         "SamsaraWest.Data",
+        "SamsaraWest.Narrative",
         "SamsaraWest.Battle",
         "SamsaraWest.Exploration",
         "SamsaraWest.Save",

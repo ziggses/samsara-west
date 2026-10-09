@@ -34,3 +34,4 @@ MonoBehaviour:
   _karmaDelta: 0
   _bgmKey: music.ch01.field
   _portraitKey: 
+  _isTerminal: 1

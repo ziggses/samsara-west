@@ -3,8 +3,8 @@ using UnityEngine;
 namespace SamsaraWest.Data
 {
     /// <summary>
-    /// 对话节点。骨架期只做数据契约与校验，不接 Ink 运行时；
-    /// Ink 属垂直切片阶段，届时 <see cref="InkKnotName"/> 直接对接剧本节点。
+    /// 对话节点。数据契约加校验，外加 <c>Narrative</c> 侧的<b>节点推进器</b>（ADR-029）：
+    /// 推进器只认本表的字段，不接 Ink；Ink 属垂直切片阶段，届时 <see cref="InkKnotName"/> 直接对接剧本节点。
     /// </summary>
     [CreateAssetMenu(fileName = "Dialogue", menuName = "SamsaraWest/定义/对话 Dialogue")]
     public sealed class DialogueDefinition : DefinitionBase
@@ -36,6 +36,9 @@ namespace SamsaraWest.Data
         [CsvColumn("bgmKey")] [SerializeField] private string _bgmKey;
         [CsvColumn("portraitKey")] [SerializeField] private string _portraitKey;
 
+        [Tooltip("终局节点：播完本节点就结束会话，不沿 nextNodeIds 续跑。环境调查类节点用它把自己从链上摘下来。")]
+        [CsvColumn("isTerminal")] [SerializeField] private bool _isTerminal;
+
         public override DefinitionKind Kind => DefinitionKind.Dialogue;
 
         public int ChapterIndex => _chapterIndex;
@@ -63,6 +66,17 @@ namespace SamsaraWest.Data
         public string BgmKey => _bgmKey;
 
         public string PortraitKey => _portraitKey;
+
+        /// <summary>
+        /// 播完本节点是否<b>就地收场</b>，而不是沿 <see cref="NextNodeIds"/> 继续跑。
+        /// </summary>
+        /// <remarks>
+        /// 为什么要这一列：环境调查（断鼓、血迹、小猴的桃）是<b>各自独立</b>的一次性旁白——
+        /// 调查断鼓之后自动接着播血迹的文本，是数据说不出来的意思。没有这一列时，
+        /// 为了让「有文本就必须有后继」的校验闭嘴，只能把它们串成一条假的主线链。
+        /// 有了它，环境调查节点可以诚实地承认「到这里就完了」。
+        /// </remarks>
+        public bool IsTerminal => _isTerminal;
 
         public override void Validate(ValidationReport report)
         {
@@ -127,7 +141,16 @@ namespace SamsaraWest.Data
                 report.Error("DLG_LINECOUNT_INVALID", $"文本行数不能为负，当前 {_lineCount}。", Id, fieldName: "lineCount");
             }
 
-            if (_lineCount > 0 && NextNodeIds.Length == 0)
+            if (_isTerminal && NextNodeIds.Length > 0)
+            {
+                report.Warn(
+                    "DLG_TERMINAL_WITH_NEXT",
+                    "标了终局却还登记着后继节点，运行时不会走它们：要么删掉后继，要么取消终局。",
+                    Id,
+                    fieldName: "nextNodeIds");
+            }
+
+            if (!_isTerminal && _lineCount > 0 && NextNodeIds.Length == 0)
             {
                 report.Warn("DLG_DEAD_END", "有文本但没有后继节点，若不是结局节点请检查剧本。", Id, fieldName: "nextNodeIds");
             }

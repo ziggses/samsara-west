@@ -5,6 +5,7 @@ using SamsaraWest.Core;
 using SamsaraWest.Data;
 using SamsaraWest.Exploration;
 using SamsaraWest.Localization;
+using SamsaraWest.Narrative;
 using UnityEngine;
 
 namespace SamsaraWest.UI
@@ -88,6 +89,15 @@ namespace SamsaraWest.UI
         private IDefinitionRegistry _definitions;
         private ILocalizationService _localization;
 
+        /// <summary>
+        /// 剧情节点推进器。
+        /// </summary>
+        /// <remarks>
+        /// 与<b>账本</b>不同，它可能是<b>缺席</b>的：组合根不给定义目录时不装这个服务，
+        /// 那时面板照旧要能探索，只是没有对白块。所以按软依赖解析，缺席不报警。
+        /// </remarks>
+        private IDialogueService _dialogue;
+
         /// <summary>已解析过的那张注册表。换了一张就说明服务重装过，缓存必须整个丢掉。</summary>
         private IServiceRegistry _registryRef;
 
@@ -97,6 +107,12 @@ namespace SamsaraWest.UI
         private string _legendLine;
         private string _noteLine;
         private string _hintLine;
+
+        /// <summary>对白块的四行。没有对白开着时全部为 null，面板就一像素也不多占。</summary>
+        private string _dialogueTitleLine;
+        private string _dialogueStatusLine;
+        private string _dialogueSpeakerLine;
+        private string _dialogueTextLine;
 
         private MoveResult? _lastMove;
         private InteractionResult? _lastInteraction;
@@ -156,6 +172,24 @@ namespace SamsaraWest.UI
         public string NoteLine => _noteLine;
 
         public string HintLine => _hintLine;
+
+        /// <summary>对白块的标题行；没有对白开着时为 null。</summary>
+        public string DialogueTitleLine => _dialogueTitleLine;
+
+        /// <summary>对白块当前展示的正文；没有对白开着时为 null。</summary>
+        public string DialogueLine => _dialogueTextLine;
+
+        /// <summary>对白块当前展示的说话人；没有对白开着时为 null。</summary>
+        public string DialogueSpeaker => _dialogueSpeakerLine;
+
+        /// <summary>对白块的状态行（节点名 · 第 n/N 行）；没有对白开着时为 null。</summary>
+        public string DialogueStatusLine => _dialogueStatusLine;
+
+        /// <summary>
+        /// 当前有没有对白开着。
+        /// </summary>
+        /// <remarks>开着的时候本面板是<b>模态</b>的：方向键不再挪人，交互键变成「继续」。</remarks>
+        public bool IsDialogueActive => _dialogue != null && _dialogue.IsActive;
 
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
         private static void AutoInstall()
@@ -236,6 +270,7 @@ namespace SamsaraWest.UI
             _titleLine = Get(ExplorationTextKeys.Title);
             _hintLine = Get(ExplorationTextKeys.Hint);
             _legendLine = Get(ExplorationTextKeys.GridLegend);
+            RebuildDialogue();
 
             var session = Session;
             if (session == null)
@@ -249,6 +284,45 @@ namespace SamsaraWest.UI
             RebuildStatus(session);
             RebuildFacing(session);
             RebuildNote(session);
+        }
+
+        /// <summary>
+        /// 重建对白块的四行。
+        /// </summary>
+        /// <remarks>
+        /// 分工是刻意的：<b>「该念哪一行」由推进器给</b>（<c>dlg.ch01.002.line.3</c> 这种键），
+        /// <b>「那一行长什么样」才在这里解析</b>。Narrative 因此不必认识本地化服务，
+        /// 本层也不必认识剧本节点——两侧各跨半步，靠一条文本键对接。
+        /// 缺键时把「缺的是哪一个」写进面板：本层的规矩是不给兜底正文，
+        /// 但一次数据错位在玩家眼里会表现成「对白面板上一片空白」，那比丑更糟。
+        /// </remarks>
+        private void RebuildDialogue()
+        {
+            if (!IsDialogueActive)
+            {
+                _dialogueTitleLine = null;
+                _dialogueStatusLine = null;
+                _dialogueSpeakerLine = null;
+                _dialogueTextLine = null;
+                return;
+            }
+
+            _dialogueTitleLine = Get(ExplorationTextKeys.DialogueTitle);
+            _dialogueStatusLine = _localization.Format(
+                ExplorationTextKeys.DialogueStatus,
+                Get(_dialogue.NodeDisplayNameKey),
+                _dialogue.LineNumber,
+                _dialogue.LineCount);
+
+            var speaker = Get(_dialogue.SpeakerKey);
+            _dialogueSpeakerLine = string.IsNullOrEmpty(speaker)
+                ? Get(ExplorationTextKeys.DialogueNarrator)
+                : speaker;
+
+            var text = Get(_dialogue.LineKey);
+            _dialogueTextLine = string.IsNullOrEmpty(text)
+                ? _localization.Format(ExplorationTextKeys.DialogueMissing, _dialogue.DialogueId, _dialogue.LineKey)
+                : text;
         }
 
         /// <summary>
@@ -374,6 +448,21 @@ namespace SamsaraWest.UI
             _lastInteraction = result;
             Rebuild();
             return result.Triggered;
+        }
+
+        /// <summary>推进对白一行。没有对白开着时返回 false，什么也不做。</summary>
+        public bool AdvanceDialogue()
+        {
+            EnsureServices();
+
+            if (_dialogue == null || !_dialogue.IsActive)
+            {
+                return false;
+            }
+
+            var result = _dialogue.Advance();
+            Rebuild();
+            return result.Advanced;
         }
 
         private void RebuildStatus(ExplorationSession session)
@@ -535,6 +624,10 @@ namespace SamsaraWest.UI
                 return;
             }
 
+            // 推进器是软依赖：组合根只装账本（没给定义目录）时不装它，
+            // 那时界面照旧要探索，只是按 E 只会发一条交互事件，读不出对白。
+            registry.TryResolve(out _dialogue);
+
             _registryRef = registry;
             Rebuild();
             GameLog.Info(LogChannel.UI, "Exploration screen view bound to the service registry.");
@@ -546,6 +639,11 @@ namespace SamsaraWest.UI
             _exploration = null;
             _definitions = null;
             _localization = null;
+            _dialogue = null;
+            _dialogueTitleLine = null;
+            _dialogueStatusLine = null;
+            _dialogueSpeakerLine = null;
+            _dialogueTextLine = null;
             _lastMove = null;
             _lastInteraction = null;
         }
@@ -618,7 +716,11 @@ namespace SamsaraWest.UI
 
             var session = Session;
             var gridHeight = session == null ? 0 : session.Grid.Height;
-            var panel = new Rect(Margin, Margin, PanelWidthFor(session == null ? 0 : session.Grid.Width), PanelHeight(gridHeight));
+            var panel = new Rect(
+                Margin,
+                Margin,
+                PanelWidthFor(session == null ? 0 : session.Grid.Width),
+                PanelHeight(gridHeight, IsDialogueActive));
             DrawRect(panel, PanelColor);
             DrawRect(new Rect(panel.x, panel.y, panel.width, AccentHeight), AccentColor);
 
@@ -658,7 +760,32 @@ namespace SamsaraWest.UI
                 _lineStyle.normal.textColor = LineColor;
             }
 
+            y += LineHeight;
+
+            if (IsDialogueActive)
+            {
+                DrawDialogueBlock(x, y, width);
+                DrawHintLine(panel, x, width, Get(ExplorationTextKeys.DialogueHint));
+                return;
+            }
+
             DrawHintLine(panel, x, width);
+        }
+
+        /// <summary>画对白块：标题、进度、说话人、正文。位置由调用方给。</summary>
+        private void DrawDialogueBlock(float x, float y, float width)
+        {
+            _lineStyle.normal.textColor = InteractableColor;
+            GUI.Label(new Rect(x, y, width, LineHeight), _dialogueTitleLine, _lineStyle);
+            _lineStyle.normal.textColor = LineColor;
+            y += LineHeight;
+
+            _lineStyle.normal.textColor = HintColor;
+            GUI.Label(new Rect(x, y, width, LineHeight), _dialogueStatusLine, _lineStyle);
+            GUI.Label(new Rect(x, y + LineHeight, width, LineHeight), _dialogueSpeakerLine, _lineStyle);
+            _lineStyle.normal.textColor = LineColor;
+
+            GUI.Label(new Rect(x, y + (LineHeight * 2f), width, LineHeight), _dialogueTextLine, _lineStyle);
         }
 
         /// <summary>
@@ -677,33 +804,60 @@ namespace SamsaraWest.UI
                 return;
             }
 
-            if (current.keyCode == KeyCode.F3)
+            if (HandleKey(current.keyCode))
+            {
+                current.Use();
+            }
+        }
+
+        /// <summary>
+        /// 处理一个按键，返回「吃掉了没有」。
+        /// </summary>
+        /// <remarks>
+        /// 判定之所以从 <see cref="HandleKeys"/> 里拆出来，是因为 IMGUI 事件在用例里不好造：
+        /// 拆开之后「对白开着时方向键不许穿过去」这种事直接喂一个 <c>KeyCode</c> 就能断言，
+        /// 不必去伪造 <c>Event.current</c>。行为与拆之前逐条一致。
+        /// </remarks>
+        public bool HandleKey(KeyCode keyCode)
+        {
+            if (keyCode == KeyCode.F3)
             {
                 IsVisible = false;
-                current.Use();
-                return;
+                return true;
             }
 
-            if (current.keyCode == KeyCode.F4 && IsDiagnosticStartSupported)
+            if (keyCode == KeyCode.F4 && IsDiagnosticStartSupported)
             {
                 ToggleDiagnosticMap();
-                current.Use();
-                return;
+                return true;
             }
 
-            var direction = DirectionOf(current.keyCode);
+            if (IsDialogueActive)
+            {
+                // 对白开着时本面板模态：方向键不许穿过去挪人，交互键变成「继续」。
+                // 这是「对白期间走不动」的唯一实现处——探索内核不认对白，不会替我们挡住。
+                if (IsInteractKey(keyCode))
+                {
+                    AdvanceDialogue();
+                }
+
+                return true;
+            }
+
+            var direction = DirectionOf(keyCode);
             if (direction.HasValue)
             {
                 Step(direction.Value);
-                current.Use();
-                return;
+                return true;
             }
 
-            if (IsInteractKey(current.keyCode))
+            if (IsInteractKey(keyCode))
             {
                 Interact();
-                current.Use();
+                return true;
             }
+
+            return false;
         }
 
         /// <summary>方向键与 WASD 等价。IMGUI 里字母键一律报大写 <c>KeyCode</c>。</summary>
@@ -750,10 +904,16 @@ namespace SamsaraWest.UI
         }
 
         /// <summary>面板高度按内容算：图高不同面板就不同，不留一大片空。</summary>
-        private static float PanelHeight(int gridHeight)
+        /// <param name="dialogueOpen">
+        /// 对白块开着没有。它画在备注行下方，所以面板得跟着长高——
+        /// 不预留的话对白正文会被底部那行提示压住，而「压住一半的字」比丑更难读。
+        /// 没进图时必然没有对白（没有会话就没有交互），那一支不看这个参数。
+        /// </param>
+        private static float PanelHeight(int gridHeight, bool dialogueOpen)
         {
             var titleHeight = FontSize + 12f;
             var hintHeight = FontSize + 6f;
+            var dialogueHeight = dialogueOpen ? (LineHeight * 5f) + (Gap * 2f) : 0f;
 
             if (gridHeight <= 0)
             {
@@ -761,9 +921,9 @@ namespace SamsaraWest.UI
                 return AccentHeight + (Padding * 2f) + titleHeight + LineHeight + Gap + hintHeight;
             }
 
-            // 正文四行（状态／前方／图例／备注）+ 三段间隔 + 格子 + 底部提示。
+            // 正文四行（状态／前方／图例／备注）+ 三段间隔 + 格子 + 对白块 + 底部提示。
             return AccentHeight + (Padding * 2f) + titleHeight + (LineHeight * 4f) + (Gap * 3f) +
-                (gridHeight * (float)CellSize) + hintHeight;
+                (gridHeight * (float)CellSize) + dialogueHeight + hintHeight;
         }
 
         /// <summary>
@@ -827,16 +987,18 @@ namespace SamsaraWest.UI
             GUI.Label(rect, FloorChar, _cellStyle);
         }
 
-        private void DrawHintLine(Rect panel, float x, float width)
+        /// <param name="hint">要画的提示文字。不传就用探索那条；对白开着时传对白那条。</param>
+        private void DrawHintLine(Rect panel, float x, float width, string hint = null)
         {
-            if (string.IsNullOrEmpty(_hintLine))
+            var text = hint ?? _hintLine;
+            if (string.IsNullOrEmpty(text))
             {
                 return;
             }
 
             GUI.Label(
                 new Rect(x, panel.yMax - Padding - FontSize - 6f, width, FontSize + 6f),
-                _hintLine,
+                text,
                 _hintStyle);
         }
 

@@ -58,6 +58,9 @@ namespace SamsaraWest.Flow
         /// <summary>「战斗胜利 → 战利品入账」的接线；同样在 <see cref="OnDestroy"/> 里释放。</summary>
         private LootBattleLink _lootBattleLink;
 
+        /// <summary>「按 E 交互 → 开一段对白」的接线；同样在 <see cref="OnDestroy"/> 里释放。</summary>
+        private ExplorationDialogueLink _explorationDialogueLink;
+
         /// <summary>已完成的引导次数。PlayMode 测试用它证明「第二次启动没有重复安装」。</summary>
         public static int BootstrapCount { get; private set; }
 
@@ -90,6 +93,9 @@ namespace SamsaraWest.Flow
 
         /// <summary>「战斗胜利 → 战利品入账」的接线。同样装在引导末尾。</summary>
         public LootBattleLink LootLink => _lootBattleLink;
+
+        /// <summary>「按 E 交互 → 开一段对白」的接线。同样装在引导末尾。</summary>
+        public ExplorationDialogueLink DialogueLink => _explorationDialogueLink;
 
         /// <summary>其它模块安装自身服务的挂载点。</summary>
         public event Action<IServiceRegistry> ModuleInstalled;
@@ -147,6 +153,12 @@ namespace SamsaraWest.Flow
             {
                 _lootBattleLink.Dispose();
                 _lootBattleLink = null;
+            }
+
+            if (_explorationDialogueLink != null)
+            {
+                _explorationDialogueLink.Dispose();
+                _explorationDialogueLink = null;
             }
 
             if (_explorationBattleLink != null)
@@ -228,8 +240,10 @@ namespace SamsaraWest.Flow
                 Track("Battle");
 
                 // 剧情状态账就位：任务、对话、结局与探索的条件读的是同一本账。
-                // 它只依赖 Core（事件总线是软依赖），装在探索之前——探索要拿它当条件源。
-                Narrative.NarrativeModule.Install(registry);
+                // 账本只依赖 Core（事件总线是软依赖），装在探索之前——探索要拿它当条件源。
+                // 定义目录一并传进去，是为了让剧情节点推进器（ADR-029）跟着起来：
+                // 它要按 inkKnotName 找后继节点，所以必须排在 Data 之后。
+                Narrative.NarrativeModule.Install(registry, registry.Resolve<IDefinitionRegistry>());
                 Track("Narrative");
 
                 // 探索运行时就位：走格、交互、掷遭遇都要读地图与交互物表，所以排在 Data 之后。
@@ -290,6 +304,14 @@ namespace SamsaraWest.Flow
                 _interactionFlagLink = new InteractionFlagLink(
                     registry.Resolve<IEventBus>(),
                     registry.Resolve<Narrative.IStoryState>());
+
+                // 交互对白线：按 E 之后由这里决定「这句话要不要读出来」。
+                // 它与换图那条读同一条交互事件，但判据不同——换图看 targetId 是不是地图，
+                // 这条看它是不是一条对话。对白开着时挡住移动是界面层的事（面板吃掉按键），
+                // 所以这里不必监听换图：对白开着的时候走不到门口。
+                _explorationDialogueLink = new ExplorationDialogueLink(
+                    registry.Resolve<IEventBus>(),
+                    registry.Resolve<Narrative.IDialogueService>());
 
                 // 战果回写线：打完一场就把结局记进账本（flag.battle.<遭遇>.won / lost / fled / retreated），
                 // 内容侧据此显隐交互物与分支剧情。它同样只写不读，所以不必拿战斗或探索服务；

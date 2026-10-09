@@ -91,6 +91,24 @@ namespace SamsaraWest.UI
             }
         }
 
+        /// <summary>对白块的标题（「对白」）。</summary>
+        public static string DialogueTitle => LocalizationKeys.UI_DIALOGUE_TITLE;
+
+        /// <summary>对白块的状态行：节点名 · 第 n/N 行。</summary>
+        public static string DialogueStatus => LocalizationKeys.UI_DIALOGUE_STATUS;
+
+        /// <summary>对白块底部的按键提示。对白开着时顶替探索那一条。</summary>
+        public static string DialogueHint => LocalizationKeys.UI_DIALOGUE_HINT;
+
+        /// <summary>对白行没登记说话人时的兜底（旁白）。</summary>
+        public static string DialogueNarrator => LocalizationKeys.UI_DIALOGUE_NARRATOR;
+
+        /// <summary>
+        /// 缺文本时的提示。本层不允许给兜底正文，但「这里该有一行字却没对上」必须说出来——
+        /// 否则一次数据错位在玩家眼里就是「对话面板上一片空白」。
+        /// </summary>
+        public static string DialogueMissing => LocalizationKeys.UI_DIALOGUE_MISSING;
+
         public static string InteractTriggered => LocalizationKeys.UI_EXPLORE_INTERACT_TRIGGERED;
 
         public static string InteractMapChange => LocalizationKeys.UI_EXPLORE_INTERACT_MAP_CHANGE;
