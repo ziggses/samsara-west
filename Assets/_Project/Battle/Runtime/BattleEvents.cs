@@ -395,4 +395,66 @@ namespace SamsaraWest.Battle
         /// <summary>敌方战力合计（只算站着的单位）。</summary>
         public float EnemyPower { get; }
     }
+
+    /// <summary>
+    /// Boss 换了一档（ADR-030）。一档一幕：技能组、倍率、入场状态都随这一条一起变。
+    /// </summary>
+    /// <remarks>
+    /// <para>带 <see cref="TauntKey"/> 与 <see cref="BgmSwitchKey"/> 是因为「换档」在演出上就是换一首曲子、
+    /// 说一句狠话；带 <see cref="CameraCueKey"/> 是因为有些档位要推镜头。三者都是数据表里的键，
+    /// 界面认不认识都不影响内核继续跑。</para>
+    /// <para><see cref="PhaseIndex"/> 从 1 起，与阶段表的 <c>phaseIndex</c> 一致；内核不拿它做判断，
+    /// 只用来按档播演出——判断永远看配置里的 <c>healthThreshold</c>。</para>
+    /// <para><b>一次跨两档会连发两条</b>：一条重击把 Boss 从满血打到 30% 时，中间那一档不会静悄悄跳过。</para>
+    /// </remarks>
+    public readonly struct BattleBossPhaseChangedEvent : IGameEvent
+    {
+        public BattleBossPhaseChangedEvent(
+            int runtimeId,
+            BattleSide side,
+            string encounterId,
+            int phaseIndex,
+            string phaseDefinitionId,
+            float healthRatio,
+            string tauntKey,
+            string bgmSwitchKey,
+            string cameraCueKey)
+        {
+            RuntimeId = runtimeId;
+            Side = side;
+            EncounterId = encounterId;
+            PhaseIndex = phaseIndex;
+            PhaseDefinitionId = phaseDefinitionId;
+            HealthRatio = healthRatio;
+            TauntKey = tauntKey;
+            BgmSwitchKey = bgmSwitchKey;
+            CameraCueKey = cameraCueKey;
+        }
+
+        /// <summary>换档的 Boss。</summary>
+        public int RuntimeId { get; }
+
+        public BattleSide Side { get; }
+
+        /// <summary>哪一场遭遇的阶段表。手工构造的战斗里为空。</summary>
+        public string EncounterId { get; }
+
+        /// <summary>第几档，从 1 起。</summary>
+        public int PhaseIndex { get; }
+
+        /// <summary>阶段定义的 ID（<c>bossphases.csv</c> 里的那一条）。</summary>
+        public string PhaseDefinitionId { get; }
+
+        /// <summary>换档那一刻的生命比例，用来核对「是哪一下打进去的」。</summary>
+        public float HealthRatio { get; }
+
+        /// <summary>这一档的台词键；没有配置时为空。</summary>
+        public string TauntKey { get; }
+
+        /// <summary>这一档要换的曲子键；没有配置时为空。</summary>
+        public string BgmSwitchKey { get; }
+
+        /// <summary>这一档要推的镜头键；没有配置时为空。</summary>
+        public string CameraCueKey { get; }
+    }
 }

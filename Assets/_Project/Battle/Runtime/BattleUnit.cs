@@ -22,7 +22,13 @@ namespace SamsaraWest.Battle
         private readonly Dictionary<string, int> _cooldowns = new Dictionary<string, int>(StringComparer.Ordinal);
         private readonly HashSet<string> _cooledThisTurn = new HashSet<string>(StringComparer.Ordinal);
         private readonly List<string> _cooldownScratch = new List<string>(4);
-        private readonly string[] _skillIds;
+        private string[] _skillIds;
+
+        // Boss 阶段倍率（ADR-030）。默认 1 表示「没有阶段机，或还没进任何阶段」，
+        // 于是不带阶段表的单位算出来的数与这一层落地之前一模一样。
+        private float _bossAttackMultiplier = 1f;
+        private float _bossDefenseMultiplier = 1f;
+        private float _bossSpeedMultiplier = 1f;
 
         internal BattleUnit(
             int runtimeId,
@@ -194,11 +200,27 @@ namespace SamsaraWest.Battle
             }
         }
 
-        public int EffectiveAttack => Mathf.Max(0, Mathf.RoundToInt(BaseAttack * (1f + AttackModifier)));
+        /// <summary>
+        /// Boss 当前阶段给的攻击倍率（ADR-030），中性值 1。它与状态修正是<b>两个乘区</b>：
+        /// 状态写「+30%」，阶段写「这一档整体 ×1.25」。分开的理由是它们来自两份表，
+        /// 阶段表调档位不该顺带改掉状态表的加成口径。
+        /// </summary>
+        public float BossAttackMultiplier => _bossAttackMultiplier;
 
-        public int EffectiveDefense => Mathf.Max(0, Mathf.RoundToInt(BaseDefense * (1f + DefenseModifier)));
+        /// <summary>Boss 当前阶段给的防御倍率，中性值 1。见 <see cref="BossAttackMultiplier"/>。</summary>
+        public float BossDefenseMultiplier => _bossDefenseMultiplier;
 
-        public int EffectiveSpeed => Mathf.Max(1, Mathf.RoundToInt(BaseSpeed * (1f + SpeedModifier)));
+        /// <summary>Boss 当前阶段给的速度倍率，中性值 1。见 <see cref="BossAttackMultiplier"/>。</summary>
+        public float BossSpeedMultiplier => _bossSpeedMultiplier;
+
+        public int EffectiveAttack =>
+            Mathf.Max(0, Mathf.RoundToInt(BaseAttack * (1f + AttackModifier) * _bossAttackMultiplier));
+
+        public int EffectiveDefense =>
+            Mathf.Max(0, Mathf.RoundToInt(BaseDefense * (1f + DefenseModifier) * _bossDefenseMultiplier));
+
+        public int EffectiveSpeed =>
+            Mathf.Max(1, Mathf.RoundToInt(BaseSpeed * (1f + SpeedModifier) * _bossSpeedMultiplier));
 
         /// <summary>是否被「剥夺行动」的状态控住（眩晕）。</summary>
         public bool IsActionPrevented
@@ -225,6 +247,33 @@ namespace SamsaraWest.Battle
         /// （见 Docs/战斗内核-v1.md 第 4 节「不挑残血」一条）。
         /// </remarks>
         public float HealthRatio => MaxHealth <= 0 ? 0f : (float)Health / MaxHealth;
+
+        /// <summary>
+        /// 整体替换技能清单（Boss 换阶段时用，见 ADR-030）。
+        /// </summary>
+        /// <remarks>
+        /// <para><b>为什么不逐条增删</b>：阶段表的 <c>skillIds</c> 写的是「这一档会哪几手」的<b>全集</b>，
+        /// 不是补丁。逐条增删会留下上一档的招，而「最后一档只剩压箱底那一手」正是剧本要的效果。</para>
+        /// <para><b>在冷却的技能不受影响</b>：冷却跟着技能 ID 走、不跟着阶段走。换组之后
+        /// 「这招还在冷却」照旧成立——否则每次换档都等于白送一次大招。</para>
+        /// <para>只由 <c>BattleSession</c> 在阶段机里调用：技能清单是「进场快照」的一部分，
+        /// 战斗之外改它没有任何东西会重新读一遍。</para>
+        /// </remarks>
+        internal void ReplaceSkills(string[] skillIds)
+        {
+            _skillIds = skillIds ?? Array.Empty<string>();
+        }
+
+        /// <summary>
+        /// 写入当前阶段的三个倍率（ADR-030）。取<b>绝对替换</b>而不是累乘：阶段表写的就是那一档的最终倍率。
+        /// </summary>
+        internal void SetBossPhaseMultipliers(float attack, float defense, float speed)
+        {
+            // 数据表校验要求倍率为正；这里再兜一道，免得一条坏数据把有效属性算成 0 或负数。
+            _bossAttackMultiplier = attack > 0f ? attack : 1f;
+            _bossDefenseMultiplier = defense > 0f ? defense : 1f;
+            _bossSpeedMultiplier = speed > 0f ? speed : 1f;
+        }
 
         public bool HasSkill(string skillId) =>
             !string.IsNullOrEmpty(skillId) && Array.IndexOf(_skillIds, skillId) >= 0;

@@ -233,6 +233,57 @@ namespace SamsaraWest.Tests.EditMode
         }
 
         /// <summary>
+        /// 造一档 Boss 阶段。
+        /// </summary>
+        /// <remarks>
+        /// <para>默认值刻意都取中性：阈值 1（开场即命中）、三个倍率全 1、不带入场状态与演出键。
+        /// 于是「阶段机本身」的用例只管改它要验的那一处，别的形状不会来干扰断言。</para>
+        /// <para><paramref name="encounterId"/> 是必填的：阶段表要按遭遇对齐，测试里漏填会立刻
+        /// 在阶段机的「不属于本次遭遇」那道闸上被跳过，报错却看不出是建场漏了字段。</para>
+        /// </remarks>
+        internal BossPhaseDefinition BossPhase(
+            string id,
+            string encounterId,
+            int phaseIndex = 1,
+            float healthThreshold = 1f,
+            string[] skillIds = null,
+            string[] onEnterStatusIds = null,
+            float attackMultiplier = 1f,
+            float defenseMultiplier = 1f,
+            float speedMultiplier = 1f,
+            string tauntKey = null,
+            string bgmSwitchKey = null,
+            string cameraCueKey = null)
+        {
+            var phase = New<BossPhaseDefinition>(id, "bsp");
+            Set(phase, "_phaseIndex", phaseIndex);
+            Set(phase, "_encounterId", encounterId);
+            Set(phase, "_healthThreshold", healthThreshold);
+            Set(phase, "_skillIds", skillIds ?? Array.Empty<string>());
+            Set(phase, "_onEnterStatusIds", onEnterStatusIds ?? Array.Empty<string>());
+            Set(phase, "_attackMultiplier", attackMultiplier);
+            Set(phase, "_defenseMultiplier", defenseMultiplier);
+            Set(phase, "_speedMultiplier", speedMultiplier);
+            Set(phase, "_tauntKey", tauntKey);
+            Set(phase, "_bgmSwitchKey", bgmSwitchKey);
+            Set(phase, "_cameraCueKey", cameraCueKey);
+            return phase;
+        }
+
+        /// <summary>
+        /// 给遭遇标上 Boss 并挂一组阶段表。
+        /// </summary>
+        /// <remarks>
+        /// 另开一个方法而不是往 <see cref="Encounter"/> 上加可选参数，理由与 <see cref="SetLoot"/> 相同：
+        /// 那个方法的末尾是 <c>params string[] enemyIds</c>，可选参数压不进它后面。
+        /// </remarks>
+        internal static void SetBoss(EncounterDefinition encounter, params string[] bossPhaseIds)
+        {
+            SetPrivate(encounter, "_isBoss", true);
+            SetPrivate(encounter, "_bossPhaseIds", bossPhaseIds ?? Array.Empty<string>());
+        }
+
+        /// <summary>
         /// 造一张掉落表。
         /// </summary>
         /// <remarks>

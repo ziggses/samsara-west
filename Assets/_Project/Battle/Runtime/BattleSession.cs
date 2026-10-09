@@ -46,6 +46,12 @@ namespace SamsaraWest.Battle
         private readonly Dictionary<int, BattlePlan> _plans = new Dictionary<int, BattlePlan>(12);
         private readonly ActionQueue _queue;
 
+        /// <summary>带阶段表的 Boss 进度（ADR-030）。这一战没有阶段表时它是空的，判定一路直接返回。</summary>
+        private readonly List<BossPhaseTrack> _bossPhases = new List<BossPhaseTrack>(1);
+
+        /// <summary>开场查表用的暂存区，避免每次开战都新建一个 List。</summary>
+        private readonly List<BossPhaseDefinition> _bossPhaseScratch = new List<BossPhaseDefinition>(4);
+
         private bool _mainActionUsed;
         private bool _moveUsed;
         private bool _plansDirty = true;
@@ -96,6 +102,11 @@ namespace SamsaraWest.Battle
                 _setup.EncounterId);
 
             Publish(new BattleStartedEvent(_setup.EncounterId, _players.Count, _enemies.Count, _setup.IsBoss));
+
+            // 阶段机在开场事件之后启动。开局这一次判定照常走流程：第一档的阈值是 1.0，
+            // 于是它此刻必然命中——「开场技能组」与「换档技能组」因此是同一条路，没有特例。
+            InitializeBossPhases();
+            UpdateBossPhases();
         }
 
         /// <summary>这场战斗的数值配置。</summary>
@@ -1117,6 +1128,10 @@ namespace SamsaraWest.Battle
                 ApplySkillToTarget(result, actor, skill, targets[i]);
             }
 
+            // 换档判定放在「一整手结算完」之后，而不是每一段伤害之后：一次行动是原子单位，
+            // 该问的是「这一手打完打到哪了」，而不是在一手的多段之间反复横跳。
+            UpdateBossPhases();
+
             _plansDirty = true;
             ResolveOutcome();
             return result;
@@ -1351,6 +1366,10 @@ namespace SamsaraWest.Battle
                 Publish(new BattleUnitDiedEvent(actor.RuntimeId, actor.Side, null));
             }
 
+            // Boss 被持续伤害或自己的苦修跌破阈值时，同样在这一处换档：
+            // 「任何一次生命变化之后都重新问一遍」，才不至于漏掉死在自己身上的那一路。
+            UpdateBossPhases();
+
             actor.TurnsTaken++;
             _queue.Advance(actor);
             Publish(new BattleTurnEndedEvent(actor.RuntimeId, actor.Side, actor.ActionValue));
@@ -1521,6 +1540,198 @@ namespace SamsaraWest.Battle
             }
 
             _plansDirty = false;
+        }
+
+        // ── Boss 阶段机（口径见 ADR-030） ──────────────────────────────────────
+
+        /// <summary>
+        /// 按入场清单里的 <see cref="BattleSetup.BossPhaseIds"/> 查表、排序，挂到敌方每一个 Boss 单位上。
+        /// </summary>
+        /// <remarks>
+        /// <para>查不到定义、类型不对、或阶段属于另一场遭遇，都只记一条日志并跳过那一条——与在身装备、
+        /// 被动同一条口径：不让一处数据错误变成打不开的战斗。整张表都坏掉时，这一战退化成「Boss 只有单一形态」。</para>
+        /// <para>排序按阈值<b>从高到低</b>，这个顺序是 <see cref="BossPhaseTrack"/> 判定的前提：
+        /// 它靠「跌破就前进、没跌破就停」一次走完，顺序错了就会在第一档上停死。</para>
+        /// </remarks>
+        private void InitializeBossPhases()
+        {
+            var phaseIds = _setup.BossPhaseIds;
+            if (phaseIds == null || phaseIds.Count == 0)
+            {
+                return;
+            }
+
+            _bossPhaseScratch.Clear();
+            for (var i = 0; i < phaseIds.Count; i++)
+            {
+                var phaseId = phaseIds[i];
+                if (string.IsNullOrWhiteSpace(phaseId))
+                {
+                    continue;
+                }
+
+                if (!_registry.TryGet(phaseId, out var mounted) || mounted == null)
+                {
+                    GameLog.Warn(
+                        LogChannel.Battle,
+                        $"遭遇 {_setup.EncounterId ?? "(手工构造)"} 的阶段 '{phaseId}' 在数据表里找不到，已跳过。",
+                        phaseId);
+                    continue;
+                }
+
+                if (!(mounted is BossPhaseDefinition phase))
+                {
+                    GameLog.Warn(
+                        LogChannel.Battle,
+                        $"'{phaseId}' 是 {mounted.Kind}，阶段栏只接受 Boss 阶段，已跳过。",
+                        phaseId);
+                    continue;
+                }
+
+                if (!string.IsNullOrEmpty(_setup.EncounterId) &&
+                    !string.Equals(phase.EncounterId, _setup.EncounterId, StringComparison.Ordinal))
+                {
+                    GameLog.Warn(
+                        LogChannel.Battle,
+                        $"阶段 '{phaseId}' 属于遭遇 {phase.EncounterId}，与本次 {_setup.EncounterId} 不一致，已跳过。",
+                        phaseId);
+                    continue;
+                }
+
+                _bossPhaseScratch.Add(phase);
+            }
+
+            if (_bossPhaseScratch.Count == 0)
+            {
+                return;
+            }
+
+            _bossPhaseScratch.Sort(ComparePhaseByThresholdDescending);
+
+            // 一份排好序的表发给所有 Boss 单位。本作每场只有一个 Boss；真有多个也是自洽的——
+            // 同一场共用同一个剧本，一起换档。
+            var phases = new List<BossPhaseDefinition>(_bossPhaseScratch);
+
+            var bossCount = 0;
+            for (var i = 0; i < _enemies.Count; i++)
+            {
+                if (!_enemies[i].IsBoss)
+                {
+                    continue;
+                }
+
+                _bossPhases.Add(new BossPhaseTrack(_enemies[i], phases));
+                bossCount++;
+            }
+
+            if (bossCount == 0)
+            {
+                GameLog.Warn(
+                    LogChannel.Battle,
+                    $"遭遇 {_setup.EncounterId ?? "(手工构造)"} 配了 {phases.Count} 档阶段，" +
+                    "但敌方没有标记为 Boss 的单位，阶段表不会生效。",
+                    _setup.EncounterId);
+            }
+        }
+
+        private static int ComparePhaseByThresholdDescending(BossPhaseDefinition a, BossPhaseDefinition b)
+        {
+            var byThreshold = b.HealthThreshold.CompareTo(a.HealthThreshold);
+
+            // 阈值相同时按档位序号升序。List.Sort 不稳定，不显式兜住的话同阈值两档的先后就成了实现细节；
+            // 同阈值意味着「这一下会连进两档」，那至少得是确定的顺序。
+            return byThreshold != 0 ? byThreshold : a.PhaseIndex.CompareTo(b.PhaseIndex);
+        }
+
+        /// <summary>
+        /// 逐个 Boss 问一遍「该不该进下一档」，进了就把这一档的一切落实下去。
+        /// </summary>
+        /// <remarks>
+        /// 用 while 而不是 if：一次重击可以连跨两档，两档的入场状态与两次演出都要发生，
+        /// 不能静悄悄跳到最后一档。
+        /// </remarks>
+        private void UpdateBossPhases()
+        {
+            for (var i = 0; i < _bossPhases.Count; i++)
+            {
+                var track = _bossPhases[i];
+                while (track.TryEnterNextPhase())
+                {
+                    EnterBossPhase(track);
+                }
+            }
+        }
+
+        /// <summary>落实一档：换技能组、写倍率、挂入场状态、标脏意图，最后发一条换档事件。</summary>
+        /// <remarks>
+        /// 事件放在<b>最后</b>：它是「这一档已经落实完毕」的信号。订阅方接到它时，技能组、倍率、
+        /// 入场状态都已就位，重绘一次就够，不必自己去猜还有没有后续。
+        /// </remarks>
+        private void EnterBossPhase(BossPhaseTrack track)
+        {
+            var unit = track.Unit;
+            var phase = track.CurrentPhase;
+
+            unit.ReplaceSkills(phase.SkillIds);
+            unit.SetBossPhaseMultipliers(phase.AttackMultiplier, phase.DefenseMultiplier, phase.SpeedMultiplier);
+
+            // 手里换了一副牌，界面上的预告不能还是上一档那一手。
+            _plansDirty = true;
+
+            var statusIds = phase.OnEnterStatusIds;
+            for (var i = 0; i < statusIds.Length; i++)
+            {
+                ApplyBossPhaseStatus(unit, phase, statusIds[i]);
+            }
+
+            Publish(new BattleBossPhaseChangedEvent(
+                unit.RuntimeId,
+                unit.Side,
+                _setup.EncounterId,
+                phase.PhaseIndex,
+                phase.Id,
+                unit.HealthRatio,
+                phase.TauntKey,
+                phase.BgmSwitchKey,
+                phase.CameraCueKey));
+
+            GameLog.Info(
+                LogChannel.Battle,
+                $"#{unit.RuntimeId} {unit.DefinitionId} 进入第 {phase.PhaseIndex} 档 {phase.Id}" +
+                $"（生命 {unit.HealthRatio:P0}）：技能组 [{string.Join(";", phase.SkillIds)}]，" +
+                $"倍率 攻×{phase.AttackMultiplier} 防×{phase.DefenseMultiplier} 速×{phase.SpeedMultiplier}。",
+                phase.Id);
+        }
+
+        /// <summary>
+        /// 给刚进这一档的 Boss 挂上一条入场状态。查不到定义、或它不是状态，都只跳过这一条并记日志。
+        /// </summary>
+        private void ApplyBossPhaseStatus(BattleUnit unit, BossPhaseDefinition phase, string statusId)
+        {
+            if (string.IsNullOrWhiteSpace(statusId))
+            {
+                return;
+            }
+
+            if (!_registry.TryGet(statusId, out var mounted) ||
+                mounted == null ||
+                !(mounted is StatusDefinition status))
+            {
+                GameLog.Warn(
+                    LogChannel.Battle,
+                    $"Boss 阶段 {phase.Id} 的入场状态 '{statusId}' 在数据表里找不到或不是状态，已跳过。",
+                    phase.Id);
+                return;
+            }
+
+            var change = unit.ApplyStatus(status);
+            var applied = unit.FindStatus(status.Id);
+            Publish(new BattleStatusAppliedEvent(
+                unit.RuntimeId,
+                status.Id,
+                change,
+                applied?.Stacks ?? 1,
+                applied?.RemainingTurns ?? status.DurationTurns));
         }
 
         private void Publish<T>(T gameEvent) where T : IGameEvent =>

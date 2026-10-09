@@ -42,7 +42,8 @@ namespace SamsaraWest.Battle
             string backgroundKey = null,
             string bgmKey = null,
             IBattleInventory inventory = null,
-            IBattleLoadout loadout = null)
+            IBattleLoadout loadout = null,
+            IReadOnlyList<string> bossPhaseIds = null)
         {
             EncounterId = encounterId;
             Party = party ?? Array.Empty<BattleUnitBlueprint>();
@@ -52,6 +53,7 @@ namespace SamsaraWest.Battle
             BgmKey = bgmKey;
             Inventory = inventory;
             Loadout = loadout;
+            BossPhaseIds = bossPhaseIds ?? Array.Empty<string>();
         }
 
         /// <summary>遭遇 ID，来自 <c>ENC_CH01_001</c> 这类既有约定。手工构造时可以为空。</summary>
@@ -88,6 +90,17 @@ namespace SamsaraWest.Battle
         /// （口径见 <see cref="CharacterStatsResolver"/>），之后换装不会回头改动进行中的战斗。
         /// </remarks>
         public IBattleLoadout Loadout { get; }
+
+        /// <summary>
+        /// 这一战按哪几档来打（<c>bossphases.csv</c> 的 ID）。空表示「这场没有阶段机」——
+        /// 敌方就算标了 <c>isBoss</c>，也只是一场普通敌袭，见 ADR-030。
+        /// </summary>
+        /// <remarks>
+        /// 与 <see cref="Party"/>／<see cref="Enemies"/> 同一条口径：<see cref="BattleSession"/> 只认这份清单，
+        /// 不认 <see cref="EncounterDefinition"/>。因此测试里可以手工拼一档出来，
+        /// 不必先造遭遇资产与四张阶段资产。
+        /// </remarks>
+        public IReadOnlyList<string> BossPhaseIds { get; }
 
         /// <summary>
         /// 入场清单自检。不合法时返回 false 并把原因写进 <paramref name="error"/>，
@@ -228,7 +241,8 @@ namespace SamsaraWest.Battle
                 encounter.BackgroundKey,
                 encounter.BgmKey,
                 inventory,
-                loadout);
+                loadout,
+                encounter.BossPhaseIds);
         }
 
         /// <summary>
