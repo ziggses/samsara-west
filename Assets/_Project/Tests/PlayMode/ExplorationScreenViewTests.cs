@@ -492,6 +492,102 @@ namespace SamsaraWest.Tests.PlayMode
             Assert.AreEqual(1, GameBootstrap.Instance.MapChange.MapChanges);
         }
 
+        [UnityTest]
+        public IEnumerator Screen_TheBanquetGateLeadsIntoTheBanquetGround()
+        {
+            yield return LoadBootstrapScene();
+
+            var screen = ExplorationScreenView.Instance;
+            screen.Tick();
+
+            // 桃林北缘的宴场门在 (52,47)：站到 (52,46) 朝北，正前方就是它。
+            Assert.IsTrue(screen.EnterDiagnosticMap("CH01_MAP02", new GridPosition(52, 46), MoveDirection.North));
+
+            var localization = GameServices.Registry.Resolve<ILocalizationService>();
+            StringAssert.Contains(
+                localization.Get(LocalizationKeys.INT_CH01_016_NAME),
+                screen.FacingLine,
+                "面朝的那一格是宴场门，就该报出它的名字。");
+
+            Assert.IsTrue(screen.Interact(), "门是可以交互的。");
+
+            var session = screen.Session;
+            Assert.IsNotNull(session, "换图不是离图：走完门必须还在某张图上。");
+            Assert.AreEqual("CH01_MAP03", session.MapId, "走了宴场门就必须真的换到宴场那张图。");
+            Assert.AreEqual(90, session.Grid.Width, "换图之后网格得重建，宴场尺寸来自 maps.csv。");
+            Assert.AreEqual(70, session.Grid.Height);
+            Assert.IsTrue(session.Grid.IsWalkable(session.Position), "落点必须是能站的格子。");
+
+            // 两张图的门嵌在同一个坐标上：锚点 (52,47) 本身就是可行走格，落点就在原地；
+            // 进门一律面朝南，正前方正好是摆在 (52,46) 的回程门。
+            // 这是桃林那两扇门定下的口径——落点要在对面那扇门跟前，而不是被丢到图另一头。
+            Assert.AreEqual(new GridPosition(52, 47), session.Position);
+            Assert.AreEqual(new GridPosition(52, 46), session.FacingPosition, "落点应当就在回程门跟前。");
+
+            var gateBack = session.Grid.InteractableAt(session.FacingPosition);
+            Assert.IsNotNull(gateBack, "回程门应当就在落点正前方。");
+            Assert.AreEqual("INT_CH01_017_BANQUET_EXIT", gateBack.Id);
+            StringAssert.Contains("CH01_MAP03", screen.StatusLine, "状态行得跟着报出新图。");
+            Assert.AreEqual(0, localization.MissingKeys.Count, "新加的门与提示文案必须都在文本表里。");
+        }
+
+        [UnityTest]
+        public IEnumerator Screen_TheBanquetExitLeadsBackIntoThePeachGrove()
+        {
+            yield return LoadBootstrapScene();
+
+            var screen = ExplorationScreenView.Instance;
+            screen.Tick();
+
+            // 反过来走一遍：宴场 (52,45) 朝北，正前方是 (52,46) 的回程门。
+            Assert.IsTrue(screen.EnterDiagnosticMap("CH01_MAP03", new GridPosition(52, 45), MoveDirection.North));
+            Assert.IsTrue(screen.Interact());
+
+            var session = screen.Session;
+            Assert.AreEqual("CH01_MAP02", session.MapId, "门是双向的：两张图的 connections 互相指着对方。");
+            Assert.AreEqual(
+                new GridPosition(52, 46),
+                session.Position,
+                "回程门在 (52,46)，桃林 70x50 装得下这个坐标，落点就是它自己，不必搜索。");
+            Assert.AreEqual(1, GameBootstrap.Instance.MapChange.MapChanges);
+        }
+
+        [UnityTest]
+        public IEnumerator Screen_TheBanquetGroundCarriesAllEightStations()
+        {
+            yield return LoadBootstrapScene();
+
+            var screen = ExplorationScreenView.Instance;
+            screen.Tick();
+            Assert.IsTrue(screen.EnterDiagnosticMap("CH01_MAP03", new GridPosition(52, 47), MoveDirection.North));
+
+            var grid = screen.Session.Grid;
+
+            // 剧本给了宴场八个节点（入口、厨房、主桌、鼓楼、祠堂、宿舍、白眉、子时舞台），
+            // 这里按 ID 逐个点名，而不是数总数：将来往宴场上加一件装饰，
+            // 这条用例就不该跟着变红——它守的是「八个节点一个不落」，不是「图上正好有八件东西」。
+            var stations = new (string Id, int X, int Y)[]
+            {
+                ("INT_CH01_017_BANQUET_EXIT", 52, 46),
+                ("INT_CH01_018_KITCHEN", 22, 50),
+                ("INT_CH01_019_MAIN_TABLE", 48, 58),
+                ("INT_CH01_020_DRUM_TOWER", 76, 44),
+                ("INT_CH01_021_SHRINE", 26, 64),
+                ("INT_CH01_022_MONKEY_DORM", 16, 26),
+                ("INT_CH01_023_BAI_MEI", 68, 20),
+                ("INT_CH01_024_MIDNIGHT_STAGE", 48, 66),
+            };
+
+            foreach (var station in stations)
+            {
+                var found = grid.InteractableAt(new GridPosition(station.X, station.Y));
+                Assert.IsNotNull(
+                    found,
+                    $"宴场缺了 {station.Id}：剧本那八个节点要一个不落地画在图上，落位也不能漂。");
+                Assert.AreEqual(station.Id, found.Id);
+            }
+        }
+
         private static IEnumerator LoadBootstrapScene()
         {
             SceneManager.LoadScene(BootstrapSceneName, LoadSceneMode.Single);

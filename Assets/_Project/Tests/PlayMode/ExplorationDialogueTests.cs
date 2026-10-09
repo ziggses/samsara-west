@@ -300,6 +300,106 @@ namespace SamsaraWest.Tests.PlayMode
             yield return null;
         }
 
+        [UnityTest]
+        public IEnumerator MeetingBaiMei_RecordsTheOneWhoRemembersEveryNight()
+        {
+            var screen = EnterBanquet(new GridPosition(68, 19));
+
+            var missingBefore = _localization.MissingKeys.Count;
+            Assert.IsTrue(screen.Interact(), "前置条件：白眉就在面朝的那一格。");
+
+            Assert.IsTrue(screen.IsDialogueActive);
+            Assert.AreEqual(_localization.Get(LocalizationKeys.DLG_CH01_022_LINE_1), screen.DialogueLine);
+            Assert.AreEqual(_localization.Get(LocalizationKeys.DLG_CH01_022_LINE_1_WHO), screen.DialogueSpeaker);
+            Assert.AreEqual(
+                _localization.Format(
+                    LocalizationKeys.UI_DIALOGUE_STATUS,
+                    _localization.Get(LocalizationKeys.DLG_CH01_022_NAME),
+                    1,
+                    9),
+                screen.DialogueStatusLine,
+                "状态行要说清「这是哪一段、读到第几行」——9 这个行数得真的来自剧本里那条节点。");
+
+            Assert.AreEqual(
+                9,
+                AdvanceToTheEnd(screen),
+                "白眉那段一次念完九行：他记得每一夜，所以不敢告诉别人。");
+            Assert.AreEqual(
+                1,
+                _story.GetValue("flag.ch01.bai_mei_met"),
+                "搭过话，故事就记住「见过白眉」——MAP04 的守门猴要拿它当进入条件。");
+            Assert.AreEqual(
+                0,
+                _story.GetKarma(KarmaAxis.Truth),
+                "白眉还没把真相交出去，这一趟不该记心念。");
+            Assert.AreEqual(
+                missingBefore,
+                _localization.MissingKeys.Count,
+                "白眉那九行连说话人，必须一行不落地命中文本表。");
+            yield return null;
+        }
+
+        [UnityTest]
+        public IEnumerator TheBanquetStations_EachRememberTheirOwnVisit()
+        {
+            // 主线「谁在摆宴」要求查三处：主桌、祠堂、鼓楼。它们是并列的——
+            // 先查哪一处都不该影响另外两处，所以这里逐处各走一遍，看它们各写各的旗标。
+            var screen = EnterBanquet(new GridPosition(48, 57));
+            Assert.IsTrue(screen.Interact(), "前置条件：主桌就在面朝的那一格。");
+            Assert.AreEqual(3, AdvanceToTheEnd(screen), "主桌那一段三行：一只空碗，碗底刻着「等大王回来再吃」。");
+            Assert.AreEqual(1, _story.GetValue("flag.ch01.main_table_seen"));
+
+            screen = EnterBanquet(new GridPosition(26, 63));
+            Assert.IsTrue(screen.Interact(), "前置条件：祠堂就在面朝的那一格。");
+            Assert.AreEqual(4, AdvanceToTheEnd(screen), "祠堂那一段四行：三块牌位，没有名字的那块香火最旺。");
+            Assert.AreEqual(1, _story.GetValue("flag.ch01.shrine_seen"));
+
+            screen = EnterBanquet(new GridPosition(76, 43));
+            Assert.IsTrue(screen.Interact(), "前置条件：鼓楼就在面朝的那一格。");
+            Assert.AreEqual(6, AdvanceToTheEnd(screen), "鼓楼那一段六行：鼓手抬了一千多次胳膊，同一段节奏，不敢停。");
+            Assert.AreEqual(1, _story.GetValue("flag.ch01.drum_seen"));
+
+            // 三处查完，旗标互不覆盖（上面每条都还在，没有被后来的冲掉）；
+            // 厨房与宿舍是顺路的旁证，子时舞台是那一夜的落点，也各记一笔。
+            Assert.AreEqual(1, _story.GetValue("flag.ch01.main_table_seen"), "查过祠堂不该把主桌那一笔抹掉。");
+
+            screen = EnterBanquet(new GridPosition(22, 49));
+            Assert.IsTrue(screen.Interact(), "前置条件：厨房就在面朝的那一格。");
+            Assert.AreEqual(
+                _localization.Get(LocalizationKeys.UI_DIALOGUE_NARRATOR),
+                screen.DialogueSpeaker,
+                "厨房那一段第一行是旁白，表里没有登记 .who——该画「旁白」，而不是那个键的占位符。");
+            Assert.AreEqual(3, AdvanceToTheEnd(screen));
+            Assert.AreEqual(1, _story.GetValue("flag.ch01.kitchen_seen"));
+
+            screen = EnterBanquet(new GridPosition(16, 25));
+            Assert.IsTrue(screen.Interact(), "前置条件：猴子宿舍就在面朝的那一格。");
+            Assert.AreEqual(3, AdvanceToTheEnd(screen));
+            Assert.AreEqual(1, _story.GetValue("flag.ch01.dorm_seen"));
+
+            screen = EnterBanquet(new GridPosition(48, 65));
+            Assert.IsTrue(screen.Interact(), "前置条件：子时舞台就在面朝的那一格。");
+            Assert.AreEqual(4, AdvanceToTheEnd(screen), "子时舞台那一段四行：子时还没到，可桌上的食物已经在动。");
+            Assert.AreEqual(1, _story.GetValue("flag.ch01.midnight_stage_seen"));
+
+            Assert.AreEqual(0, _localization.MissingKeys.Count, "宴场八段新对白必须全部命中文本表。");
+            yield return null;
+        }
+
+        private static ExplorationScreenView EnterBanquet(GridPosition approach)
+        {
+            var screen = ExplorationScreenView.Instance;
+            screen.Tick();
+
+            // 同一个入口不允许抢会话：先离图，再按坐标进宴场。
+            screen.LeaveMap();
+
+            Assert.IsTrue(
+                screen.EnterDiagnosticMap("CH01_MAP03", approach, MoveDirection.North),
+                "前置条件：进得了宴场那张图。");
+            return screen;
+        }
+
         private static ExplorationScreenView EnterPeachGrove(GridPosition approach)
         {
             var screen = ExplorationScreenView.Instance;

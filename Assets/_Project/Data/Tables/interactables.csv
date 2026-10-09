@@ -15,3 +15,12 @@ INT_CH01_012_PEACH_TREE_SIGN_THREE,int.ch01.012.name,int.ch01.012.desc,ch01;prop
 INT_CH01_013_OLD_STONE_TABLE,int.ch01.013.name,int.ch01.013.desc,ch01;prop,1,CH01_MAP02,44,22,interact.examine,DLG_CH01_014,,Equal,0,false,false,ui.prompt.examine,sprite.int.stone_table
 INT_CH01_014_BROKEN_BRIDGE_VINE,int.ch01.014.name,int.ch01.014.desc,ch01;prop,1,CH01_MAP02,35,30,interact.examine,DLG_CH01_015,,Equal,0,false,false,ui.prompt.examine,sprite.int.vine
 INT_CH01_015_TOMB_ENTRANCE,int.ch01.015.name,int.ch01.015.desc,ch01;secret,1,CH01_MAP02,26,38,interact.examine,DLG_CH01_016,flag.ch01.broken_bridge_seen,Equal,1,false,true,ui.prompt.examine,sprite.int.tomb_gate
+INT_CH01_016_BANQUET_GATE,int.ch01.016.name,int.ch01.016.desc,ch01;door,1,CH01_MAP02,52,47,interact.door,CH01_MAP03,,Equal,0,false,false,ui.prompt.enter,sprite.int.gate
+INT_CH01_017_BANQUET_EXIT,int.ch01.017.name,int.ch01.017.desc,ch01;door,1,CH01_MAP03,52,46,interact.door,CH01_MAP02,,Equal,0,false,false,ui.prompt.enter,sprite.int.gate
+INT_CH01_018_KITCHEN,int.ch01.018.name,int.ch01.018.desc,ch01;prop,1,CH01_MAP03,22,50,interact.examine,DLG_CH01_017,,Equal,0,false,false,ui.prompt.examine,sprite.int.kitchen
+INT_CH01_019_MAIN_TABLE,int.ch01.019.name,int.ch01.019.desc,ch01;prop,1,CH01_MAP03,48,58,interact.examine,DLG_CH01_018,,Equal,0,false,false,ui.prompt.examine,sprite.int.banquet_table
+INT_CH01_020_DRUM_TOWER,int.ch01.020.name,int.ch01.020.desc,ch01;prop,1,CH01_MAP03,76,44,interact.examine,DLG_CH01_019,,Equal,0,false,false,ui.prompt.examine,sprite.int.drum_tower
+INT_CH01_021_SHRINE,int.ch01.021.name,int.ch01.021.desc,ch01;prop,1,CH01_MAP03,26,64,interact.examine,DLG_CH01_020,,Equal,0,false,false,ui.prompt.examine,sprite.int.shrine
+INT_CH01_022_MONKEY_DORM,int.ch01.022.name,int.ch01.022.desc,ch01;prop,1,CH01_MAP03,16,26,interact.examine,DLG_CH01_021,,Equal,0,false,false,ui.prompt.examine,sprite.int.dorm
+INT_CH01_023_BAI_MEI,int.ch01.023.name,int.ch01.023.desc,ch01;npc,1,CH01_MAP03,68,20,interact.dialogue,DLG_CH01_022,,Equal,0,false,false,ui.prompt.talk,sprite.int.bai_mei
+INT_CH01_024_MIDNIGHT_STAGE,int.ch01.024.name,int.ch01.024.desc,ch01;prop,1,CH01_MAP03,48,66,interact.examine,DLG_CH01_023,,Equal,0,false,false,ui.prompt.examine,sprite.int.banquet_stage

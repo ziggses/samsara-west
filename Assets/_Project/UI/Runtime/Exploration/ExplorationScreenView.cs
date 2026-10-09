@@ -314,7 +314,11 @@ namespace SamsaraWest.UI
                 _dialogue.LineNumber,
                 _dialogue.LineCount);
 
-            var speaker = Get(_dialogue.SpeakerKey);
+            // 旁白行在文本表里压根没有 .who 这一条，所以得先问「表里有没有这个键」，再取词。
+            // 直接取词会拿到缺失键的占位符 [[dlg...line.n.who]]——它非空，于是「没有登记说话人就画旁白」
+            // 那一路永远走不到，面板上会顶着一串键名，运行时缺失键清单也被旁白行灌满。
+            var speakerKey = _dialogue.SpeakerKey;
+            var speaker = _localization != null && _localization.HasKey(speakerKey) ? Get(speakerKey) : null;
             _dialogueSpeakerLine = string.IsNullOrEmpty(speaker)
                 ? Get(ExplorationTextKeys.DialogueNarrator)
                 : speaker;
